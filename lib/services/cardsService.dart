@@ -1,27 +1,15 @@
 import 'dart:math';
 
-class Card {
-  int id;
-  String digimonName;
-  String color;
-  int attackPoints;
-  int hp;
-  int evolutionId;
-  int energyCount;
+import 'package:net_monstrum_card_game/domain/color.dart';
 
-  Card(this.id, this.digimonName, this.color, this.attackPoints, this.hp, this.evolutionId, this.energyCount);
-
-  String getDigimonImageFilename() {
-    return '$digimonName.jpg';
-  }
-}
+import '../domain/card.dart';
 
 class CardsService {
   List<Card> deck = [];
   List<String> digimonNames = [
-    'Agumon', 'Greymon', 'MetalGreymon', 'WarGreymon',
+    'Agumon', 'Greymon', 'MetalGreymon (Vaccine)', 'WarGreymon',
     'Gabumon', 'Garurumon', 'WereGarurumon', 'MetalGarurumon',
-    'Veemon', 'ExVeemon', 'Paildramon', 'Imperialdramon',
+    'Veemon', 'ExVeemon', 'Paildramon', 'Imperialdramon Fighter Mode',
     'Patamon', 'Angemon', 'MagnaAngemon', 'Seraphimon',
     'Gatomon', 'Angewomon', 'Magnadramon', 'Ophanimon',
     'Biyomon', 'Birdramon', 'Garudamon', 'Phoenixmon',
@@ -31,12 +19,12 @@ class CardsService {
     'Elecmon', 'Leomon', 'IceLeomon', 'Saberdramon',
     'Renamon', 'Kyubimon', 'Taomon', 'Sakuyamon',
     'Terriermon', 'Gargomon', 'Rapidmon', 'MegaGargomon',
-    'Guilmon', 'Growlmon', 'WarGrowlmon', 'Dukemon',
+    'Guilmon', 'Growlmon', 'WarGrowlmon', 'Gallantmon',
     'Impmon', 'Wizardmon', 'Mistymon', 'Dynasmon',
     'Palmon', 'Togemon', 'Lillymon', 'Rosemon',
     'Biyomon', 'Birdramon', 'Garudamon', 'Phoenixmon',
-    'Kumamon', 'Grizzmon', 'Gigasmon', 'Hisyarumon',
-    'Agunimon', 'BurningGreymon', 'Aldamon', 'KaiserGreymon',
+    'Kumamon', 'Grizzlymon', 'Gigasmon', 'Hisyaryumon',
+    'Agunimon', 'BurningGreymon', 'Aldamon', 'EmperorGreymon',
     'Lobomon', 'KendoGarurumon', 'BeoWolfmon', 'Magnagarurumon',
   ];
 
@@ -64,11 +52,11 @@ class CardsService {
   }
 
   Card getCardById(int cardId) {
-    return deck.firstWhere((card) => card.id == cardId, orElse: () => null);
+    return deck.firstWhere((card) => card.id == cardId);
   }
 
   String getRandomColor() {
-    List<String> colors = ['Red', 'Blue', 'Green', 'Yellow', 'Black', 'Brown'];
+    List<String> colors = CardColor.getAllColors();
     return colors[Random().nextInt(colors.length)];
   }
 }

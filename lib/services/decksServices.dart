@@ -1,9 +1,4 @@
-class Deck {
-  int id;
-  List<int> cardsIds;
-
-  Deck(this.id, this.cardsIds);
-}
+import '../domain/deck.dart';
 
 class DeckService {
   List<Deck> _deckList = [];
@@ -16,6 +11,6 @@ class DeckService {
   }
 
   Deck getDeckById(int id) {
-    return _deckList.firstWhere((deck) => deck.id == id, orElse: () => null);
+    return _deckList.firstWhere((deck) => deck.id == id);
   }
 }

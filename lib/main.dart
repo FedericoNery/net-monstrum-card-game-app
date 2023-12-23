@@ -2,9 +2,13 @@ import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/domain/game.dart';
+import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 import 'package:net_monstrum_card_game/screens/background_battle.dart';
 import 'package:net_monstrum_card_game/screens/color_counter.dart';
+import 'package:net_monstrum_card_game/screens/counters_measures.dart';
 import 'package:net_monstrum_card_game/screens/digimon_card.dart';
+import 'package:net_monstrum_card_game/screens/texts_counters_player.dart';
 import 'package:net_monstrum_card_game/services/aggregationService.dart';
 
 void main() async {
@@ -16,10 +20,10 @@ void main() async {
   runApp(GameWidget(game: game));
 }
 
+
+
 class MyGame extends FlameGame with HasGameRef {
   MyGame();
-  final offsetX = 100;
-  final counterOffsetY = 370.0;
   final background = Background();
   ImageCardExample? card1;
   ImageCardExample? card2;
@@ -27,6 +31,7 @@ class MyGame extends FlameGame with HasGameRef {
   ImageCardExample? card4;
   ImageCardExample? card5;
   ImageCardExample? card6;
+
   final blueCounter = ColorCounter(Colors.blueAccent);
   final redCounter = ColorCounter(Colors.red);
   final brownCounter = ColorCounter(Colors.brown);
@@ -38,6 +43,12 @@ class MyGame extends FlameGame with HasGameRef {
   @override
   Future<void> onLoad() async {
     Aggregation player = service.getAggregatioByUserId(1);
+    Aggregation rival = service.getAggregatioByUserId(2);
+
+    Tamer playerTamer = new Tamer(player.decksAggregations[0].cards, player.user.username);
+    Tamer rivalTamer = new Tamer(rival.decksAggregations[0].cards, rival.user.username);
+    BattleCardGame game = new BattleCardGame(playerTamer, rivalTamer);
+
     card1 = ImageCardExample(player.decksAggregations[0].cards[0].digimonName, player.decksAggregations[0].cards[0].color);
     card2 = ImageCardExample(player.decksAggregations[0].cards[1].digimonName, player.decksAggregations[0].cards[1].color);
     card3 = ImageCardExample(player.decksAggregations[0].cards[2].digimonName, player.decksAggregations[0].cards[2].color);
@@ -45,53 +56,22 @@ class MyGame extends FlameGame with HasGameRef {
     card5 = ImageCardExample(player.decksAggregations[0].cards[4].digimonName, player.decksAggregations[0].cards[4].color);
     card6 = ImageCardExample(player.decksAggregations[0].cards[5].digimonName, player.decksAggregations[0].cards[5].color);
 
-    blueCounter.x = offsetX + 10;
-    blueCounter.y = counterOffsetY;
-    redCounter.x = offsetX + 100;
-    redCounter.y = counterOffsetY;
-    brownCounter.x = offsetX + 190;
-    brownCounter.y = counterOffsetY;
-    whiteCounter.x = offsetX + 280;
-    whiteCounter.y = counterOffsetY;
-    blackCounter.x = offsetX + 370;
-    blackCounter.y = counterOffsetY;
-    greenCounter.x = offsetX + 450;
-    greenCounter.y = counterOffsetY;
+    blueCounter.x = CountersMeasures.BLUE_X;
+    blueCounter.y = CountersMeasures.BLUE_Y;
+    redCounter.x = CountersMeasures.RED_X;
+    redCounter.y = CountersMeasures.RED_Y;
+    brownCounter.x = CountersMeasures.BROWN_X;
+    brownCounter.y = CountersMeasures.BROWN_Y;
+    whiteCounter.x = CountersMeasures.WHITE_X;
+    whiteCounter.y = CountersMeasures.WHITE_Y;
+    blackCounter.x = CountersMeasures.BLACK_X;
+    blackCounter.y = CountersMeasures.BLACK_Y;
+    greenCounter.x = CountersMeasures.GREEN_X;
+    greenCounter.y = CountersMeasures.GREEN_Y;
 
-    final offsetNumbersX = 25;
-    final offsetNumbersY = -4;
 
-    final numberBlueCounter = TextComponent(
-    text: '100',
-    size: Vector2.all(10.0),
-    position: Vector2(blueCounter.x + offsetNumbersX, blueCounter.y + offsetNumbersY),
-    );
-    final numberRedCounter = TextComponent(
-      text: '100',
-      size: Vector2.all(10.0),
-      position: Vector2(redCounter.x + offsetNumbersX, redCounter.y + offsetNumbersY),
-    );
-    final numberBrownCounter = TextComponent(
-      text: '100',
-      size: Vector2.all(10.0),
-      position: Vector2(brownCounter.x + offsetNumbersX, brownCounter.y + offsetNumbersY),
-    );
-    final numberWhiteCounter = TextComponent(
-      text: '100',
-      size: Vector2.all(10.0),
-      position: Vector2(whiteCounter.x + offsetNumbersX, whiteCounter.y + offsetNumbersY),
-    );
-    final numberBlackCounter = TextComponent(
-      text: '100',
-      size: Vector2.all(10.0),
-      position: Vector2(blackCounter.x + offsetNumbersX, blackCounter.y + offsetNumbersY),
-    );
-    final numberGreenCounter = TextComponent(
-      text: '100',
-      size: Vector2.all(10.0),
-      position: Vector2(greenCounter.x + offsetNumbersX, greenCounter.y + offsetNumbersY),
-    );
-
+    List<TextComponent> textsCounters = TextsCounters.getComponents(game.player.energiesCounters);
+    const offsetX = 100;
     card1?.x = offsetX + 10;
     card1?.y = 300;
     card2?.x = offsetX + 100;
@@ -118,12 +98,10 @@ class MyGame extends FlameGame with HasGameRef {
     add(whiteCounter);
     add(blackCounter);
     add(greenCounter);
-    add(numberBlueCounter);
-    add(numberRedCounter);
-    add(numberBrownCounter);
-    add(numberWhiteCounter);
-    add(numberBlackCounter);
-    add(numberGreenCounter);
+
+    for (var textCounterComponent in textsCounters) {
+      add(textCounterComponent);
+    }
   }
 
   @override

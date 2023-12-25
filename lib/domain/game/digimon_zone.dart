@@ -12,4 +12,21 @@ class DigimonZone {
   void removeFromDigimonZone(int index) {
     cards.removeAt(index);
   }
+
+  int getAttackPoints(){
+    return 0;
+  }
+
+  int getHealthPoints(){
+    return 0;
+  }
+
+  int getAttackPointsOfEvolutions(){
+    return 0;
+  }
+
+  int getHealthPointsOfEvolutions(){
+    return 0;
+  }
+
 }

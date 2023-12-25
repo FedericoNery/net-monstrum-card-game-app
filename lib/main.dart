@@ -10,6 +10,7 @@ import 'package:net_monstrum_card_game/screens/counters_measures.dart';
 import 'package:net_monstrum_card_game/screens/digimon_card.dart';
 import 'package:net_monstrum_card_game/screens/texts_counters_player.dart';
 import 'package:net_monstrum_card_game/services/aggregationService.dart';
+import 'package:net_monstrum_card_game/widgets/button.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,8 +20,6 @@ void main() async {
   final game = MyGame();
   runApp(GameWidget(game: game));
 }
-
-
 
 class MyGame extends FlameGame with HasGameRef {
   MyGame();
@@ -32,12 +31,28 @@ class MyGame extends FlameGame with HasGameRef {
   ImageCardExample? card5;
   ImageCardExample? card6;
 
+  ImageCardExample? card1Rival;
+  ImageCardExample? card2Rival;
+  ImageCardExample? card3Rival;
+  ImageCardExample? card4Rival;
+  ImageCardExample? card5Rival;
+  ImageCardExample? card6Rival;
+
   final blueCounter = ColorCounter(Colors.blueAccent);
   final redCounter = ColorCounter(Colors.red);
   final brownCounter = ColorCounter(Colors.brown);
   final whiteCounter = ColorCounter(Colors.white);
   final blackCounter = ColorCounter(Colors.black);
   final greenCounter = ColorCounter(Colors.green);
+
+  final blueCounterRival = ColorCounter(Colors.blueAccent);
+  final redCounterRival = ColorCounter(Colors.red);
+  final brownCounterRival = ColorCounter(Colors.brown);
+  final whiteCounterRival = ColorCounter(Colors.white);
+  final blackCounterRival = ColorCounter(Colors.black);
+  final greenCounterRival = ColorCounter(Colors.green);
+  final defaultButton = DefaultButton();
+
   final service = AggregationService();
 
   @override
@@ -45,9 +60,9 @@ class MyGame extends FlameGame with HasGameRef {
     Aggregation player = service.getAggregatioByUserId(1);
     Aggregation rival = service.getAggregatioByUserId(2);
 
-    Tamer playerTamer = new Tamer(player.decksAggregations[0].cards, player.user.username);
-    Tamer rivalTamer = new Tamer(rival.decksAggregations[0].cards, rival.user.username);
-    BattleCardGame game = new BattleCardGame(playerTamer, rivalTamer);
+    Tamer playerTamer = Tamer(player.decksAggregations[0].cards, player.user.username);
+    Tamer rivalTamer = Tamer(rival.decksAggregations[0].cards, rival.user.username);
+    BattleCardGame game = BattleCardGame(playerTamer, rivalTamer);
 
     card1 = ImageCardExample(player.decksAggregations[0].cards[0].digimonName, player.decksAggregations[0].cards[0].color);
     card2 = ImageCardExample(player.decksAggregations[0].cards[1].digimonName, player.decksAggregations[0].cards[1].color);
@@ -55,6 +70,13 @@ class MyGame extends FlameGame with HasGameRef {
     card4 = ImageCardExample(player.decksAggregations[0].cards[3].digimonName, player.decksAggregations[0].cards[3].color);
     card5 = ImageCardExample(player.decksAggregations[0].cards[4].digimonName, player.decksAggregations[0].cards[4].color);
     card6 = ImageCardExample(player.decksAggregations[0].cards[5].digimonName, player.decksAggregations[0].cards[5].color);
+
+    card1Rival = ImageCardExample(rival.decksAggregations[0].cards[0].digimonName, player.decksAggregations[0].cards[0].color);
+    card2Rival = ImageCardExample(rival.decksAggregations[0].cards[1].digimonName, player.decksAggregations[0].cards[1].color);
+    card3Rival = ImageCardExample(rival.decksAggregations[0].cards[2].digimonName, player.decksAggregations[0].cards[2].color);
+    card4Rival = ImageCardExample(rival.decksAggregations[0].cards[3].digimonName, player.decksAggregations[0].cards[3].color);
+    card5Rival = ImageCardExample(rival.decksAggregations[0].cards[4].digimonName, player.decksAggregations[0].cards[4].color);
+    card6Rival = ImageCardExample(rival.decksAggregations[0].cards[5].digimonName, player.decksAggregations[0].cards[5].color);
 
     blueCounter.x = CountersMeasures.BLUE_X;
     blueCounter.y = CountersMeasures.BLUE_Y;
@@ -69,9 +91,23 @@ class MyGame extends FlameGame with HasGameRef {
     greenCounter.x = CountersMeasures.GREEN_X;
     greenCounter.y = CountersMeasures.GREEN_Y;
 
+    blueCounterRival.x = CountersMeasures.BLUE_RIVAL_X;
+    blueCounterRival.y = CountersMeasures.BLUE_RIVAL_Y;
+    redCounterRival.x = CountersMeasures.RED_RIVAL_X;
+    redCounterRival.y = CountersMeasures.RED_RIVAL_Y;
+    brownCounterRival.x = CountersMeasures.BROWN_RIVAL_X;
+    brownCounterRival.y = CountersMeasures.BROWN_RIVAL_Y;
+    whiteCounterRival.x = CountersMeasures.WHITE_RIVAL_X;
+    whiteCounterRival.y = CountersMeasures.WHITE_RIVAL_Y;
+    blackCounterRival.x = CountersMeasures.BLACK_RIVAL_X;
+    blackCounterRival.y = CountersMeasures.BLACK_RIVAL_Y;
+    greenCounterRival.x = CountersMeasures.GREEN_RIVAL_X;
+    greenCounterRival.y = CountersMeasures.GREEN_RIVAL_Y;
 
     List<TextComponent> textsCounters = TextsCounters.getComponents(game.player.energiesCounters);
-    const offsetX = 100;
+    List<TextComponent> textsCountersRival = TextsCounters.getRivalComponents(game.rival.energiesCounters);
+    
+    const offsetX = 100.0;
     card1?.x = offsetX + 10;
     card1?.y = 300;
     card2?.x = offsetX + 100;
@@ -85,6 +121,64 @@ class MyGame extends FlameGame with HasGameRef {
     card6?.x = offsetX + 450;
     card6?.y = 300;
 
+    const offsetYCards = 25.0;
+    card1Rival?.x = offsetX + 10;
+    card1Rival?.y = offsetYCards;
+    card2Rival?.x = offsetX + 100;
+    card2Rival?.y = offsetYCards;
+    card3Rival?.x = offsetX + 190;
+    card3Rival?.y = offsetYCards;
+    card4Rival?.x = offsetX + 280;
+    card4Rival?.y = offsetYCards;
+    card5Rival?.x = offsetX + 370;
+    card5Rival?.y = offsetYCards;
+    card6Rival?.x = offsetX + 450;
+    card6Rival?.y = offsetYCards;
+
+    final roundsWinPlayer = TextComponent(
+    text: 'W:0',
+    size: Vector2.all(10.0),
+    position: Vector2(0, 370),
+    );
+
+    final roundsWinRival = TextComponent(
+    text: 'W:0',
+    size: Vector2.all(10.0),
+    position: Vector2(0, 0),
+    );
+
+    final apRival = TextComponent(
+    text: 'AP:0',
+    size: Vector2.all(10.0),
+    position: Vector2(700, 0),
+    );
+
+    final hpRival = TextComponent(
+    text: 'HP:0',
+    size: Vector2.all(10.0),
+    position: Vector2(750, 0),
+    );
+
+    final apPlayer = TextComponent(
+    text: 'AP:0',
+    size: Vector2.all(10.0),
+    position: Vector2(700, 370),
+    );
+
+    final hpPlayer = TextComponent(
+    text: 'HP:0',
+    size: Vector2.all(10.0),
+    position: Vector2(750, 370),
+    );
+
+    defaultButton.position = Vector2(650, 50);
+    defaultButton.size = Vector2(100, 50);
+    defaultButton.tapUpCallback = this.nextPhase;
+    defaultButton.onPressed = this.nextPhase;
+
+    print("SISI");
+    print(defaultButton.tapUpCallback);
+
     add(background);
     add(card1 as Component);
     add(card2 as Component);
@@ -92,22 +186,52 @@ class MyGame extends FlameGame with HasGameRef {
     add(card4 as Component);
     add(card5 as Component);
     add(card6 as Component);
+    add(card1Rival as Component);
+    add(card2Rival as Component);
+    add(card3Rival as Component);
+    add(card4Rival as Component);
+    add(card5Rival as Component);
+    add(card6Rival as Component);
     add(blueCounter);
     add(redCounter);
     add(brownCounter);
     add(whiteCounter);
     add(blackCounter);
     add(greenCounter);
+    add(blueCounterRival);
+    add(redCounterRival);
+    add(brownCounterRival);
+    add(whiteCounterRival);
+    add(blackCounterRival);
+    add(greenCounterRival);
+    add(roundsWinPlayer);
+    add(roundsWinRival);
+    add(apRival);
+    add(hpRival);
+    add(apPlayer);
+    add(hpPlayer);
 
     for (var textCounterComponent in textsCounters) {
       add(textCounterComponent);
     }
+    
+    for (var textCounterComponent in textsCountersRival) {
+      add(textCounterComponent);
+    }
+    add(defaultButton);
+    
   }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
     // Aquí se renderizarán los componentes adicionales si los tienes
+  }
+
+  void nextPhase(){
+    print("LLEGO AL METHOD");
+    remove(this.defaultButton);
+    this.update(1);
   }
 }
 

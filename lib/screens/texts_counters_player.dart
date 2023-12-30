@@ -8,37 +8,37 @@ class TextsCounters {
     const double offsetNumbersY = -4;
 
     final blueCounterText = TextComponent(
-    text: '100',
+    text: '${energiesCounters.blue}',
     size: Vector2.all(10.0),
     position: Vector2(CountersMeasures.BLUE_RIVAL_X + offsetNumbersX, CountersMeasures.BLUE_RIVAL_Y + offsetNumbersY),
     );
 
     final redCounterText = TextComponent(
-      text: '100',
+      text: '${energiesCounters.red}',
       size: Vector2.all(10.0),
       position: Vector2(CountersMeasures.RED_RIVAL_X + offsetNumbersX, CountersMeasures.RED_RIVAL_Y + offsetNumbersY),
     );
     
     final brownCounterText = TextComponent(
-      text: '100',
+      text: '${energiesCounters.brown}',
       size: Vector2.all(10.0),
       position: Vector2(CountersMeasures.BROWN_RIVAL_X + offsetNumbersX, CountersMeasures.BROWN_RIVAL_Y + offsetNumbersY),
     );
     
     final whiteCounterText = TextComponent(
-      text: '100',
+      text: '${energiesCounters.white}',
       size: Vector2.all(10.0),
       position: Vector2(CountersMeasures.WHITE_RIVAL_X + offsetNumbersX, CountersMeasures.WHITE_RIVAL_Y + offsetNumbersY),
     );
     
     final blackCounterText = TextComponent(
-      text: '100',
+      text: '${energiesCounters.black}',
       size: Vector2.all(10.0),
       position: Vector2(CountersMeasures.BLACK_RIVAL_X + offsetNumbersX, CountersMeasures.BLACK_RIVAL_Y + offsetNumbersY),
     );
     
     final greenCounterText = TextComponent(
-      text: '100',
+      text: '${energiesCounters.green}',
       size: Vector2.all(10.0),
       position: Vector2(CountersMeasures.GREEN_RIVAL_X + offsetNumbersX, CountersMeasures.GREEN_RIVAL_Y + offsetNumbersY),
     );
@@ -51,37 +51,37 @@ class TextsCounters {
     const double offsetNumbersY = -4;
 
     final blueCounterText = TextComponent(
-    text: '100',
+    text: '${energiesCounters.blue}',
     size: Vector2.all(10.0),
     position: Vector2(CountersMeasures.BLUE_X + offsetNumbersX, CountersMeasures.BLUE_Y + offsetNumbersY),
     );
 
     final redCounterText = TextComponent(
-      text: '100',
+      text: '${energiesCounters.red}',
       size: Vector2.all(10.0),
       position: Vector2(CountersMeasures.RED_X + offsetNumbersX, CountersMeasures.RED_Y + offsetNumbersY),
     );
     
     final brownCounterText = TextComponent(
-      text: '100',
+      text: '${energiesCounters.brown}',
       size: Vector2.all(10.0),
       position: Vector2(CountersMeasures.BROWN_X + offsetNumbersX, CountersMeasures.BROWN_Y + offsetNumbersY),
     );
     
     final whiteCounterText = TextComponent(
-      text: '100',
+      text: '${energiesCounters.white}',
       size: Vector2.all(10.0),
       position: Vector2(CountersMeasures.WHITE_X + offsetNumbersX, CountersMeasures.WHITE_Y + offsetNumbersY),
     );
     
     final blackCounterText = TextComponent(
-      text: '100',
+      text: '${energiesCounters.black}',
       size: Vector2.all(10.0),
       position: Vector2(CountersMeasures.BLACK_X + offsetNumbersX, CountersMeasures.BLACK_Y + offsetNumbersY),
     );
     
     final greenCounterText = TextComponent(
-      text: '100',
+      text: '${energiesCounters.green}',
       size: Vector2.all(10.0),
       position: Vector2(CountersMeasures.GREEN_X + offsetNumbersX, CountersMeasures.GREEN_Y + offsetNumbersY),
     );

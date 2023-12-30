@@ -5,11 +5,19 @@ class Trash {
 
   Trash(this.cards);
 
-  void add(int index) {
-    cards.add(cards.removeAt(index));
+  void add(Card card) {
+    cards.add(card);
   }
 
-  void remove(int index) {
+  void addAll(List<Card> cards) {
+    for (Card card in cards){
+      this.cards.add(card);
+    }
+  }
+
+  Card removeCardAt(int index) {
+    Card card = cards[index];
     cards.removeAt(index);
+    return card;
   }
 }

@@ -14,9 +14,14 @@ class Hand {
     cards.removeAt(index);
   }
 
+  void clear(){
+    cards.clear();
+  }
+
   EnergiesCounters getEnergiesCounters(){
     EnergiesCounters energiesCounters = new EnergiesCounters.initAllInZero();
     for (Card card in this.cards) {
+      print(card.color);
       if (card.isRedColor()){
         energiesCounters.red += 1;
       }
@@ -36,7 +41,7 @@ class Hand {
         energiesCounters.green += 1;
       }
     }
-
+    print("--------");
     return energiesCounters;
   }
 }

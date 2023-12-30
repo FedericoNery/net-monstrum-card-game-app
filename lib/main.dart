@@ -22,21 +22,21 @@ void main() async {
 }
 
 class MyGame extends FlameGame with HasGameRef {
-  MyGame();
   final background = Background();
-  ImageCardExample? card1;
-  ImageCardExample? card2;
-  ImageCardExample? card3;
-  ImageCardExample? card4;
-  ImageCardExample? card5;
-  ImageCardExample? card6;
 
-  ImageCardExample? card1Rival;
-  ImageCardExample? card2Rival;
-  ImageCardExample? card3Rival;
-  ImageCardExample? card4Rival;
-  ImageCardExample? card5Rival;
-  ImageCardExample? card6Rival;
+  late CartaWidget card1;
+  late CartaWidget card2;
+  late CartaWidget card3;
+  late CartaWidget card4;
+  late CartaWidget card5;
+  late CartaWidget card6;
+
+  late CartaWidget card1Rival;
+  late CartaWidget card2Rival;
+  late CartaWidget card3Rival;
+  late CartaWidget card4Rival;
+  late CartaWidget card5Rival;
+  late CartaWidget card6Rival;
 
   final blueCounter = ColorCounter(Colors.blueAccent);
   final redCounter = ColorCounter(Colors.red);
@@ -52,31 +52,78 @@ class MyGame extends FlameGame with HasGameRef {
   final blackCounterRival = ColorCounter(Colors.black);
   final greenCounterRival = ColorCounter(Colors.green);
   final defaultButton = DefaultButton();
-
   final service = AggregationService();
+  late Aggregation player;
+  late Aggregation rival;
+
+  late Tamer playerTamer;
+  late Tamer rivalTamer;
+  late BattleCardGame battleCardGame;
+  late TextComponent apRival;
+  late TextComponent hpRival;
+  late TextComponent apPlayer;
+  late TextComponent hpPlayer;
+
+  MyGame();
 
   @override
   Future<void> onLoad() async {
-    Aggregation player = service.getAggregatioByUserId(1);
-    Aggregation rival = service.getAggregatioByUserId(2);
+    player = service.getAggregatioByUserId(1);
+    rival = service.getAggregatioByUserId(2);
 
-    Tamer playerTamer = Tamer(player.decksAggregations[0].cards, player.user.username);
-    Tamer rivalTamer = Tamer(rival.decksAggregations[0].cards, rival.user.username);
-    BattleCardGame game = BattleCardGame(playerTamer, rivalTamer);
+    playerTamer = Tamer(player.decksAggregations[0].cards, player.user.username);
+    rivalTamer = Tamer(rival.decksAggregations[0].cards, rival.user.username);
 
-    card1 = ImageCardExample(player.decksAggregations[0].cards[0].digimonName, player.decksAggregations[0].cards[0].color);
-    card2 = ImageCardExample(player.decksAggregations[0].cards[1].digimonName, player.decksAggregations[0].cards[1].color);
-    card3 = ImageCardExample(player.decksAggregations[0].cards[2].digimonName, player.decksAggregations[0].cards[2].color);
-    card4 = ImageCardExample(player.decksAggregations[0].cards[3].digimonName, player.decksAggregations[0].cards[3].color);
-    card5 = ImageCardExample(player.decksAggregations[0].cards[4].digimonName, player.decksAggregations[0].cards[4].color);
-    card6 = ImageCardExample(player.decksAggregations[0].cards[5].digimonName, player.decksAggregations[0].cards[5].color);
+    battleCardGame = BattleCardGame(playerTamer, rivalTamer);
 
-    card1Rival = ImageCardExample(rival.decksAggregations[0].cards[0].digimonName, player.decksAggregations[0].cards[0].color);
-    card2Rival = ImageCardExample(rival.decksAggregations[0].cards[1].digimonName, player.decksAggregations[0].cards[1].color);
-    card3Rival = ImageCardExample(rival.decksAggregations[0].cards[2].digimonName, player.decksAggregations[0].cards[2].color);
-    card4Rival = ImageCardExample(rival.decksAggregations[0].cards[3].digimonName, player.decksAggregations[0].cards[3].color);
-    card5Rival = ImageCardExample(rival.decksAggregations[0].cards[4].digimonName, player.decksAggregations[0].cards[4].color);
-    card6Rival = ImageCardExample(rival.decksAggregations[0].cards[5].digimonName, player.decksAggregations[0].cards[5].color);
+    //TODO ANIMACION
+    battleCardGame.shuffleDeck();
+
+    //TODO ANIMACION
+    battleCardGame.drawCards();
+
+    const offsetX = 100.0;
+    const offsetYPlayer= 250.0;
+    const card1x = offsetX + 10;
+    const card1y = offsetYPlayer;
+    const card2x = offsetX + 100;
+    const card2y = offsetYPlayer;
+    const card3x = offsetX + 190;
+    const card3y = offsetYPlayer;
+    const card4x = offsetX + 280;
+    const card4y = offsetYPlayer;
+    const card5x = offsetX + 370;
+    const card5y = offsetYPlayer;
+    const card6x = offsetX + 450;
+    const card6y = offsetYPlayer;
+
+    card1 = CartaWidget(battleCardGame.player.hand.cards[0], card1x, card1y, false);
+    card2 = CartaWidget(battleCardGame.player.hand.cards[1], card2x, card2y, false);
+    card3 = CartaWidget(battleCardGame.player.hand.cards[2], card3x, card3y, false);
+    card4 = CartaWidget(battleCardGame.player.hand.cards[3], card4x, card4y, false);
+    card5 = CartaWidget(battleCardGame.player.hand.cards[4], card5x, card5y, false);
+    card6 = CartaWidget(battleCardGame.player.hand.cards[5], card6x, card6y, false);
+
+    const offsetYCards = 25.0;
+    const card1Rivalx = offsetX + 10;
+    const card1Rivaly = offsetYCards;
+    const card2Rivalx = offsetX + 100;
+    const card2Rivaly = offsetYCards;
+    const card3Rivalx = offsetX + 190;
+    const card3Rivaly = offsetYCards;
+    const card4Rivalx = offsetX + 280;
+    const card4Rivaly = offsetYCards;
+    const card5Rivalx = offsetX + 370;
+    const card5Rivaly = offsetYCards;
+    const card6Rivalx = offsetX + 450;
+    const card6Rivaly = offsetYCards;
+
+    card1Rival = CartaWidget(battleCardGame.rival.hand.cards[0], card1Rivalx, card1Rivaly, true);
+    card2Rival = CartaWidget(battleCardGame.rival.hand.cards[1], card2Rivalx, card2Rivaly, true);
+    card3Rival = CartaWidget(battleCardGame.rival.hand.cards[2], card3Rivalx, card3Rivaly, true);
+    card4Rival = CartaWidget(battleCardGame.rival.hand.cards[3], card4Rivalx, card4Rivaly, true);
+    card5Rival = CartaWidget(battleCardGame.rival.hand.cards[4], card5Rivalx, card5Rivaly, true);
+    card6Rival = CartaWidget(battleCardGame.rival.hand.cards[5], card6Rivalx, card6Rivaly, true);
 
     blueCounter.x = CountersMeasures.BLUE_X;
     blueCounter.y = CountersMeasures.BLUE_Y;
@@ -104,69 +151,41 @@ class MyGame extends FlameGame with HasGameRef {
     greenCounterRival.x = CountersMeasures.GREEN_RIVAL_X;
     greenCounterRival.y = CountersMeasures.GREEN_RIVAL_Y;
 
-    List<TextComponent> textsCounters = TextsCounters.getComponents(game.player.energiesCounters);
-    List<TextComponent> textsCountersRival = TextsCounters.getRivalComponents(game.rival.energiesCounters);
-    
-    const offsetX = 100.0;
-    card1?.x = offsetX + 10;
-    card1?.y = 300;
-    card2?.x = offsetX + 100;
-    card2?.y = 300;
-    card3?.x = offsetX + 190;
-    card3?.y = 300;
-    card4?.x = offsetX + 280;
-    card4?.y = 300;
-    card5?.x = offsetX + 370;
-    card5?.y = 300;
-    card6?.x = offsetX + 450;
-    card6?.y = 300;
-
-    const offsetYCards = 25.0;
-    card1Rival?.x = offsetX + 10;
-    card1Rival?.y = offsetYCards;
-    card2Rival?.x = offsetX + 100;
-    card2Rival?.y = offsetYCards;
-    card3Rival?.x = offsetX + 190;
-    card3Rival?.y = offsetYCards;
-    card4Rival?.x = offsetX + 280;
-    card4Rival?.y = offsetYCards;
-    card5Rival?.x = offsetX + 370;
-    card5Rival?.y = offsetYCards;
-    card6Rival?.x = offsetX + 450;
-    card6Rival?.y = offsetYCards;
+    List<TextComponent> textsCounters = TextsCounters.getComponents(battleCardGame.player.energiesCounters);
+    List<TextComponent> textsCountersRival = TextsCounters.getRivalComponents(battleCardGame.rival.energiesCounters);
 
     final roundsWinPlayer = TextComponent(
-    text: 'W:0',
+    text: 'W:${this.battleCardGame.player.roundsWon}',
     size: Vector2.all(10.0),
     position: Vector2(0, 370),
     );
 
     final roundsWinRival = TextComponent(
-    text: 'W:0',
+    text: 'W:${this.battleCardGame.rival.roundsWon}',
     size: Vector2.all(10.0),
     position: Vector2(0, 0),
     );
 
-    final apRival = TextComponent(
-    text: 'AP:0',
+    apRival = TextComponent(
+    text: 'AP:${this.battleCardGame.rival.attackPoints}',
     size: Vector2.all(10.0),
     position: Vector2(700, 0),
     );
 
-    final hpRival = TextComponent(
-    text: 'HP:0',
+    hpRival = TextComponent(
+    text: 'HP:${this.battleCardGame.rival.healthPoints}',
     size: Vector2.all(10.0),
     position: Vector2(750, 0),
     );
 
-    final apPlayer = TextComponent(
-    text: 'AP:0',
+    apPlayer = TextComponent(
+    text: 'AP:${this.battleCardGame.player.attackPoints}',
     size: Vector2.all(10.0),
     position: Vector2(700, 370),
     );
 
-    final hpPlayer = TextComponent(
-    text: 'HP:0',
+    hpPlayer = TextComponent(
+    text: 'HP:${this.battleCardGame.player.healthPoints}',
     size: Vector2.all(10.0),
     position: Vector2(750, 370),
     );
@@ -175,9 +194,6 @@ class MyGame extends FlameGame with HasGameRef {
     defaultButton.size = Vector2(100, 50);
     defaultButton.tapUpCallback = this.nextPhase;
     defaultButton.onPressed = this.nextPhase;
-
-    print("SISI");
-    print(defaultButton.tapUpCallback);
 
     add(background);
     add(card1 as Component);
@@ -225,13 +241,35 @@ class MyGame extends FlameGame with HasGameRef {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+    this.apRival.text = 'AP:${this.battleCardGame.rival.attackPoints}';
+    this.hpRival.text = 'HP:${this.battleCardGame.rival.healthPoints}';
+    this.apPlayer.text = 'AP:${this.battleCardGame.player.attackPoints}';
+    this.hpPlayer.text = 'HP:${this.battleCardGame.player.healthPoints}';
     // Aquí se renderizarán los componentes adicionales si los tienes
   }
 
+  void revealRivalCards(){
+    this.card1Rival.reveal();
+    this.card2Rival.reveal();
+    this.card3Rival.reveal();
+    this.card4Rival.reveal();
+    this.card5Rival.reveal();
+    this.card6Rival.reveal();
+  }
+
   void nextPhase(){
-    print("LLEGO AL METHOD");
-    remove(this.defaultButton);
-    this.update(1);
+    if (this.battleCardGame.digimonsCanBeSummoned()){
+      this.battleCardGame.calculatePoints();
+      remove(this.defaultButton);
+      this.revealRivalCards();
+      this.update(1);
+      print(this.battleCardGame.rival.healthPoints);
+      print(this.battleCardGame.player.healthPoints);
+      this.apRival.update(1);
+      this.hpRival.update(1);
+      this.apPlayer.update(1);
+      this.hpPlayer.update(1);
+    }
   }
 }
 

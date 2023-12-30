@@ -11,7 +11,15 @@ class Deck {
     }
 
     List<Card> drawnCards = cards.sublist(0, count);
+    for (Card card in drawnCards){
+      print('${card.digimonName} - ${card.color}');
+    }
     cards.removeRange(0, count);
+    print("----");
     return drawnCards;
+  }
+
+  void shuffle(){
+    this.cards.shuffle();
   }
 }

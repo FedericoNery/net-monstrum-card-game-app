@@ -14,13 +14,24 @@ class DigimonZone {
   }
 
   int getAttackPoints(){
-    return 0;
+    int attackPoints = 0;
+    for (Card card in cards){
+        attackPoints += card.attackPoints;
+    }
+
+    return attackPoints;
   }
 
   int getHealthPoints(){
-    return 0;
+    int healthPoints = 0;
+    for (Card card in cards){
+      healthPoints += card.healthPoints;
+    }
+
+    return healthPoints;
   }
 
+  //TODO :: si hay 3 o mas cartas iguales, entonces sumar la totalidad de cada carta y mostrar la imagen de la evolución
   int getAttackPointsOfEvolutions(){
     return 0;
   }

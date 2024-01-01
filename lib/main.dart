@@ -96,7 +96,8 @@ class MyGame extends FlameGame with HasGameRef {
     const card5y = offsetYPlayer;
     const card6x = offsetX + 450;
     const card6y = offsetYPlayer;
-
+    //TODO: agregar callback para marcar carta como seleccionada, conviene
+    // que la entidad hand tenga los indices de las cartas seleccionadas
     card1 = CartaWidget(battleCardGame.player.hand.cards[0], card1x, card1y, false);
     card2 = CartaWidget(battleCardGame.player.hand.cards[1], card2x, card2y, false);
     card3 = CartaWidget(battleCardGame.player.hand.cards[2], card3x, card3y, false);

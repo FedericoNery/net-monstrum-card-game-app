@@ -6,6 +6,11 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/domain/color.dart';
 import 'package:net_monstrum_card_game/domain/card.dart' as CardPackage;
+import 'package:net_monstrum_card_game/screens/styles/ap_hp_texts.dart';
+import 'package:net_monstrum_card_game/screens/styles/card_color_border.dart';
+import 'package:net_monstrum_card_game/screens/styles/flickering_card_border.dart';
+
+import 'effects/effects.dart';
 
 class CartaWidget extends SpriteComponent with TapCallbacks {
   final CardPackage.Card card;
@@ -13,9 +18,10 @@ class CartaWidget extends SpriteComponent with TapCallbacks {
   final double y;
   bool isHidden = false;
   bool isSelected = false;
+  Function callbackSelectCardFromHand;
+  int indexCard;
 
-
-  CartaWidget(this.card, this.x, this.y, this.isHidden): super(size: isHidden ? Vector2(64, 85) : Vector2.all(64), position: Vector2(x, y)){
+  CartaWidget(this.card, this.x, this.y, this.isHidden, this.callbackSelectCardFromHand, this.indexCard): super(size: isHidden ? Vector2(64, 85) : Vector2.all(64), position: Vector2(x, y)){
 
   }
 
@@ -29,75 +35,12 @@ class CartaWidget extends SpriteComponent with TapCallbacks {
   void render(Canvas canvas) async {
     super.render(canvas);
     if (!this.isHidden){
-      //print('${card.digimonName} - ${card.color}');
-      final Rect bounds = Rect.fromLTWH(0, 0, 65, 85);
-      final Paint paint = Paint()
-        ..color = CardColor.toFlutterColor(card.color)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.0;
+      drawCardColor(canvas, card.color);
+      drawBackgroundApHp(canvas);
 
-      final RRect roundedRect = RRect.fromRectAndRadius(bounds, Radius.circular(5.0));
-      canvas.drawRRect(roundedRect, paint);
+      drawApHpTexts(canvas, this.card.attackPoints, this.card.healthPoints);
 
-
-      final Paint paintBlack = Paint()
-        ..color = Colors.black;
-      final Rect boundsBlack = Rect.fromLTWH(0, 64, 64.5, 20);
-      final RRect roundedRectBlack = RRect.fromRectAndRadius(boundsBlack, Radius.circular(5.0));
-
-      canvas.drawRRect(roundedRectBlack, paintBlack);
-
-      // Dibuja valores de ataque y vida
-      final TextPainter textPainter = TextPainter(
-        text: TextSpan(
-          text: '${this.card.attackPoints} | ${this.card.healthPoints}',
-          style: TextStyle(color: Colors.white, backgroundColor: Colors.black),
-        ),
-        textAlign: TextAlign.center,
-        textDirection: TextDirection.ltr
-      );
-
-      textPainter.layout();
-      textPainter.paint(canvas, Offset(15, 65));
     }
-
-
-
-
-/*      final effect = ColorEffect(
-        Colors.yellow,
-        EffectController(duration: 1.5),
-        opacityFrom: 0.2,
-        opacityTo: 0.8,
-      );*/
-
-/*      final Rect bounds = Rect.fromLTWH(-3, -3, 70, 91);
-      final Paint paint = Paint()
-        ..color = Colors.yellow
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.0;
-
-      final RRect roundedRect = RRect.fromRectAndRadius(bounds, Radius.circular(7.0));
-
-      canvas.drawRRect(roundedRect, paint);*/
-
-
-      /*final timer = Timer(
-        100,
-        repeat: true,
-        onTick: () {
-          print("llego");
-          shapeComponent.paint.color = shapeComponent.paint.color.withOpacity(shapeComponent.paint.color.opacity == 0.0 ? 1.0 : 0.0);
-          shapeComponent.update(1);
-        },
-      );*/
-
-
-
-
-     /* if (timer.isRunning() && !shapeComponent.isMounted){
-        add(shapeComponent);
-      }*/
   }
 
   @override
@@ -111,49 +54,17 @@ class CartaWidget extends SpriteComponent with TapCallbacks {
     this.sprite = await Sprite.load(uri);
   }
 
-  //TODO: el efecto podría ser similar al que se usa en DW3
-  // Eleva la carta hacia arriba
-  // La rodea de un borde que titila amarillo
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
     this.isSelected = !this.isSelected;
+    this.callbackSelectCardFromHand(this.indexCard);
 
-/*    final colorEffect = ColorEffect(
-      Colors.blue,
-      EffectController(
-        duration: 1.5,
-      ),
-    );*/
-
-    final moveEffect = MoveEffect.to(
-      this.isSelected ? Vector2(this.x, this.y - 20) : Vector2(this.x, this.y),
-      EffectController(
-        duration: 0.1,
-        curve: Curves.easeOut,
-      ),
-    );
-
+    final moveEffect = getUpAndDownEffect(this.isSelected, this.x, this.y);
     this.add(moveEffect);
 
     if (this.isSelected){
-      final Rect bounds = Rect.fromLTWH(-3, -3, 70, 91);
-      final Paint paint = Paint()
-        ..color = Colors.yellow
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.0;
-
-      final shapeComponent = RectangleComponent.fromRect(bounds);
-      shapeComponent.paint = paint;
-
-      final effect = ColorEffect(
-        Colors.green,
-        EffectController(duration: 0.25, infinite: true, reverseDuration: 0.25),
-        opacityFrom: 0.2,
-        opacityTo: 0.8,
-      );
-
-      shapeComponent.add(effect);
+      final shapeComponent = getFlickeringCardBorder();
       this.add(shapeComponent);
     }
     else{
@@ -161,14 +72,6 @@ class CartaWidget extends SpriteComponent with TapCallbacks {
     }
 
     this.update(1);
-
-
-    /*final sizeEffectSelected = SizeEffect.to(
-      this.isSelected ? Vector2(90, 80) : Vector2.all(64),
-      EffectController(duration: 0.1),
-    );
-
-    this.add(sizeEffectSelected);*/
   }
 }
 

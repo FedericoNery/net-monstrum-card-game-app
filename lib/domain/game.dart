@@ -33,6 +33,7 @@ class BattleCardGame {
   }
 
   bool digimonsCanBeSummoned(){
+    rival.selectAllDigimonThatCanBeSummoned();
     return player.canSummonAllDigimonSelected() && rival.canSummonAllDigimonSelected();
   }
 

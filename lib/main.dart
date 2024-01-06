@@ -71,8 +71,7 @@ class MyGame extends FlameGame with HasGameRef {
     player = service.getAggregatioByUserId(1);
     rival = service.getAggregatioByUserId(2);
 
-    playerTamer =
-        Tamer(player.decksAggregations[0].cards, player.user.username);
+    playerTamer = Tamer(player.decksAggregations[0].cards, player.user.username);
     rivalTamer = Tamer(rival.decksAggregations[0].cards, rival.user.username);
 
     battleCardGame = BattleCardGame(playerTamer, rivalTamer);
@@ -97,20 +96,13 @@ class MyGame extends FlameGame with HasGameRef {
     const card5y = offsetYPlayer;
     const card6x = offsetX + 450;
     const card6y = offsetYPlayer;
-    //TODO: agregar callback para marcar carta como seleccionada, conviene
-    // que la entidad hand tenga los indices de las cartas seleccionadas
-    card1 = CartaWidget(battleCardGame.player.hand.cards[0], card1x, card1y,
-        false, this.addSelectedCard, 1);
-    card2 = CartaWidget(battleCardGame.player.hand.cards[1], card2x, card2y,
-        false, this.addSelectedCard, 2);
-    card3 = CartaWidget(battleCardGame.player.hand.cards[2], card3x, card3y,
-        false, this.addSelectedCard, 3);
-    card4 = CartaWidget(battleCardGame.player.hand.cards[3], card4x, card4y,
-        false, this.addSelectedCard, 4);
-    card5 = CartaWidget(battleCardGame.player.hand.cards[4], card5x, card5y,
-        false, this.addSelectedCard, 5);
-    card6 = CartaWidget(battleCardGame.player.hand.cards[5], card6x, card6y,
-        false, this.addSelectedCard, 6);
+
+    card1 = CartaWidget(battleCardGame.player.hand.cards[0], card1x, card1y, false, this.addSelectedCard, 1, false);
+    card2 = CartaWidget(battleCardGame.player.hand.cards[1], card2x, card2y, false, this.addSelectedCard, 2, false);
+    card3 = CartaWidget(battleCardGame.player.hand.cards[2], card3x, card3y, false, this.addSelectedCard, 3, false);
+    card4 = CartaWidget(battleCardGame.player.hand.cards[3], card4x, card4y, false, this.addSelectedCard, 4, false);
+    card5 = CartaWidget(battleCardGame.player.hand.cards[4], card5x, card5y, false, this.addSelectedCard, 5, false);
+    card6 = CartaWidget(battleCardGame.player.hand.cards[5], card6x, card6y, false, this.addSelectedCard, 6, false);
 
     const offsetYCards = 25.0;
     const card1Rivalx = offsetX + 10;
@@ -126,18 +118,12 @@ class MyGame extends FlameGame with HasGameRef {
     const card6Rivalx = offsetX + 450;
     const card6Rivaly = offsetYCards;
 
-    card1Rival = CartaWidget(battleCardGame.rival.hand.cards[0], card1Rivalx,
-        card1Rivaly, true, this.addSelectedCard, 1);
-    card2Rival = CartaWidget(battleCardGame.rival.hand.cards[1], card2Rivalx,
-        card2Rivaly, true, this.addSelectedCard, 2);
-    card3Rival = CartaWidget(battleCardGame.rival.hand.cards[2], card3Rivalx,
-        card3Rivaly, true, this.addSelectedCard, 3);
-    card4Rival = CartaWidget(battleCardGame.rival.hand.cards[3], card4Rivalx,
-        card4Rivaly, true, this.addSelectedCard, 4);
-    card5Rival = CartaWidget(battleCardGame.rival.hand.cards[4], card5Rivalx,
-        card5Rivaly, true, this.addSelectedCard, 5);
-    card6Rival = CartaWidget(battleCardGame.rival.hand.cards[5], card6Rivalx,
-        card6Rivaly, true, this.addSelectedCard, 6);
+    card1Rival = CartaWidget(battleCardGame.rival.hand.cards[0], card1Rivalx, card1Rivaly, true, this.addSelectedCard, 1, true);
+    card2Rival = CartaWidget(battleCardGame.rival.hand.cards[1], card2Rivalx, card2Rivaly, true, this.addSelectedCard, 2, true);
+    card3Rival = CartaWidget(battleCardGame.rival.hand.cards[2], card3Rivalx, card3Rivaly, true, this.addSelectedCard, 3, true);
+    card4Rival = CartaWidget(battleCardGame.rival.hand.cards[3], card4Rivalx, card4Rivaly, true, this.addSelectedCard, 4, true);
+    card5Rival = CartaWidget(battleCardGame.rival.hand.cards[4], card5Rivalx, card5Rivaly, true, this.addSelectedCard, 5, true);
+    card6Rival = CartaWidget(battleCardGame.rival.hand.cards[5], card6Rivalx, card6Rivaly, true, this.addSelectedCard, 6, true);
 
     blueCounter.x = CountersMeasures.BLUE_X;
     blueCounter.y = CountersMeasures.BLUE_Y;
@@ -165,10 +151,8 @@ class MyGame extends FlameGame with HasGameRef {
     greenCounterRival.x = CountersMeasures.GREEN_RIVAL_X;
     greenCounterRival.y = CountersMeasures.GREEN_RIVAL_Y;
 
-    List<TextComponent> textsCounters =
-        TextsCounters.getComponents(battleCardGame.player.energiesCounters);
-    List<TextComponent> textsCountersRival =
-        TextsCounters.getRivalComponents(battleCardGame.rival.energiesCounters);
+    List<TextComponent> textsCounters = TextsCounters.getComponents(battleCardGame.player.energiesCounters);
+    List<TextComponent> textsCountersRival = TextsCounters.getRivalComponents(battleCardGame.rival.energiesCounters);
 
     final roundsWinPlayer = TextComponent(
       text: 'W:${this.battleCardGame.player.roundsWon}',
@@ -273,19 +257,75 @@ class MyGame extends FlameGame with HasGameRef {
   }
 
   void nextPhase() {
-    print(this.battleCardGame.player.hand.selectedCards);
-    print(this.battleCardGame.rival.hand.selectedCards);
+    print(this.battleCardGame.player.hand.selectedCardsIndexs);
+    print(this.battleCardGame.rival.hand.selectedCardsIndexs);
 
     if (this.battleCardGame.digimonsCanBeSummoned()) {
       this.battleCardGame.calculatePoints();
       remove(this.defaultButton);
+
+      this.removeNotSummonedCards();
       this.revealRivalCards();
+
+
       this.update(1);
       this.apRival.update(1);
       this.hpRival.update(1);
       this.apPlayer.update(1);
       this.hpPlayer.update(1);
+
     }
+  }
+
+  void removeNotSummonedCards(){
+    if (!this.battleCardGame.player.hand.selectedCardsIndexs.contains(1)){
+      this.card1.removeFromParent();
+    }
+
+    if (!this.battleCardGame.player.hand.selectedCardsIndexs.contains(2)){
+      this.card2.removeFromParent();
+    }
+
+    if (!this.battleCardGame.player.hand.selectedCardsIndexs.contains(3)){
+      this.card3.removeFromParent();
+    }
+
+    if (!this.battleCardGame.player.hand.selectedCardsIndexs.contains(4)){
+      this.card4.removeFromParent();
+    }
+
+    if (!this.battleCardGame.player.hand.selectedCardsIndexs.contains(5)){
+      this.card5.removeFromParent();
+    }
+
+    if (!this.battleCardGame.player.hand.selectedCardsIndexs.contains(6)){
+      this.card6.removeFromParent();
+    }
+
+    if (!this.battleCardGame.rival.hand.selectedCardsIndexs.contains(1)){
+      this.card1Rival.removeFromParent();
+    }
+
+    if (!this.battleCardGame.rival.hand.selectedCardsIndexs.contains(2)){
+      this.card2Rival.removeFromParent();
+    }
+
+    if (!this.battleCardGame.rival.hand.selectedCardsIndexs.contains(3)){
+      this.card3Rival.removeFromParent();
+    }
+
+    if (!this.battleCardGame.rival.hand.selectedCardsIndexs.contains(4)){
+      this.card4Rival.removeFromParent();
+    }
+
+    if (!this.battleCardGame.rival.hand.selectedCardsIndexs.contains(5)){
+      this.card5Rival.removeFromParent();
+    }
+
+    if (!this.battleCardGame.rival.hand.selectedCardsIndexs.contains(6)){
+      this.card6Rival.removeFromParent();
+    }
+
   }
 
   void addSelectedCard(int index) {

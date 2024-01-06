@@ -24,6 +24,29 @@ class EnergiesCounters {
     return EnergiesCounters(red, blue, brown, black, green, white);
   }
 
+  bool canBeDiscountedByColor(String color){
+    if (CardColor.RED == color){
+      return this.red - 1 >= 0;
+    }
+    if (CardColor.GREEN == color){
+      return this.green - 1 >= 0;
+    }
+    if (CardColor.BROWN == color){
+      return this.brown - 1 >= 0;
+    }
+    if (CardColor.BLACK == color){
+      return this.black - 1 >= 0;
+    }
+    if (CardColor.BLUE == color){
+      return this.blue - 1 >= 0;
+    }
+    if (CardColor.WHITE == color){
+      return this.white - 1 >= 0;
+    }
+
+    return false;
+  }
+
   void discountByColor(String color){
     if (CardColor.RED == color){
       this.red =- 1;

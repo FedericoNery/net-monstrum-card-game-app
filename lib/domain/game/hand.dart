@@ -3,7 +3,7 @@ import 'package:net_monstrum_card_game/domain/game/energies_counters.dart';
 
 class Hand {
   List<Card> cards;
-  List<int> selectedCards = [];
+  List<int> selectedCardsIndexs = [];
 
   Hand(this.cards);
 
@@ -19,12 +19,26 @@ class Hand {
     cards.clear();
   }
 
+  List<Card> getSelectedCards(){
+    List<Card> selectedCards = [];
+    for (int index in this.selectedCardsIndexs){
+      selectedCards.add(this.cards[index]);
+    }
+    return selectedCards;
+  }
+
   void selectCardByIndex(int index){
-    if (this.selectedCards.contains(index)){
-      this.selectedCards.remove(index);
+    if (this.selectedCardsIndexs.contains(index)){
+      this.selectedCardsIndexs.remove(index);
     }
     else{
-      this.selectedCards.add(index);
+      this.selectedCardsIndexs.add(index);
+    }
+  }
+
+  void onlySelectCardByIndex(int index){
+    if (!this.selectedCardsIndexs.contains(index)){
+      this.selectedCardsIndexs.add(index);
     }
   }
 

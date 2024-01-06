@@ -18,10 +18,11 @@ class CartaWidget extends SpriteComponent with TapCallbacks {
   final double y;
   bool isHidden = false;
   bool isSelected = false;
+  bool isRival = false;
   Function callbackSelectCardFromHand;
   int indexCard;
 
-  CartaWidget(this.card, this.x, this.y, this.isHidden, this.callbackSelectCardFromHand, this.indexCard): super(size: isHidden ? Vector2(64, 85) : Vector2.all(64), position: Vector2(x, y)){
+  CartaWidget(this.card, this.x, this.y, this.isHidden, this.callbackSelectCardFromHand, this.indexCard, this.isRival): super(size: isHidden ? Vector2(64, 85) : Vector2.all(64), position: Vector2(x, y)){
 
   }
 
@@ -49,6 +50,9 @@ class CartaWidget extends SpriteComponent with TapCallbacks {
   }
 
   void reveal() async{
+    if (this.isRival){
+      this.size = Vector2.all(64);
+    }
     this.isHidden = false;
     final uri = 'digimon/${this.card.digimonName}.jpg';
     this.sprite = await Sprite.load(uri);
@@ -56,22 +60,25 @@ class CartaWidget extends SpriteComponent with TapCallbacks {
 
   @override
   void onTapDown(TapDownEvent event) {
-    super.onTapDown(event);
-    this.isSelected = !this.isSelected;
-    this.callbackSelectCardFromHand(this.indexCard);
+    //TODO :: ver si conviene renderizar o utilizar otra clase para la carta rival
+    if(!this.isRival){
+      super.onTapDown(event);
+      this.isSelected = !this.isSelected;
+      this.callbackSelectCardFromHand(this.indexCard);
 
-    final moveEffect = getUpAndDownEffect(this.isSelected, this.x, this.y);
-    this.add(moveEffect);
+      final moveEffect = getUpAndDownEffect(this.isSelected, this.x, this.y);
+      this.add(moveEffect);
 
-    if (this.isSelected){
-      final shapeComponent = getFlickeringCardBorder();
-      this.add(shapeComponent);
+      if (this.isSelected){
+        final shapeComponent = getFlickeringCardBorder();
+        this.add(shapeComponent);
+      }
+      else{
+        this.children.first.add(RemoveEffect(delay: 0.1));
+      }
+
+      this.update(1);
     }
-    else{
-      this.children.first.add(RemoveEffect(delay: 0.1));
-    }
-
-    this.update(1);
   }
 }
 

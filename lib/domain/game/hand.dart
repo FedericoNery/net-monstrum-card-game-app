@@ -1,3 +1,4 @@
+import 'package:flame/extensions.dart';
 import 'package:net_monstrum_card_game/domain/card.dart';
 import 'package:net_monstrum_card_game/domain/game/energies_counters.dart';
 
@@ -15,15 +16,32 @@ class Hand {
     cards.removeAt(index);
   }
 
+  void removeSelectedCards() {
+    if (selectedCardsIndexs.isNotEmpty){
+      selectedCardsIndexs.sort();
+      for (int i = selectedCardsIndexs.length - 1; i >= 0; i--) {
+        cards.removeAt(selectedCardsIndexs[i]);
+      }
+    }
+  }
+
   void clear(){
     cards.clear();
+    selectedCardsIndexs.clear();
   }
 
   List<Card> getSelectedCards(){
     List<Card> selectedCards = [];
-    for (int index in this.selectedCardsIndexs){
-      selectedCards.add(this.cards[index]);
+    this.selectedCardsIndexs.sort();
+    print(this.selectedCardsIndexs);
+    this.selectedCardsIndexs.reverse();
+    if (this.selectedCardsIndexs.isNotEmpty){
+      for (int index in this.selectedCardsIndexs){
+        print(index);
+        selectedCards.add(this.cards[index]);
+      }
     }
+
     return selectedCards;
   }
 

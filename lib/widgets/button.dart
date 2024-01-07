@@ -97,10 +97,10 @@ class DefaultButton extends AdvancedButtonComponent with TapCallbacks {
     this.tapUpCallback();
   }
 
-  @override
+/*  @override
   void onTapUp(_) {
     this.tapUpCallback();
-  }
+  }*/
 }
 
 /* class DisableButton extends AdvancedButtonComponent {

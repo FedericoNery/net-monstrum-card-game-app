@@ -49,22 +49,22 @@ class EnergiesCounters {
 
   void discountByColor(String color){
     if (CardColor.RED == color){
-      this.red =- 1;
+      this.red -= 1;
     }
     if (CardColor.GREEN == color){
-      this.green =- 1;
+      this.green -= 1;
     }
     if (CardColor.BROWN == color){
-      this.brown =- 1;
+      this.brown -= 1;
     }
     if (CardColor.BLACK == color){
-      this.black =- 1;
+      this.black -= 1;
     }
     if (CardColor.BLUE == color){
-      this.blue =- 1;
+      this.blue -= 1;
     }
     if (CardColor.WHITE == color){
-      this.white =- 1;
+      this.white -= 1;
     }
   }
 

@@ -33,20 +33,30 @@ class BattleCardGame {
   }
 
   bool digimonsCanBeSummoned(){
-    rival.selectAllDigimonThatCanBeSummoned();
+    print(player.canSummonAllDigimonSelected());
+    print(rival.canSummonAllDigimonSelected());
+
     return player.canSummonAllDigimonSelected() && rival.canSummonAllDigimonSelected();
   }
 
   void calculatePoints(){
-    if (digimonsCanBeSummoned()){
+    //if (digimonsCanBeSummoned()){
       player.calculatePoints();
       rival.calculatePoints();
-    }
+   // }
   }
 
   void battle(){
     player.attack(rival);
     rival.attack(player);
+  }
+
+  bool battleIsFinished(){
+    return this.player.roundsWon == 2 || this.rival.roundsWon == 2;
+  }
+
+  bool isPlayerWinner(){
+    return this.player.roundsWon == 2;
   }
 
   void calculateWinner(){
@@ -72,5 +82,12 @@ class BattleCardGame {
 
     player.hand.clear();
     rival.hand.clear();
+
+    player.clearPoints();
+    rival.clearPoints();
+  }
+
+  void startRound(){
+    this.drawCards();
   }
 }

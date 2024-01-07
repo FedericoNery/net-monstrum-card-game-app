@@ -29,6 +29,8 @@ class Tamer {
 
   void attack(Tamer rival){
     rival.receiveAttack(this.attackPoints);
+    //TODO ANIMACION DE REDUCCION DE ATTACK POINTS
+    this.attackPoints = 0;
   }
 
   void receiveAttack(int points){
@@ -60,12 +62,33 @@ class Tamer {
   //TODO Tomar el color de energia y la CANTIDAD de energias que consume la carta
   bool canSummonAllDigimonSelected(){
     List<Card> digimonsToSummon = this.hand.getSelectedCards();
-    EnergiesCounters energiesCounters = this.energiesCounters.getCopy();
-    for (Card card in digimonsToSummon){
-      energiesCounters.discountByColor(card.color);
+    EnergiesCounters energiesCountersCopy = this.energiesCounters.getCopy();
+    if (digimonsToSummon.isNotEmpty){
+      for (Card card in digimonsToSummon){
+        energiesCountersCopy.discountByColor(card.color);
+      }
     }
-    return this.energiesCounters.allEnergiesAreZeroOrMore();
+    return energiesCountersCopy.allEnergiesAreZeroOrMore();
   }
 
-  
+  void summonToDigimonZone(){
+    List<Card> cardsToSummon = this.hand.getSelectedCards();
+    this.discountEnergiesToSummon(cardsToSummon);
+    this.digimonZone.cards = cardsToSummon;
+    this.hand.removeSelectedCards();
+  }
+
+  void discountEnergiesToSummon(List<Card> cardsToSummon){
+    if (cardsToSummon.length > 0){
+      for (Card card in cardsToSummon){
+        this.energiesCounters.discountByColor(card.color);
+      }
+    }
+  }
+
+  void clearPoints(){
+    this.attackPoints = 0;
+    this.healthPoints = 0;
+  }
+
 }

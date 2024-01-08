@@ -4,13 +4,18 @@ class DeckService {
   List<Deck> _deckList = [];
 
   DeckService() {
-    for (int i = 1; i <= 3; i++) {
-      List<int> cardIds = List.generate(40, (index) => index + 1);
-      _deckList.add(Deck(i, cardIds));
-    }
+    List<int> cardIdsDeck1 = [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 5, 5, 5, 5, 9, 9, 9, 9];
+    _deckList.add(Deck(1, cardIdsDeck1));
+
+    List<int> cardIdsDeck2 = [65, 66, 67, 68, 65, 66, 67, 68, 65, 66, 67, 68, 65, 66, 67, 68, 49, 49, 49, 49, 9, 9, 9, 9];
+    _deckList.add(Deck(2, cardIdsDeck2));
+
+    List<int> cardIdsDeck3 = [13, 14, 15, 16, 13, 14, 15, 16, 13, 14, 15, 16, 13, 14, 15, 16, 5, 5, 5, 5, 9, 9, 9, 9];
+    _deckList.add(Deck(3, cardIdsDeck3));
   }
 
   Deck getDeckById(int id) {
     return _deckList.firstWhere((deck) => deck.id == id);
   }
+
 }

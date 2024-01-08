@@ -207,7 +207,7 @@ class MyGame extends FlameGame with HasGameRef {
     }
     add(defaultButton);
 
-    this.revealPlayerCards();
+    //this.revealPlayerCards();
   }
 
 

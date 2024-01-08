@@ -11,8 +11,8 @@ import 'package:net_monstrum_card_game/screens/digimon_card.dart';
 import 'package:net_monstrum_card_game/screens/texts_counters_player.dart';
 import 'package:net_monstrum_card_game/services/aggregationService.dart';
 import 'package:net_monstrum_card_game/widgets/button.dart';
-
 import 'components/victory_message.dart';
+import 'package:flame_audio/flame_audio.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +25,9 @@ void main() async {
 
 class MyGame extends FlameGame with HasGameRef {
   final background = Background();
+
+  final enabledMusic = false;
+  late AudioPool pool;
   late VictoryMessage victoryMessage;
   late CartaWidget card1;
   late CartaWidget card2;
@@ -74,6 +77,15 @@ class MyGame extends FlameGame with HasGameRef {
 
   @override
   Future<void> onLoad() async {
+    pool = await FlameAudio.createPool(
+      'sounds/card-battle-theme.mp3',
+      minPlayers: 2,
+      maxPlayers: 2,
+    );
+    if (enabledMusic){
+      startBgmMusic();
+    }
+
     player = service.getAggregatioByUserId(1);
     rival = service.getAggregatioByUserId(2);
 
@@ -194,6 +206,14 @@ class MyGame extends FlameGame with HasGameRef {
       add(textCounterComponent);
     }
     add(defaultButton);
+
+    this.revealPlayerCards();
+  }
+
+
+  void startBgmMusic() {
+    FlameAudio.bgm.initialize();
+    FlameAudio.bgm.play('sounds/card-battle-theme.mp3');
   }
 
   @override
@@ -332,6 +352,15 @@ class MyGame extends FlameGame with HasGameRef {
     card4Rival = CartaWidget(battleCardGame.rival.hand.cards[3], card4Rivalx, card4Rivaly, true, this.addSelectedCard, 3, true);
     card5Rival = CartaWidget(battleCardGame.rival.hand.cards[4], card5Rivalx, card5Rivaly, true, this.addSelectedCard, 4, true);
     card6Rival = CartaWidget(battleCardGame.rival.hand.cards[5], card6Rivalx, card6Rivaly, true, this.addSelectedCard, 5, true);
+  }
+
+  void revealPlayerCards(){
+    this.card1.isHidden = true;
+    this.card2.isHidden = true;
+    this.card3.isHidden = true;
+    this.card4.isHidden = true;
+    this.card5.isHidden = true;
+    this.card6.isHidden = true;
   }
 
   void addCards() async{

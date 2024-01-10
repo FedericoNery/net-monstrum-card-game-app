@@ -1,11 +1,14 @@
-import 'package:net_monstrum_card_game/domain/card.dart';
+import 'package:net_monstrum_card_game/domain/card-digimon.dart';
+
+import '../equipment-effect.dart';
 
 class DigimonZone {
-  List<Card> cards;
+  List<CardDigimon> cards;
+  List<EquipmentEffect> equipmentEffectsQueue = [];
 
   DigimonZone(this.cards);
 
-  void addToDigimonZone(Card card) {
+  void addToDigimonZone(CardDigimon card) {
     cards.add(card);
   }
 
@@ -15,7 +18,7 @@ class DigimonZone {
 
   int getAttackPoints(){
     int attackPoints = 0;
-    for (Card card in cards){
+    for (CardDigimon card in cards){
         attackPoints += card.attackPoints;
     }
 
@@ -26,7 +29,7 @@ class DigimonZone {
 
   Map<String, int> getCardCounts(){
     Map<String, int> cardCounts = {};
-    for (Card card in cards) {
+    for (CardDigimon card in cards) {
       if (cardCounts.containsKey(card.digimonName)) {
         cardCounts[card.digimonName] = cardCounts[card.digimonName]! + 1;
       } else {
@@ -44,18 +47,16 @@ class DigimonZone {
     for (String digimonName in cardCounts.keys) {
       int count = cardCounts[digimonName]!;
       if (count >= 3) {
-        Card card = cards.firstWhere((card) => card.digimonName == digimonName);
+        CardDigimon card = cards.firstWhere((card) => card.digimonName == digimonName);
         totalAttackPoints += card.attackPoints * count;
       }
     }
     return totalAttackPoints;
   }
 
-
-
   int getHealthPoints(){
     int healthPoints = 0;
-    for (Card card in cards){
+    for (CardDigimon card in cards){
       healthPoints += card.healthPoints;
     }
 
@@ -71,20 +72,21 @@ class DigimonZone {
     for (String digimonName in cardCounts.keys) {
       int count = cardCounts[digimonName]!;
       if (count >= 3) {
-        Card card = cards.firstWhere((card) => card.digimonName == digimonName);
+        CardDigimon card = cards.firstWhere((card) => card.digimonName == digimonName);
         totalHealthPoints += card.healthPoints * count;
       }
     }
     return totalHealthPoints;
   }
 
-  //TODO :: si hay 3 o mas cartas iguales, entonces sumar la totalidad de cada carta y mostrar la imagen de la evolución
-  int getAttackPointsOfEvolutions(){
-    return 0;
+  void addEquipmentsEffect(List<EquipmentEffect> equipmentEffects){
+    for (EquipmentEffect equipmentEffect in equipmentEffects){
+      equipmentEffectsQueue.add(equipmentEffect);
+    }
   }
 
-  int getHealthPointsOfEvolutions(){
-    return 0;
+  void applyLastEquipmentEffectTo(CardDigimon cardDigimon){
+    EquipmentEffect equipmentEffect = equipmentEffectsQueue.removeLast();
+    equipmentEffect.applyTo(cardDigimon);
   }
-
 }

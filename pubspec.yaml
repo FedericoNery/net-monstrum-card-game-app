@@ -68,6 +68,7 @@ flutter:
     - assets/images/digimon/
     - assets/images/playmat/
     - assets/images/cards/
+    - assets/images/equipments/
     - assets/audio/sounds/
   #   - images/a_dot_ham.jpeg
 

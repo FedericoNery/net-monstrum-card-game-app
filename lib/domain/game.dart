@@ -1,6 +1,7 @@
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 
-import 'card.dart';
+import 'Card.dart';
+import 'card-digimon.dart';
 
 class Phases {
   static const String DRAW_PHASE = 'DRAW_PHASE';

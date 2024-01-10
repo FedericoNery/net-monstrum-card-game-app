@@ -4,21 +4,21 @@ import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:net_monstrum_card_game/screens/card_widget_base.dart';
+import 'package:net_monstrum_card_game/domain/card-equipment.dart';
+import 'package:net_monstrum_card_game/domain/color.dart';
 import 'package:net_monstrum_card_game/screens/styles/ap_hp_texts.dart';
 import 'package:net_monstrum_card_game/screens/styles/card_color_border.dart';
 import 'package:net_monstrum_card_game/screens/styles/flickering_card_border.dart';
-
-import '../domain/card-digimon.dart';
 import 'effects/effects.dart';
+import 'package:net_monstrum_card_game/screens/card_widget_base.dart';
 
-class CardDigimonWidget extends CardWidget with TapCallbacks {
-  final CardDigimon card;
+class CardEquipmentWidget extends CardWidget with TapCallbacks {
+  final CardEquipment card;
 
-  CardDigimonWidget(this.card, x, y, isHidden, callbackSelectCardFromHand, indexCard, isRival):
+  CardEquipmentWidget(this.card, x, y, isHidden, callbackSelectCardFromHand, indexCard, isRival):
         super(
-        size: isHidden ? Vector2(64, 85) : Vector2.all(64),
-        position: Vector2(x, y),
+          size: isHidden ? Vector2(64, 85) : Vector2.all(64),
+          position: Vector2(x, y),
       ){
     this.isHidden = isHidden;
     this.isRival = isRival;
@@ -30,7 +30,8 @@ class CardDigimonWidget extends CardWidget with TapCallbacks {
 
   @override
   Future<void> onLoad() async {
-    final uri = this.isHidden ? 'cards/card_back4.webp' : 'digimon/${this.card.digimonName}.jpg';
+    print(this.isHidden);
+    final uri = this.isHidden ? 'cards/card_back4.webp' : 'equipments/${this.card.name}.jpg';
     sprite = await Sprite.load(uri);
   }
 
@@ -38,9 +39,8 @@ class CardDigimonWidget extends CardWidget with TapCallbacks {
   void render(Canvas canvas) async {
     super.render(canvas);
     if (!this.isHidden){
-      drawCardColor(canvas, card.color);
+      drawCardColor(canvas, CardColor.EQUIPMENT);
       drawBackgroundApHp(canvas);
-
       drawApHpTexts(canvas, this.card.attackPoints, this.card.healthPoints);
 
     }
@@ -48,21 +48,20 @@ class CardDigimonWidget extends CardWidget with TapCallbacks {
 
   @override
   void update(double dt) {
-    // Implementa la lógica de actualización si es necesario
   }
 
+  @override
   void reveal() async{
     if (this.isRival){
       this.size = Vector2.all(64);
     }
     this.isHidden = false;
-    final uri = 'digimon/${this.card.digimonName}.jpg';
+    final uri = 'equipments/${this.card.name}.jpg';
     this.sprite = await Sprite.load(uri);
   }
 
   @override
   void onTapDown(TapDownEvent event) {
-    //TODO :: ver si conviene renderizar o utilizar otra clase para la carta rival
     if(!this.isRival){
       super.onTapDown(event);
       this.isSelected = !this.isSelected;
@@ -83,7 +82,3 @@ class CardDigimonWidget extends CardWidget with TapCallbacks {
     }
   }
 }
-
-
-
-

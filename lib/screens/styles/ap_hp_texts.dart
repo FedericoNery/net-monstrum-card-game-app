@@ -10,10 +10,23 @@ void drawBackgroundApHp(Canvas canvas){
 }
 
 void drawApHpTexts(Canvas canvas, int attackPoints, int healthPoints){
-  // Dibuja valores de ataque y vida
   final TextPainter textPainter = TextPainter(
       text: TextSpan(
         text: '${attackPoints} | ${healthPoints}',
+        style: TextStyle(color: Colors.white, backgroundColor: Colors.black),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr
+  );
+
+  textPainter.layout();
+  textPainter.paint(canvas, Offset(15, 65));
+}
+
+void drawEquipmentText(Canvas canvas, String name){
+  final TextPainter textPainter = TextPainter(
+      text: TextSpan(
+        text: '${name}',
         style: TextStyle(color: Colors.white, backgroundColor: Colors.black),
       ),
       textAlign: TextAlign.center,

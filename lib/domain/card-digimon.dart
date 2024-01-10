@@ -1,9 +1,9 @@
+import 'package:net_monstrum_card_game/domain/Card.dart';
 import 'package:net_monstrum_card_game/domain/color.dart';
 
 import 'evolution.dart';
 
-class Card {
-  int id;
+class CardDigimon extends Card{
   String digimonName;
   String color;
   int attackPoints;
@@ -11,7 +11,7 @@ class Card {
   Evolution? evolution;
   int energyCount;
 
-  Card(this.id, this.digimonName, this.color, this.attackPoints, this.healthPoints, this.evolution, this.energyCount);
+  CardDigimon(id, this.digimonName, this.color, this.attackPoints, this.healthPoints, this.evolution, this.energyCount) : super(id);
 
   String getDigimonImageFilename() {
     return '$digimonName.jpg';

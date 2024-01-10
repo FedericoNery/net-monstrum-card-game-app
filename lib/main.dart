@@ -2,12 +2,26 @@ import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/domain/card-digimon.dart';
+import 'package:net_monstrum_card_game/domain/card-equipment.dart';
+import 'package:net_monstrum_card_game/domain/card-equipment.dart';
+import 'package:net_monstrum_card_game/domain/card-equipment.dart';
+import 'package:net_monstrum_card_game/domain/card-equipment.dart';
+import 'package:net_monstrum_card_game/domain/card-equipment.dart';
+import 'package:net_monstrum_card_game/domain/card-equipment.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 import 'package:net_monstrum_card_game/screens/background_battle.dart';
+import 'package:net_monstrum_card_game/screens/card_widget_base.dart';
 import 'package:net_monstrum_card_game/screens/color_counter.dart';
 import 'package:net_monstrum_card_game/screens/counters_measures.dart';
 import 'package:net_monstrum_card_game/screens/digimon_card.dart';
+import 'package:net_monstrum_card_game/screens/equipment_card.dart';
+import 'package:net_monstrum_card_game/screens/equipment_card.dart';
+import 'package:net_monstrum_card_game/screens/equipment_card.dart';
+import 'package:net_monstrum_card_game/screens/equipment_card.dart';
+import 'package:net_monstrum_card_game/screens/equipment_card.dart';
+import 'package:net_monstrum_card_game/screens/equipment_card.dart';
 import 'package:net_monstrum_card_game/screens/texts_counters_player.dart';
 import 'package:net_monstrum_card_game/services/aggregationService.dart';
 import 'package:net_monstrum_card_game/widgets/button.dart';
@@ -29,18 +43,18 @@ class MyGame extends FlameGame with HasGameRef {
   final enabledMusic = false;
   late AudioPool pool;
   late VictoryMessage victoryMessage;
-  late CartaWidget card1;
-  late CartaWidget card2;
-  late CartaWidget card3;
-  late CartaWidget card4;
-  late CartaWidget card5;
-  late CartaWidget card6;
-  late CartaWidget card1Rival;
-  late CartaWidget card2Rival;
-  late CartaWidget card3Rival;
-  late CartaWidget card4Rival;
-  late CartaWidget card5Rival;
-  late CartaWidget card6Rival;
+  late CardWidget card1;
+  late CardWidget card2;
+  late CardWidget card3;
+  late CardWidget card4;
+  late CardWidget card5;
+  late CardWidget card6;
+  late CardWidget card1Rival;
+  late CardWidget card2Rival;
+  late CardWidget card3Rival;
+  late CardWidget card4Rival;
+  late CardWidget card5Rival;
+  late CardWidget card6Rival;
 
   final blueCounter = ColorCounter(Colors.blueAccent);
   final redCounter = ColorCounter(Colors.red);
@@ -325,12 +339,12 @@ class MyGame extends FlameGame with HasGameRef {
     const card6x = offsetX + 450;
     const card6y = offsetYPlayer;
 
-    card1 = CartaWidget(battleCardGame.player.hand.cards[0], card1x, card1y, false, this.addSelectedCard, 0, false);
-    card2 = CartaWidget(battleCardGame.player.hand.cards[1], card2x, card2y, false, this.addSelectedCard, 1, false);
-    card3 = CartaWidget(battleCardGame.player.hand.cards[2], card3x, card3y, false, this.addSelectedCard, 2, false);
-    card4 = CartaWidget(battleCardGame.player.hand.cards[3], card4x, card4y, false, this.addSelectedCard, 3, false);
-    card5 = CartaWidget(battleCardGame.player.hand.cards[4], card5x, card5y, false, this.addSelectedCard, 4, false);
-    card6 = CartaWidget(battleCardGame.player.hand.cards[5], card6x, card6y, false, this.addSelectedCard, 5, false);
+    card1 = battleCardGame.player.hand.cards[0].isDigimonCard() ? CardDigimonWidget(battleCardGame.player.hand.cards[0] as CardDigimon, card1x, card1y, false, this.addSelectedCard, 0, false) : CardEquipmentWidget(battleCardGame.player.hand.cards[0] as CardEquipment, card1x, card1y, false, this.addSelectedCard, 0, false);
+    card2 = battleCardGame.player.hand.cards[1].isDigimonCard() ? CardDigimonWidget(battleCardGame.player.hand.cards[1] as CardDigimon, card2x, card2y, false, this.addSelectedCard, 1, false) : CardEquipmentWidget(battleCardGame.player.hand.cards[1] as CardEquipment, card2x, card2y, false, this.addSelectedCard, 1, false);
+    card3 = battleCardGame.player.hand.cards[2].isDigimonCard() ? CardDigimonWidget(battleCardGame.player.hand.cards[2] as CardDigimon, card3x, card3y, false, this.addSelectedCard, 2, false) : CardEquipmentWidget(battleCardGame.player.hand.cards[2] as CardEquipment, card3x, card3y, false, this.addSelectedCard, 2, false);
+    card4 = battleCardGame.player.hand.cards[3].isDigimonCard() ? CardDigimonWidget(battleCardGame.player.hand.cards[3] as CardDigimon, card4x, card4y, false, this.addSelectedCard, 3, false) : CardEquipmentWidget(battleCardGame.player.hand.cards[3] as CardEquipment, card4x, card4y, false, this.addSelectedCard, 3, false);
+    card5 = battleCardGame.player.hand.cards[4].isDigimonCard() ? CardDigimonWidget(battleCardGame.player.hand.cards[4] as CardDigimon, card5x, card5y, false, this.addSelectedCard, 4, false) : CardEquipmentWidget(battleCardGame.player.hand.cards[4] as CardEquipment, card5x, card5y, false, this.addSelectedCard, 4, false);
+    card6 = battleCardGame.player.hand.cards[5].isDigimonCard() ? CardDigimonWidget(battleCardGame.player.hand.cards[5] as CardDigimon, card6x, card6y, false, this.addSelectedCard, 5, false) : CardEquipmentWidget(battleCardGame.player.hand.cards[5] as CardEquipment, card6x, card6y, false, this.addSelectedCard, 5, false);
 
     const offsetYCards = 25.0;
     const card1Rivalx = offsetX + 10;
@@ -346,12 +360,12 @@ class MyGame extends FlameGame with HasGameRef {
     const card6Rivalx = offsetX + 450;
     const card6Rivaly = offsetYCards;
 
-    card1Rival = CartaWidget(battleCardGame.rival.hand.cards[0], card1Rivalx, card1Rivaly, true, this.addSelectedCard, 0, true);
-    card2Rival = CartaWidget(battleCardGame.rival.hand.cards[1], card2Rivalx, card2Rivaly, true, this.addSelectedCard, 1, true);
-    card3Rival = CartaWidget(battleCardGame.rival.hand.cards[2], card3Rivalx, card3Rivaly, true, this.addSelectedCard, 2, true);
-    card4Rival = CartaWidget(battleCardGame.rival.hand.cards[3], card4Rivalx, card4Rivaly, true, this.addSelectedCard, 3, true);
-    card5Rival = CartaWidget(battleCardGame.rival.hand.cards[4], card5Rivalx, card5Rivaly, true, this.addSelectedCard, 4, true);
-    card6Rival = CartaWidget(battleCardGame.rival.hand.cards[5], card6Rivalx, card6Rivaly, true, this.addSelectedCard, 5, true);
+    card1Rival = battleCardGame.player.hand.cards[0].isDigimonCard() ? CardDigimonWidget(battleCardGame.rival.hand.cards[0] as CardDigimon, card1Rivalx, card1Rivaly, true, this.addSelectedCard, 0, true) : CardEquipmentWidget(battleCardGame.player.hand.cards[0] as CardEquipment, card1x, card1y, true, this.addSelectedCard, 0, true);
+    card2Rival = battleCardGame.player.hand.cards[1].isDigimonCard() ? CardDigimonWidget(battleCardGame.rival.hand.cards[1] as CardDigimon, card2Rivalx, card2Rivaly, true, this.addSelectedCard, 1, true) : CardEquipmentWidget(battleCardGame.player.hand.cards[1] as CardEquipment, card2x, card2y, true, this.addSelectedCard, 1, true);
+    card3Rival = battleCardGame.player.hand.cards[2].isDigimonCard() ? CardDigimonWidget(battleCardGame.rival.hand.cards[2] as CardDigimon, card3Rivalx, card3Rivaly, true, this.addSelectedCard, 2, true) : CardEquipmentWidget(battleCardGame.player.hand.cards[2] as CardEquipment, card3x, card3y, true, this.addSelectedCard, 2, true);
+    card4Rival = battleCardGame.player.hand.cards[3].isDigimonCard() ? CardDigimonWidget(battleCardGame.rival.hand.cards[3] as CardDigimon, card4Rivalx, card4Rivaly, true, this.addSelectedCard, 3, true) : CardEquipmentWidget(battleCardGame.player.hand.cards[3] as CardEquipment, card4x, card4y, true, this.addSelectedCard, 3, true);
+    card5Rival = battleCardGame.player.hand.cards[4].isDigimonCard() ? CardDigimonWidget(battleCardGame.rival.hand.cards[4] as CardDigimon, card5Rivalx, card5Rivaly, true, this.addSelectedCard, 4, true) : CardEquipmentWidget(battleCardGame.player.hand.cards[4] as CardEquipment, card5x, card5y, true, this.addSelectedCard, 4, true);
+    card6Rival = battleCardGame.player.hand.cards[5].isDigimonCard() ? CardDigimonWidget(battleCardGame.rival.hand.cards[5] as CardDigimon, card6Rivalx, card6Rivaly, true, this.addSelectedCard, 5, true) : CardEquipmentWidget(battleCardGame.player.hand.cards[5] as CardEquipment, card6x, card6y, true, this.addSelectedCard, 5, true);
   }
 
   void revealPlayerCards(){

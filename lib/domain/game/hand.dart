@@ -1,6 +1,8 @@
 import 'package:flame/extensions.dart';
-import 'package:net_monstrum_card_game/domain/card.dart';
+import 'package:net_monstrum_card_game/domain/card-digimon.dart';
 import 'package:net_monstrum_card_game/domain/game/energies_counters.dart';
+
+import '../Card.dart';
 
 class Hand {
   List<Card> cards;
@@ -30,15 +32,16 @@ class Hand {
     selectedCardsIndexs.clear();
   }
 
-  List<Card> getSelectedCards(){
-    List<Card> selectedCards = [];
+  List<CardDigimon> getSelectedCards(){
+    List<CardDigimon> selectedCards = [];
     this.selectedCardsIndexs.sort();
     print(this.selectedCardsIndexs);
     this.selectedCardsIndexs.reverse();
     if (this.selectedCardsIndexs.isNotEmpty){
       for (int index in this.selectedCardsIndexs){
-        print(index);
-        selectedCards.add(this.cards[index]);
+        if (this.cards[index].isDigimonCard()){
+          selectedCards.add(this.cards[index] as CardDigimon);
+        }
       }
     }
 
@@ -61,8 +64,11 @@ class Hand {
   }
 
   EnergiesCounters getEnergiesCounters(){
-    EnergiesCounters energiesCounters = new EnergiesCounters.initAllInZero();
-    for (Card card in this.cards) {
+    EnergiesCounters energiesCounters = EnergiesCounters.initAllInZero();
+    var filteredDigimonCards = this.cards.where((card) => card.isDigimonCard());
+    Iterable<CardDigimon> digimonCards = filteredDigimonCards.cast<CardDigimon>();
+
+    for (CardDigimon card in digimonCards) {
       if (card.isRedColor()){
         energiesCounters.red += 1;
       }

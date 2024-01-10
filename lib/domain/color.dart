@@ -8,6 +8,8 @@ class CardColor {
   static const String WHITE = 'White';
   static const String GREEN = 'Green';
 
+  static const String EQUIPMENT = 'Gray';
+
   static List<String> getAllColors() {
     return [CardColor.RED, CardColor.BLUE, CardColor.BLACK, CardColor.BROWN, CardColor.WHITE, CardColor.GREEN];
   }
@@ -20,6 +22,7 @@ class CardColor {
       CardColor.BROWN: Colors.brown,
       CardColor.WHITE: Colors.white,
       CardColor.GREEN: Colors.green,
+      CardColor.EQUIPMENT: Colors.grey,
     };
     return colorStringToColorsFlutterMap[color]!;
   }

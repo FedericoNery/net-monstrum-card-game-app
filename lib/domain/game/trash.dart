@@ -1,4 +1,6 @@
-import 'package:net_monstrum_card_game/domain/card.dart';
+import 'package:net_monstrum_card_game/domain/card-digimon.dart';
+
+import '../Card.dart';
 
 class Trash {
   List<Card> cards;

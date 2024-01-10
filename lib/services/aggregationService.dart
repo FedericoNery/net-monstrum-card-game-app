@@ -2,7 +2,8 @@ import 'package:net_monstrum_card_game/services/cardsService.dart';
 import 'package:net_monstrum_card_game/services/decksServices.dart';
 import 'package:net_monstrum_card_game/services/usersService.dart';
 
-import '../domain/card.dart';
+import '../domain/Card.dart';
+import '../domain/card-digimon.dart';
 import '../domain/deck.dart';
 import '../domain/user.dart';
 

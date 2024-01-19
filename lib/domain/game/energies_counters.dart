@@ -1,4 +1,4 @@
-import 'package:net_monstrum_card_game/domain/color.dart';
+import 'package:net_monstrum_card_game/domain/card/color.dart';
 
 class EnergiesCounters {
   int red;

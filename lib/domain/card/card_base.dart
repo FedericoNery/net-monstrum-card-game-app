@@ -1,5 +1,5 @@
-import 'package:net_monstrum_card_game/domain/card-digimon.dart';
-import 'package:net_monstrum_card_game/domain/card-equipment.dart';
+import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
+import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
 
 abstract class ICard {
   bool isDigimonCard();
@@ -8,6 +8,7 @@ abstract class ICard {
 
 class Card implements ICard {
   int id;
+  int? internalGameId;
 
   Card(this.id);
 

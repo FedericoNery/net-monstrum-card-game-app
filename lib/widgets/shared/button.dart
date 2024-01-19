@@ -6,7 +6,7 @@ import 'package:flutter/painting.dart';
 class ConfirmPhaseButton extends FlameGame {
   @override
   Future<void> onLoad() async {
-    final defaultButton = DefaultButton();
+    final defaultButton = DefaultButton("Confirm Phase");
     defaultButton.position = Vector2(50, 50);
     defaultButton.size = Vector2(250, 50);
     add(defaultButton);
@@ -71,12 +71,15 @@ class ConfirmPhaseButton extends FlameGame {
  */
 class DefaultButton extends AdvancedButtonComponent with TapCallbacks {
   var tapUpCallback;
+  String defaultText;
+
+  DefaultButton(this.defaultText);
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
 
-    defaultLabel = TextComponent(text: 'Summon Digimon', size: Vector2.all(5), scale: Vector2.all(0.5));
+    defaultLabel = TextComponent(text: defaultText, size: Vector2.all(5), scale: Vector2.all(0.5));
     disabledLabel = TextComponent(text: 'Disabled button', size: Vector2.all(5));
 
     defaultSkin = RoundedRectComponent()

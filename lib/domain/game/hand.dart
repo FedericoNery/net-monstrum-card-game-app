@@ -1,12 +1,12 @@
 import 'package:flame/extensions.dart';
-import 'package:net_monstrum_card_game/domain/card-digimon.dart';
+import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game/energies_counters.dart';
-
-import '../Card.dart';
+import 'package:collection/collection.dart';
+import '../card/card_base.dart';
 
 class Hand {
   List<Card> cards;
-  List<int> selectedCardsIndexs = [];
+  List<int> selectedCardsInternalIds = [];
 
   Hand(this.cards);
 
@@ -14,33 +14,34 @@ class Hand {
     cards.add(card);
   }
 
-  void removeFromHand(int index) {
-    cards.removeAt(index);
+  void removeFromHand(int internalCardId) {
+    int index = cards.indexWhere((card) => card.internalGameId == internalCardId);
+    if(index != -1){
+      cards.removeAt(index);
+    }
   }
 
   void removeSelectedCards() {
-    if (selectedCardsIndexs.isNotEmpty){
-      selectedCardsIndexs.sort();
-      for (int i = selectedCardsIndexs.length - 1; i >= 0; i--) {
-        cards.removeAt(selectedCardsIndexs[i]);
+    if (selectedCardsInternalIds.isNotEmpty){
+      for (int id in selectedCardsInternalIds) {
+        removeFromHand(id);
       }
     }
   }
 
   void clear(){
     cards.clear();
-    selectedCardsIndexs.clear();
+    selectedCardsInternalIds.clear();
   }
 
   List<CardDigimon> getSelectedCards(){
     List<CardDigimon> selectedCards = [];
-    this.selectedCardsIndexs.sort();
-    print(this.selectedCardsIndexs);
-    this.selectedCardsIndexs.reverse();
-    if (this.selectedCardsIndexs.isNotEmpty){
-      for (int index in this.selectedCardsIndexs){
-        if (this.cards[index].isDigimonCard()){
-          selectedCards.add(this.cards[index] as CardDigimon);
+
+    if (selectedCardsInternalIds.isNotEmpty){
+      for (int id in selectedCardsInternalIds){
+        Card? card = cards.firstWhereOrNull((card) => card.internalGameId == id);
+        if (card != null && card.isDigimonCard()){
+          selectedCards.add(card as CardDigimon);
         }
       }
     }
@@ -48,24 +49,24 @@ class Hand {
     return selectedCards;
   }
 
-  void selectCardByIndex(int index){
-    if (this.selectedCardsIndexs.contains(index)){
-      this.selectedCardsIndexs.remove(index);
+  void selectCardByInternalId(int internalCardId){
+    if (selectedCardsInternalIds.contains(internalCardId)){
+      selectedCardsInternalIds.remove(internalCardId);
     }
     else{
-      this.selectedCardsIndexs.add(index);
+      selectedCardsInternalIds.add(internalCardId);
     }
   }
 
-  void onlySelectCardByIndex(int index){
-    if (!this.selectedCardsIndexs.contains(index)){
-      this.selectedCardsIndexs.add(index);
+  void onlySelectCardByInternalId(int internalCardId){
+    if (!selectedCardsInternalIds.contains(internalCardId)){
+      selectedCardsInternalIds.add(internalCardId);
     }
   }
 
   EnergiesCounters getEnergiesCounters(){
     EnergiesCounters energiesCounters = EnergiesCounters.initAllInZero();
-    var filteredDigimonCards = this.cards.where((card) => card.isDigimonCard());
+    var filteredDigimonCards = cards.where((card) => card.isDigimonCard());
     Iterable<CardDigimon> digimonCards = filteredDigimonCards.cast<CardDigimon>();
 
     for (CardDigimon card in digimonCards) {
@@ -89,5 +90,15 @@ class Hand {
       }
     }
     return energiesCounters;
+  }
+
+  bool isDigimonCardSelected(int internalCardId){
+    var card = cards.firstWhereOrNull((card) => card.internalGameId == internalCardId);
+    return card != null && card.isDigimonCard(); //&& selectedCardsInternalIds.contains(card.internalGameId!);
+  }
+
+  bool isEquipmentCardSelected(int internalCardId){
+    var card = cards.firstWhereOrNull((card) => card.internalGameId == internalCardId);
+    return card != null && card.isEquipmentCard();
   }
 }

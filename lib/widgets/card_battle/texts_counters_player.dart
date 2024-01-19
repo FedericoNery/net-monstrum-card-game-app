@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:net_monstrum_card_game/domain/game/energies_counters.dart';
-import 'package:net_monstrum_card_game/screens/counters_measures.dart';
+
+import 'counters_measures.dart';
 
 class TextsCounters {
     static List<TextComponent> getRivalComponents(EnergiesCounters energiesCounters) {

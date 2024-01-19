@@ -1,4 +1,4 @@
-import 'card-digimon.dart';
+import 'card_digimon.dart';
 
 class EquipmentEffect{
   int attackPoints;
@@ -7,8 +7,8 @@ class EquipmentEffect{
   EquipmentEffect(this.attackPoints, this.healthPoints);
 
   void applyTo(CardDigimon cardDigimon){
-    cardDigimon.attackPoints += this.attackPoints;
-    cardDigimon.healthPoints += this.healthPoints;
+    cardDigimon.attackPoints += attackPoints;
+    cardDigimon.healthPoints += healthPoints;
   }
 
 }

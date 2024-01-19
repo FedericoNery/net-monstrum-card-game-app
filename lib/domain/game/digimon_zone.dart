@@ -1,6 +1,7 @@
-import 'package:net_monstrum_card_game/domain/card-digimon.dart';
+import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
+import 'package:collection/collection.dart';
 
-import '../equipment-effect.dart';
+import '../card/equipment_effect.dart';
 
 class DigimonZone {
   List<CardDigimon> cards;
@@ -88,5 +89,10 @@ class DigimonZone {
   void applyLastEquipmentEffectTo(CardDigimon cardDigimon){
     EquipmentEffect equipmentEffect = equipmentEffectsQueue.removeLast();
     equipmentEffect.applyTo(cardDigimon);
+  }
+
+  void applyEffectTo(int index, EquipmentEffect equipmentEffect){
+    int indexCard = cards.indexWhere((card) => card.internalGameId == index);
+    cards[indexCard].applyEquipmentEffect(equipmentEffect);
   }
 }

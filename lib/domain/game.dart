@@ -1,11 +1,13 @@
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 
-import 'Card.dart';
-import 'card-digimon.dart';
+import 'card/card_base.dart';
+import 'card/card_digimon.dart';
 
 class Phases {
   static const String DRAW_PHASE = 'DRAW_PHASE';
+  static const String COMPILATION_PHASE = 'COMPILATION_PHASE';
   static const String SUMMON_PHASE = 'SUMMON_PHASE';
+  static const String UPGRADE_PHASE = 'UPGRADE_PHASE';
   static const String BATTLE_PHASE = 'BATTLE_PHASE';
 }
 
@@ -34,9 +36,6 @@ class BattleCardGame {
   }
 
   bool digimonsCanBeSummoned(){
-    print(player.canSummonAllDigimonSelected());
-    print(rival.canSummonAllDigimonSelected());
-
     return player.canSummonAllDigimonSelected() && rival.canSummonAllDigimonSelected();
   }
 
@@ -48,6 +47,7 @@ class BattleCardGame {
   }
 
   void battle(){
+    phaseGame = Phases.BATTLE_PHASE;
     player.attack(rival);
     rival.attack(player);
   }
@@ -89,6 +89,39 @@ class BattleCardGame {
   }
 
   void startRound(){
-    this.drawCards();
+    phaseGame = Phases.DRAW_PHASE;
+    drawCards();
+  }
+
+  void toDrawPhase(){
+    phaseGame = Phases.DRAW_PHASE;
+  }
+
+  void toSummonPhase(){
+    phaseGame = Phases.SUMMON_PHASE;
+  }
+
+  void toUpgradePhase(){
+    phaseGame = Phases.UPGRADE_PHASE;
+  }
+
+  void toBattlePhase(){
+    phaseGame = Phases.BATTLE_PHASE;
+  }
+
+  bool isCompilationPhase(){
+    return phaseGame == Phases.COMPILATION_PHASE;
+  }
+
+  bool isSummonPhase(){
+    return phaseGame == Phases.SUMMON_PHASE;
+  }
+
+  bool isUpgradePhase(){
+    return phaseGame == Phases.UPGRADE_PHASE;
+  }
+
+  bool isBattlePhase(){
+    return phaseGame == Phases.BATTLE_PHASE;
   }
 }

@@ -1,4 +1,4 @@
-import '../domain/user.dart';
+import '../domain/data/user.dart';
 
 class UsersService {
   List<User> _usersList = [];

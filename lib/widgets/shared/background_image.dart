@@ -1,11 +1,14 @@
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 
-class Background extends SpriteComponent with HasGameRef {
-  Background();
+class BackgroundImage extends SpriteComponent with HasGameRef {
+  String imageUri;
+
+  BackgroundImage(this.imageUri);
+
   @override
   Future<void> onLoad() async {
-    final background = await Flame.images.load("playmat/playmat.png");
+    final background = await Flame.images.load(imageUri);
     size = gameRef.size;
     sprite = Sprite(background);
   }

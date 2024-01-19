@@ -1,11 +1,10 @@
-import 'package:net_monstrum_card_game/services/cardsService.dart';
-import 'package:net_monstrum_card_game/services/decksServices.dart';
-import 'package:net_monstrum_card_game/services/usersService.dart';
+import 'package:net_monstrum_card_game/services/cards_service.dart';
+import 'package:net_monstrum_card_game/services/deck_service.dart';
+import 'package:net_monstrum_card_game/services/user_service.dart';
 
-import '../domain/Card.dart';
-import '../domain/card-digimon.dart';
-import '../domain/deck.dart';
-import '../domain/user.dart';
+import '../domain/card/card_base.dart';
+import '../domain/data/deck.dart';
+import '../domain/data/user.dart';
 
 class DeckAggregation {
   int id;
@@ -23,7 +22,7 @@ class Aggregation{
 
 class AggregationService {
   CardsService cardsService = new CardsService();
-  DeckService DecksService = new DeckService();
+  DeckService decksService = new DeckService();
   UsersService usersService = new UsersService();
 
   Aggregation getAggregatioByUserId(int id) {
@@ -32,15 +31,18 @@ class AggregationService {
 
     List<Deck> decksEntities= [];
     for (final deckId in user!.decksIds) {
-      Deck deck = DeckService().getDeckById(deckId);
+      Deck deck = decksService.getDeckById(deckId);
       decksEntities.add(deck);
     }
 
     for (final deck in decksEntities){
       List<Card> cards = [];
+      int counter = 0;
       for (final idCard in deck.cardsIds){
         Card card = this.cardsService.getCardById(idCard);
+        card.internalGameId = counter;
         cards.add(card);
+        counter++;
       }
 
       DeckAggregation deckAggregation = new DeckAggregation(deck.id, cards);

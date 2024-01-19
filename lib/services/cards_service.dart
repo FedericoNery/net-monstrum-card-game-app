@@ -1,11 +1,11 @@
 import 'dart:math';
 
-import 'package:net_monstrum_card_game/domain/Card.dart';
-import 'package:net_monstrum_card_game/domain/card-equipment.dart';
-import 'package:net_monstrum_card_game/domain/color.dart';
-import 'package:net_monstrum_card_game/domain/evolution.dart';
+import 'package:net_monstrum_card_game/domain/card/card_base.dart';
+import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
+import 'package:net_monstrum_card_game/domain/card/color.dart';
+import 'package:net_monstrum_card_game/domain/data/evolution.dart';
 
-import '../domain/card-digimon.dart';
+import '../domain/card/card_digimon.dart';
 
 class CardsService {
   List<Card> cardsData = [
@@ -111,7 +111,12 @@ class CardsService {
   }
 
   Card getCardById(int cardId) {
-    return cardsData.firstWhere((card) => card.id == cardId);
+    Card card = cardsData.firstWhere((card) => card.id == cardId);
+    if (card.isDigimonCard()){
+      return (card as CardDigimon).copyWith();
+    }
+
+    return (card as CardEquipment).copyWith();
   }
 
 }

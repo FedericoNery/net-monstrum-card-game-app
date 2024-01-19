@@ -1,15 +1,16 @@
-import 'package:net_monstrum_card_game/domain/Card.dart';
-import 'package:net_monstrum_card_game/domain/card-digimon.dart';
+import 'package:net_monstrum_card_game/domain/card/card_base.dart';
+import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
 
-import 'equipment-effect.dart';
+import 'equipment_effect.dart';
 
 // UNIQUE
 // PARTIAL
 // ALL
 
 //TODO :: AMPLIAR FUNCIONALIDAD PARA QUE CARD EQUIPMENT FUNCIONE SEGUN LAS PROPIEDADES DE UN DIGIMON
-
+// TODO :: analizar si es conveniente agregar una propiedad targetZone para que la carta sepa que digimon zone es el objetivo
+// o sino delegar esto al usuario y que solo apliques efectos a las cartas que quieras
 class CardEquipment extends Card{
   String name;
   int attackPoints;
@@ -18,6 +19,17 @@ class CardEquipment extends Card{
   String targetScope = "UNIQUE";
 
   CardEquipment(id, this.name, this.attackPoints, this.healthPoints, this.targetScope, this.quantityOfTargets): super(id);
+
+  CardEquipment copyWith({int? id, String? name, int? attackPoints, int? healthPoints, int? quantityOfTargets, String? targetScope}){
+    return CardEquipment(
+      id ?? this.id,
+      name ?? this.name,
+      attackPoints ?? this.attackPoints,
+      healthPoints ?? this.healthPoints,
+      targetScope ?? this.targetScope,
+      quantityOfTargets ?? this.quantityOfTargets
+    );
+  }
 
   //TODO :: PUEDE QUE ESTO ESTE SOBRE DESARROLADO
   //Puedo hacer que quantityOfTargets si es null -> aplica a todos y si posee un numero, que lo aplique a esa cantidad

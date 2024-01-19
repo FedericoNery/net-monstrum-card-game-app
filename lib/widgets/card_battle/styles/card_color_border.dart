@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-
-import '../../domain/color.dart';
+import '../../../domain/card/color.dart';
 
 RRect getCardColorBorder(String color){
   final Rect bounds = Rect.fromLTWH(0, 0, 65, 85);

@@ -1,6 +1,6 @@
-import 'package:net_monstrum_card_game/domain/card-digimon.dart';
+import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 
-import '../Card.dart';
+import '../card/card_base.dart';
 
 class Deck {
   List<Card> cards;

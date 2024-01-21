@@ -21,12 +21,12 @@ class Aggregation{
 }
 
 class AggregationService {
-  CardsService cardsService = new CardsService();
-  DeckService decksService = new DeckService();
-  UsersService usersService = new UsersService();
+  CardsService cardsService = CardsService();
+  DeckService decksService = DeckService();
+  UsersService usersService = UsersService();
 
   Aggregation getAggregatioByUserId(int id) {
-    User? user = this.usersService.getUserById(id);
+    User? user = usersService.getUserById(id);
     List<DeckAggregation> decksAggregations = [];
 
     List<Deck> decksEntities= [];
@@ -39,17 +39,17 @@ class AggregationService {
       List<Card> cards = [];
       int counter = 0;
       for (final idCard in deck.cardsIds){
-        Card card = this.cardsService.getCardById(idCard);
+        Card card = cardsService.getCardById(idCard);
         card.internalGameId = counter;
         cards.add(card);
         counter++;
       }
 
-      DeckAggregation deckAggregation = new DeckAggregation(deck.id, cards);
+      DeckAggregation deckAggregation = DeckAggregation(deck.id, cards);
       decksAggregations.add(deckAggregation);
     }
 
-    Aggregation aggregation = new Aggregation(user, decksAggregations);
+    Aggregation aggregation = Aggregation(user, decksAggregations);
     return aggregation;
   }
 }

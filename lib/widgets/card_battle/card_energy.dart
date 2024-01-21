@@ -4,6 +4,7 @@ import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
 import 'package:net_monstrum_card_game/domain/card/color.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
@@ -12,20 +13,16 @@ import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_car
 import 'effects/effects.dart';
 import './card_widget_base.dart';
 
-class CardEquipmentWidget extends CardWidget with TapCallbacks {
-  final CardEquipment card;
-  Function callbackActivateEquipment = (int index, CardEquipment cardEquipment) => {};
+class CardEnergyWidget extends CardWidget with TapCallbacks {
+  final CardEnergy card;
 
-  CardEquipmentWidget(this.card, x, y, isHidden, callbackSelectCardFromHand, isRival, isEnabledToSelectCard, activateEquipment, internalCardId):
+  CardEnergyWidget(this.card, x, y, isHidden, isRival, internalCardId):
         super(
-          size: isHidden ? Vector2(64, 85) : Vector2.all(64),
-          position: Vector2(x, y),
+        size: isHidden ? Vector2(64, 85) : Vector2.all(64),
+        position: Vector2(x, y),
       ){
     this.isHidden = isHidden;
     this.isRival = isRival;
-    this.callbackSelectCardFromHand = callbackSelectCardFromHand;
-    this.isEnabledToSelectCard = isEnabledToSelectCard;
-    callbackActivateEquipment = activateEquipment;
     this.x = x;
     this.y = y;
     this.internalCardId = internalCardId;
@@ -33,7 +30,7 @@ class CardEquipmentWidget extends CardWidget with TapCallbacks {
 
   @override
   Future<void> onLoad() async {
-    final uri = isHidden ? 'cards/card_back4.webp' : 'equipments/${card.name}.png';
+    final uri = isHidden ? 'cards/card_back4.webp' : 'energies/${card.name}.png';
     sprite = await Sprite.load(uri);
   }
 
@@ -41,9 +38,9 @@ class CardEquipmentWidget extends CardWidget with TapCallbacks {
   void render(Canvas canvas) async {
     super.render(canvas);
     if (!isHidden){
-      drawCardColor(canvas, CardColor.EQUIPMENT);
+      drawCardColor(canvas, card.color);
       drawBackgroundApHp(canvas);
-      drawEquipmentText(canvas, " (EQG) ");
+      drawEquipmentText(canvas, " (NRG) ");
     }
   }
 
@@ -57,17 +54,19 @@ class CardEquipmentWidget extends CardWidget with TapCallbacks {
       size = Vector2.all(64);
     }
     isHidden = false;
-    final uri = 'equipments/${card.name}.png';
+    final uri = 'energies/${card.name}.png';
     sprite = await Sprite.load(uri);
   }
 
   @override
   void onTapDown(TapDownEvent event) {
-    if(isEnabledToSelectCard(card.internalGameId) && !isRival){
+    //isEnabledToSelectCard(card.internalGameId) && !isRival
+    //TODO :: TEMPORAL
+    if(true && !isRival){
       super.onTapDown(event);
       isSelected = !isSelected;
-      callbackSelectCardFromHand(card.internalGameId);
-      callbackActivateEquipment(card.internalGameId, card);
+      //callbackSelectCardFromHand(card.internalGameId);
+      //callbackActivateEquipment(card.internalGameId, card);
 
       final moveEffect = getUpAndDownEffect(isSelected, x, y);
       add(moveEffect);

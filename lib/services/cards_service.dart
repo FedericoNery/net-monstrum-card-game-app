@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
+import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
 import 'package:net_monstrum_card_game/domain/card/color.dart';
 import 'package:net_monstrum_card_game/domain/data/evolution.dart';
@@ -104,11 +105,22 @@ class CardsService {
     CardEquipment(84, "Sword 4x +10", 10, 0, "PARTIAL", 4),
     CardEquipment(85, "Aura", 10, 10, "ALL", null),
 
+    CardEnergy(86, "Red Energy +1", CardColor.RED, 1),
+    CardEnergy(87, "Green Energy +1", CardColor.GREEN, 1),
+    CardEnergy(88, "Black Energy +1", CardColor.BLACK, 1),
+    CardEnergy(89, "Blue Energy +1", CardColor.BLUE, 1),
+    CardEnergy(90, "White Energy +1", CardColor.WHITE, 1),
+    CardEnergy(91, "Brown Energy +1", CardColor.BROWN, 1),
+
+    CardEnergy(92, "Red Energy -1", CardColor.RED, -1),
+    CardEnergy(93, "Green Energy -1", CardColor.GREEN, -1),
+    CardEnergy(94, "Black Energy -1", CardColor.BLACK, -1),
+    CardEnergy(95, "Blue Energy -1", CardColor.BLUE, -1),
+    CardEnergy(96, "White Energy -1", CardColor.WHITE, -1),
+    CardEnergy(97, "Brown Energy -1", CardColor.BROWN, -1),
   ];
 
-  CardsService() {
-
-  }
+  CardsService();
 
   Card getCardById(int cardId) {
     Card card = cardsData.firstWhere((card) => card.id == cardId);

@@ -1,16 +1,13 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import '../domain/card/card_digimon.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
 import '../domain/card/card_equipment.dart';
 import '../domain/card/equipment_effect.dart';
 import '../domain/game.dart';
 import '../domain/game/tamer.dart';
 import '../services/aggregation_service.dart';
-import '../widgets/card_battle/card_widget_base.dart';
 import '../widgets/card_battle/color_counter.dart';
-import '../widgets/card_battle/digimon_card.dart';
-import '../widgets/card_battle/equipment_card.dart';
 import '../widgets/card_battle/texts_counters_player.dart';
 import '../widgets/card_battle/victory_message.dart';
 import '../widgets/shared/background_image.dart';
@@ -24,18 +21,9 @@ class CardBattle extends FlameGame with HasGameRef {
   final enabledMusic = false;
   late AudioPool pool;
   late VictoryMessage victoryMessage;
-  late CardWidget card1;
-  late CardWidget card2;
-  late CardWidget card3;
-  late CardWidget card4;
-  late CardWidget card5;
-  late CardWidget card6;
-  late CardWidget card1Rival;
-  late CardWidget card2Rival;
-  late CardWidget card3Rival;
-  late CardWidget card4Rival;
-  late CardWidget card5Rival;
-  late CardWidget card6Rival;
+
+  late CardWidgetFactory playerCards;
+  late CardWidgetFactory rivalCards;
 
 
   final summonDigimonButton = DefaultButton('Summon Digimon');
@@ -90,7 +78,8 @@ class CardBattle extends FlameGame with HasGameRef {
     battleCardGame.drawCards();
     victoryMessage = VictoryMessage();
 
-    setCardsWidgets();
+    playerCards = CardWidgetFactory(battleCardGame.player, false, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment);
+    rivalCards = CardWidgetFactory(battleCardGame.rival, true, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment);
 
     textsCounters = TextsCounters.getComponents(battleCardGame.player.energiesCounters);
     textsCountersRival = TextsCounters.getRivalComponents(battleCardGame.rival.energiesCounters);
@@ -192,27 +181,6 @@ class CardBattle extends FlameGame with HasGameRef {
     super.render(canvas);
   }
 
-  void revealRivalCards() {
-    if (!card1Rival.isRemoved && battleCardGame.rival.wasSelectedCard(card1Rival.internalCardId!)){
-      card1Rival.reveal();
-    }
-    if (!card2Rival.isRemoved && battleCardGame.rival.wasSelectedCard(card2Rival.internalCardId!)){
-      card2Rival.reveal();
-    }
-    if (!card3Rival.isRemoved && battleCardGame.rival.wasSelectedCard(card3Rival.internalCardId!)){
-      card3Rival.reveal();
-    }
-    if (!card4Rival.isRemoved && battleCardGame.rival.wasSelectedCard(card4Rival.internalCardId!)){
-      card4Rival.reveal();
-    }
-    if (!card5Rival.isRemoved && battleCardGame.rival.wasSelectedCard(card5Rival.internalCardId!)){
-      card5Rival.reveal();
-    }
-    if (!card6Rival.isRemoved && battleCardGame.rival.wasSelectedCard(card6Rival.internalCardId!)){
-      card6Rival.reveal();
-    }
-  }
-
   void updateApHp(){
     apRival.text = 'AP:${battleCardGame.rival.attackPoints}';
     hpRival.text = 'HP:${battleCardGame.rival.healthPoints}';
@@ -251,11 +219,11 @@ class CardBattle extends FlameGame with HasGameRef {
       battleCardGame.calculatePoints();
 
       removeNotSummonedCardsByPlayer();
-      deselectPlayerCards();
+      playerCards.deselectCards();
       battleCardGame.player.removeSelectedCardsSummoned();
 
       removeNotSummonedCardsByRival();
-      revealRivalCards();
+      rivalCards.revealSelectedCards();
       battleCardGame.rival.removeSelectedCardsSummoned();
 
       updateApHp();
@@ -265,14 +233,6 @@ class CardBattle extends FlameGame with HasGameRef {
     }
   }
 
-  void deselectPlayerCards(){
-    card1.deselectCardEffect();
-    card2.deselectCardEffect();
-    card3.deselectCardEffect();
-    card4.deselectCardEffect();
-    card5.deselectCardEffect();
-    card6.deselectCardEffect();
-  }
 
   void activateEquipment(int internalCardId, CardEquipment equipmentEffect){
     selectedEquipmentCardIndex = internalCardId;
@@ -295,23 +255,23 @@ class CardBattle extends FlameGame with HasGameRef {
   }
 
   void removeCardAfterEquipmentActivation(int internalCardIdActivated){
-    if (card1.isMounted && card1.internalCardId == internalCardIdActivated){
-      remove(card1);
+    if (playerCards.card1.isMounted && playerCards.card1.internalCardId == internalCardIdActivated){
+      remove(playerCards.card1);
     }
-    if (card2.isMounted && card2.internalCardId == internalCardIdActivated){
-      remove(card2);
+    if (playerCards.card2.isMounted && playerCards.card2.internalCardId == internalCardIdActivated){
+      remove(playerCards.card2);
     }
-    if (card3.isMounted && card3.internalCardId == internalCardIdActivated){
-      remove(card3);
+    if (playerCards.card3.isMounted && playerCards.card3.internalCardId == internalCardIdActivated){
+      remove(playerCards.card3);
     }
-    if (card4.isMounted && card4.internalCardId == internalCardIdActivated){
-      remove(card4);
+    if (playerCards.card4.isMounted && playerCards.card4.internalCardId == internalCardIdActivated){
+      remove(playerCards.card4);
     }
-    if (card5.isMounted && card5.internalCardId == internalCardIdActivated){
-      remove(card5);
+    if (playerCards.card5.isMounted && playerCards.card5.internalCardId == internalCardIdActivated){
+      remove(playerCards.card5);
     }
-    if (card6.isMounted && card6.internalCardId == internalCardIdActivated){
-      remove(card6);
+    if (playerCards.card6.isMounted && playerCards.card6.internalCardId == internalCardIdActivated){
+      remove(playerCards.card6);
     }
   }
 
@@ -359,207 +319,121 @@ class CardBattle extends FlameGame with HasGameRef {
   }
 
   void setCardsWidgets(){
-    const offsetX = 100.0;
-    const offsetYPlayer = 250.0;
-    const card1x = offsetX + 10;
-    const card1y = offsetYPlayer;
-    const card2x = offsetX + 100;
-    const card2y = offsetYPlayer;
-    const card3x = offsetX + 190;
-    const card3y = offsetYPlayer;
-    const card4x = offsetX + 280;
-    const card4y = offsetYPlayer;
-    const card5x = offsetX + 370;
-    const card5y = offsetYPlayer;
-    const card6x = offsetX + 450;
-    const card6y = offsetYPlayer;
-
-    card1 = battleCardGame.player.hand.cards[0].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.player.hand.cards[0] as CardDigimon, card1x, card1y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip,battleCardGame.player.hand.cards[0].internalGameId! )
-        : CardEquipmentWidget(battleCardGame.player.hand.cards[0] as CardEquipment, card1x, card1y, false, addSelectedCard, false, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.player.hand.cards[0].internalGameId!);
-
-    card2 = battleCardGame.player.hand.cards[1].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.player.hand.cards[1] as CardDigimon, card2x, card2y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip,battleCardGame.player.hand.cards[1].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.player.hand.cards[1] as CardEquipment, card2x, card2y, false, addSelectedCard, false, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.player.hand.cards[1].internalGameId!);
-
-    card3 = battleCardGame.player.hand.cards[2].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.player.hand.cards[2] as CardDigimon, card3x, card3y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip,battleCardGame.player.hand.cards[2].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.player.hand.cards[2] as CardEquipment, card3x, card3y, false, addSelectedCard, false, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.player.hand.cards[2].internalGameId!);
-
-    card4 = battleCardGame.player.hand.cards[3].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.player.hand.cards[3] as CardDigimon, card4x, card4y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip,battleCardGame.player.hand.cards[3].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.player.hand.cards[3] as CardEquipment, card4x, card4y, false, addSelectedCard, false, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.player.hand.cards[3].internalGameId!);
-
-    card5 = battleCardGame.player.hand.cards[4].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.player.hand.cards[4] as CardDigimon, card5x, card5y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip,battleCardGame.player.hand.cards[4].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.player.hand.cards[4] as CardEquipment, card5x, card5y, false, addSelectedCard, false, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.player.hand.cards[4].internalGameId!);
-
-    card6 = battleCardGame.player.hand.cards[5].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.player.hand.cards[5] as CardDigimon, card6x, card6y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip,battleCardGame.player.hand.cards[5].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.player.hand.cards[5] as CardEquipment, card6x, card6y, false, addSelectedCard, false, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.player.hand.cards[5].internalGameId!);
-
-    const offsetYCards = 25.0;
-    const card1Rivalx = offsetX + 10;
-    const card1Rivaly = offsetYCards;
-    const card2Rivalx = offsetX + 100;
-    const card2Rivaly = offsetYCards;
-    const card3Rivalx = offsetX + 190;
-    const card3Rivaly = offsetYCards;
-    const card4Rivalx = offsetX + 280;
-    const card4Rivaly = offsetYCards;
-    const card5Rivalx = offsetX + 370;
-    const card5Rivaly = offsetYCards;
-    const card6Rivalx = offsetX + 450;
-    const card6Rivaly = offsetYCards;
-
-    card1Rival = battleCardGame.rival.hand.cards[0].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.rival.hand.cards[0] as CardDigimon, card1Rivalx, card1Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, battleCardGame.rival.hand.cards[0].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.rival.hand.cards[0] as CardEquipment, card1Rivalx, card1Rivaly, true, addSelectedCard, true, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.rival.hand.cards[0].internalGameId!);
-    card2Rival = battleCardGame.rival.hand.cards[1].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.rival.hand.cards[1] as CardDigimon, card2Rivalx, card2Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip,  battleCardGame.rival.hand.cards[1].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.rival.hand.cards[1] as CardEquipment, card2Rivalx, card2Rivaly, true, addSelectedCard, true, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.rival.hand.cards[1].internalGameId!);
-    card3Rival = battleCardGame.rival.hand.cards[2].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.rival.hand.cards[2] as CardDigimon, card3Rivalx, card3Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, battleCardGame.rival.hand.cards[2].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.rival.hand.cards[2] as CardEquipment, card3Rivalx, card3Rivaly, true, addSelectedCard, true, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.rival.hand.cards[2].internalGameId!);
-    card4Rival = battleCardGame.rival.hand.cards[3].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.rival.hand.cards[3] as CardDigimon, card4Rivalx, card4Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, battleCardGame.rival.hand.cards[3].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.rival.hand.cards[3] as CardEquipment, card4Rivalx, card4Rivaly, true, addSelectedCard, true, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.rival.hand.cards[3].internalGameId!);
-    card5Rival = battleCardGame.rival.hand.cards[4].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.rival.hand.cards[4] as CardDigimon, card5Rivalx, card5Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, battleCardGame.rival.hand.cards[4].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.rival.hand.cards[4] as CardEquipment, card5Rivalx, card5Rivaly, true, addSelectedCard, true, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.rival.hand.cards[4].internalGameId!);
-    card6Rival = battleCardGame.rival.hand.cards[5].isDigimonCard() ?
-    CardDigimonWidget(battleCardGame.rival.hand.cards[5] as CardDigimon, card6Rivalx, card6Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, battleCardGame.rival.hand.cards[5].internalGameId!)
-        : CardEquipmentWidget(battleCardGame.rival.hand.cards[5] as CardEquipment, card6Rivalx, card6Rivaly, true, addSelectedCard, true, isEnabledToActivaEquipmentCard, activateEquipment, battleCardGame.rival.hand.cards[5].internalGameId!);
+    playerCards = CardWidgetFactory(battleCardGame.player, false, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment);
+    rivalCards = CardWidgetFactory(battleCardGame.rival, true, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment);
   }
 
-  void revealPlayerCards(){
-    card1.isHidden = true;
-    card2.isHidden = true;
-    card3.isHidden = true;
-    card4.isHidden = true;
-    card5.isHidden = true;
-    card6.isHidden = true;
-  }
+
 
   void addCards() async{
-    add(card1);
-    add(card2);
-    add(card3);
-    add(card4);
-    add(card5);
-    add(card6);
-    add(card1Rival);
-    add(card2Rival);
-    add(card3Rival);
-    add(card4Rival);
-    add(card5Rival);
-    add(card6Rival);
+    add(playerCards.card1);
+    add(playerCards.card2);
+    add(playerCards.card3);
+    add(playerCards.card4);
+    add(playerCards.card5);
+    add(playerCards.card6);
+    add(rivalCards.card1);
+    add(rivalCards.card2);
+    add(rivalCards.card3);
+    add(rivalCards.card4);
+    add(rivalCards.card5);
+    add(rivalCards.card6);
   }
 
   void updateCards(){
-    card1.update(1);
-    card2.update(1);
-    card3.update(1);
-    card4.update(1);
-    card5.update(1);
-    card6.update(1);
-    card1Rival.update(1);
-    card2Rival.update(1);
-    card3Rival.update(1);
-    card4Rival.update(1);
-    card5Rival.update(1);
-    card6Rival.update(1);
+    playerCards.updateCards();
+    rivalCards.updateCards();
   }
 
   void removeAllCards(){
-    if (card1.isMounted){
-      remove(card1);
+    if (playerCards.card1.isMounted){
+      remove(playerCards.card1);
     }
-    if (card2.isMounted){
-      remove(card2);
+    if (playerCards.card2.isMounted){
+      remove(playerCards.card2);
     }
-    if (card3.isMounted){
-      remove(card3);
+    if (playerCards.card3.isMounted){
+      remove(playerCards.card3);
     }
-    if (card4.isMounted){
-      remove(card4);
+    if (playerCards.card4.isMounted){
+      remove(playerCards.card4);
     }
-    if (card5.isMounted){
-      remove(card5);
+    if (playerCards.card5.isMounted){
+      remove(playerCards.card5);
     }
-    if (card6.isMounted){
-      remove(card6);
+    if (playerCards.card6.isMounted){
+      remove(playerCards.card6);
     }
-    if (card1Rival.isMounted){
-      remove(card1Rival);
+    if (rivalCards.card1.isMounted){
+      remove(rivalCards.card1);
     }
-    if (card2Rival.isMounted){
-      remove(card2Rival);
+    if (rivalCards.card2.isMounted){
+      remove(rivalCards.card2);
     }
-    if (card3Rival.isMounted){
-      remove(card3Rival);
+    if (rivalCards.card3.isMounted){
+      remove(rivalCards.card3);
     }
-    if (card4Rival.isMounted){
-      remove(card4Rival);
+    if (rivalCards.card4.isMounted){
+      remove(rivalCards.card4);
     }
-    if (card5Rival.isMounted){
-      remove(card5Rival);
+    if (rivalCards.card5.isMounted){
+      remove(rivalCards.card5);
     }
-    if (card6Rival.isMounted){
-      remove(card6Rival);
+    if (rivalCards.card6.isMounted){
+      remove(rivalCards.card6);
     }
   }
 
   void removeNotSummonedCardsByPlayer(){
-    if (isEnabledToSummonDigimonCard(card1.internalCardId!) && !battleCardGame.player.wasSelectedCard(card1.internalCardId!)){
-      card1.removeFromParent();
+    if (isEnabledToSummonDigimonCard(playerCards.card1.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card1.internalCardId!)){
+      playerCards.card1.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCard(card2.internalCardId!) && !battleCardGame.player.wasSelectedCard(card2.internalCardId!)){
-      card2.removeFromParent();
+    if (isEnabledToSummonDigimonCard(playerCards.card2.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card2.internalCardId!)){
+      playerCards.card2.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCard(card3.internalCardId!) && !battleCardGame.player.wasSelectedCard(card3.internalCardId!)){
-      card3.removeFromParent();
+    if (isEnabledToSummonDigimonCard(playerCards.card3.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card3.internalCardId!)){
+      playerCards.card3.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCard(card4.internalCardId!) && !battleCardGame.player.wasSelectedCard(card4.internalCardId!)){
-      card4.removeFromParent();
+    if (isEnabledToSummonDigimonCard(playerCards.card4.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card4.internalCardId!)){
+      playerCards.card4.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCard(card5.internalCardId!) && !battleCardGame.player.wasSelectedCard(card5.internalCardId!)){
-      card5.removeFromParent();
+    if (isEnabledToSummonDigimonCard(playerCards.card5.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card5.internalCardId!)){
+      playerCards.card5.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCard(card6.internalCardId!) && !battleCardGame.player.wasSelectedCard(card6.internalCardId!)){
-      card6.removeFromParent();
+    if (isEnabledToSummonDigimonCard(playerCards.card6.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card6.internalCardId!)){
+      playerCards.card6.removeFromParent();
     }
 
   }
 
   void removeNotSummonedCardsByRival(){
-    if (isEnabledToSummonDigimonCardRival(card1Rival.internalCardId!) && !battleCardGame.rival.wasSelectedCard(card1Rival.internalCardId!)){
-      card1Rival.removeFromParent();
+    if (isEnabledToSummonDigimonCardRival(rivalCards.card1.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card1.internalCardId!)){
+      rivalCards.card1.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCardRival(card2Rival.internalCardId!) && !battleCardGame.rival.wasSelectedCard(card2Rival.internalCardId!)){
-      card2Rival.removeFromParent();
+    if (isEnabledToSummonDigimonCardRival(rivalCards.card2.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card2.internalCardId!)){
+      rivalCards.card2.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCardRival(card3Rival.internalCardId!) && !battleCardGame.rival.wasSelectedCard(card3Rival.internalCardId!)){
-      card3Rival.removeFromParent();
+    if (isEnabledToSummonDigimonCardRival(rivalCards.card3.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card3.internalCardId!)){
+      rivalCards.card3.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCardRival(card4Rival.internalCardId!) && !battleCardGame.rival.wasSelectedCard(card4Rival.internalCardId!)){
-      card4Rival.removeFromParent();
+    if (isEnabledToSummonDigimonCardRival(rivalCards.card4.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card4.internalCardId!)){
+      rivalCards.card4.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCardRival(card5Rival.internalCardId!) && !battleCardGame.rival.wasSelectedCard(card5Rival.internalCardId!)){
-      card5Rival.removeFromParent();
+    if (isEnabledToSummonDigimonCardRival(rivalCards.card5.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card5.internalCardId!)){
+      rivalCards.card5.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCardRival(card6Rival.internalCardId!) && !battleCardGame.rival.wasSelectedCard(card6Rival.internalCardId!)){
-      card6Rival.removeFromParent();
+    if (isEnabledToSummonDigimonCardRival(rivalCards.card6.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card6.internalCardId!)){
+      rivalCards.card6.removeFromParent();
     }
   }
 

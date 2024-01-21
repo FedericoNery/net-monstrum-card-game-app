@@ -7,7 +7,9 @@ class CardColor {
   static const String BROWN = 'Brown';
   static const String WHITE = 'White';
   static const String GREEN = 'Green';
-
+  //TODO Diferenciarlo como utils, ya que estos colores son los de dominio
+  // y el color que se utiliza acá es simplemente para diferenciarlo de la UI
+  // ya que la carta no posee color por reglas
   static const String EQUIPMENT = 'Gray';
 
   static List<String> getAllColors() {

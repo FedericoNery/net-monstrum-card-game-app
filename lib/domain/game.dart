@@ -71,6 +71,9 @@ class BattleCardGame {
     else if(rival.healthPoints > player.healthPoints){
       rival.roundsWon += 1;
     }
+    else{
+      rival.roundsWon += 1;
+    }
   }
 
   void finishRound(){
@@ -91,6 +94,10 @@ class BattleCardGame {
   void startRound(){
     phaseGame = Phases.DRAW_PHASE;
     drawCards();
+  }
+
+  void toCompilationPhase(){
+    phaseGame = Phases.COMPILATION_PHASE;
   }
 
   void toDrawPhase(){

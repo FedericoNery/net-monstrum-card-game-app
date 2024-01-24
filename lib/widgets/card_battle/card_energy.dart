@@ -2,11 +2,8 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
-import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
-import 'package:net_monstrum_card_game/domain/card/color.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_border.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
@@ -15,8 +12,9 @@ import './card_widget_base.dart';
 
 class CardEnergyWidget extends CardWidget with TapCallbacks {
   final CardEnergy card;
+  Function activateEnergy = () => {};
 
-  CardEnergyWidget(this.card, x, y, isHidden, isRival, internalCardId):
+  CardEnergyWidget(this.card, x, y, isHidden, isRival, internalCardId, isEnabledToSelectCard, activateEnergy):
         super(
         size: isHidden ? Vector2(64, 85) : Vector2.all(64),
         position: Vector2(x, y),
@@ -26,6 +24,8 @@ class CardEnergyWidget extends CardWidget with TapCallbacks {
     this.x = x;
     this.y = y;
     this.internalCardId = internalCardId;
+    this.isEnabledToSelectCard = isEnabledToSelectCard;
+    this.activateEnergy = activateEnergy;
   }
 
   @override
@@ -60,9 +60,9 @@ class CardEnergyWidget extends CardWidget with TapCallbacks {
 
   @override
   void onTapDown(TapDownEvent event) {
-    //isEnabledToSelectCard(card.internalGameId) && !isRival
+    // && !isRival
     //TODO :: TEMPORAL
-    if(true && !isRival){
+    if(isEnabledToSelectCard(card.internalGameId) && !isRival){
       super.onTapDown(event);
       isSelected = !isSelected;
       //callbackSelectCardFromHand(card.internalGameId);
@@ -74,6 +74,7 @@ class CardEnergyWidget extends CardWidget with TapCallbacks {
       if (isSelected){
         final shapeComponent = getFlickeringCardBorder();
         add(shapeComponent);
+        activateEnergy(card.internalGameId, card);
       }
       else{
         children.first.add(RemoveEffect(delay: 0.1));

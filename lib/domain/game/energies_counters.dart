@@ -12,12 +12,12 @@ class EnergiesCounters {
   EnergiesCounters.initAllInZero(): red=0, blue=0, brown=0, black=0, green=0, white=0;
 
   void accumulate(EnergiesCounters energiesCounters){
-    this.red += energiesCounters.red;
-    this.blue += energiesCounters.blue;
-    this.white += energiesCounters.white;
-    this.green += energiesCounters.green;
-    this.black += energiesCounters.black;
-    this.brown += energiesCounters.brown;
+    red += energiesCounters.red;
+    blue += energiesCounters.blue;
+    white += energiesCounters.white;
+    green += energiesCounters.green;
+    black += energiesCounters.black;
+    brown += energiesCounters.brown;
   }
 
   EnergiesCounters getCopy(){
@@ -26,22 +26,22 @@ class EnergiesCounters {
 
   bool canBeDiscountedByColor(String color){
     if (CardColor.RED == color){
-      return this.red - 1 >= 0;
+      return red - 1 >= 0;
     }
     if (CardColor.GREEN == color){
-      return this.green - 1 >= 0;
+      return green - 1 >= 0;
     }
     if (CardColor.BROWN == color){
-      return this.brown - 1 >= 0;
+      return brown - 1 >= 0;
     }
     if (CardColor.BLACK == color){
-      return this.black - 1 >= 0;
+      return black - 1 >= 0;
     }
     if (CardColor.BLUE == color){
-      return this.blue - 1 >= 0;
+      return blue - 1 >= 0;
     }
     if (CardColor.WHITE == color){
-      return this.white - 1 >= 0;
+      return white - 1 >= 0;
     }
 
     return false;
@@ -49,26 +49,47 @@ class EnergiesCounters {
 
   void discountByColor(String color){
     if (CardColor.RED == color){
-      this.red -= 1;
+      red -= 1;
     }
     if (CardColor.GREEN == color){
-      this.green -= 1;
+      green -= 1;
     }
     if (CardColor.BROWN == color){
-      this.brown -= 1;
+      brown -= 1;
     }
     if (CardColor.BLACK == color){
-      this.black -= 1;
+      black -= 1;
     }
     if (CardColor.BLUE == color){
-      this.blue -= 1;
+      blue -= 1;
     }
     if (CardColor.WHITE == color){
-      this.white -= 1;
+      white -= 1;
     }
   }
 
   bool allEnergiesAreZeroOrMore(){
-    return this.green >= 0 && this.white >= 0 && this.blue >= 0 && this.red >= 0 && this.brown >= 0 && this.black >= 0;
+    return green >= 0 && white >= 0 && blue >= 0 && red >= 0 && brown >= 0 && black >= 0;
+  }
+
+  void applyEffectByColor(String color, int value){
+    if (CardColor.RED == color){
+      red = (red + value) > 0 ? red + value: 0;
+    }
+    if (CardColor.GREEN == color){
+      green = (green + value) > 0 ? green + value: 0;
+    }
+    if (CardColor.BROWN == color){
+      brown = (brown + value) > 0 ? brown + value: 0;
+    }
+    if (CardColor.BLACK == color){
+      black = (black + value) > 0 ? black + value: 0;
+    }
+    if (CardColor.BLUE == color){
+      blue = (blue + value) > 0 ? blue + value: 0;
+    }
+    if (CardColor.WHITE == color){
+      white = (white + value) > 0 ? white + value: 0;
+    }
   }
 }

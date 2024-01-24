@@ -128,7 +128,11 @@ class CardsService {
       return (card as CardDigimon).copyWith();
     }
 
-    return (card as CardEquipment).copyWith();
+    if (card.isEquipmentCard()){
+      return (card as CardEquipment).copyWith();
+    }
+
+    return (card as CardEnergy).copyWith();
   }
 
 }

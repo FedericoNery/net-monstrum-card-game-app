@@ -1,8 +1,10 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
+import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
 import '../domain/card/card_equipment.dart';
+import '../domain/card/energy_effect.dart';
 import '../domain/card/equipment_effect.dart';
 import '../domain/game.dart';
 import '../domain/game/tamer.dart';
@@ -28,7 +30,7 @@ class CardBattle extends FlameGame with HasGameRef {
 
   final summonDigimonButton = DefaultButton('Summon Digimon');
   final activateEquipmentButton = DefaultButton('Activate Equipment');
-  final passButton = DefaultButton('Pass');
+  final confirmCompilationPhaseButton = DefaultButton('Confirm compilation phase');
 
   final service = AggregationService();
   late Aggregation player;
@@ -78,8 +80,8 @@ class CardBattle extends FlameGame with HasGameRef {
     battleCardGame.drawCards();
     victoryMessage = VictoryMessage();
 
-    playerCards = CardWidgetFactory(battleCardGame.player, false, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment);
-    rivalCards = CardWidgetFactory(battleCardGame.rival, true, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment);
+    playerCards = CardWidgetFactory(battleCardGame.player, false, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
+    rivalCards = CardWidgetFactory(battleCardGame.rival, true, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
 
     textsCounters = TextsCounters.getComponents(battleCardGame.player.energiesCounters);
     textsCountersRival = TextsCounters.getRivalComponents(battleCardGame.rival.energiesCounters);
@@ -132,9 +134,9 @@ class CardBattle extends FlameGame with HasGameRef {
     activateEquipmentButton.size = Vector2(100, 50);
     activateEquipmentButton.tapUpCallback = nextToBattlePhase;
 
-    passButton.position = Vector2(650, 100);
-    passButton.size = Vector2(100, 50);
-    passButton.tapUpCallback = nextToBattlePhase;
+    confirmCompilationPhaseButton.position = Vector2(650, 100);
+    confirmCompilationPhaseButton.size = Vector2(100, 50);
+    confirmCompilationPhaseButton.tapUpCallback = confirmCompilationPhase;
 
     add(background);
     addCards();
@@ -164,9 +166,10 @@ class CardBattle extends FlameGame with HasGameRef {
     for (var textCounterComponent in textsCountersRival) {
       add(textCounterComponent);
     }
-    add(summonDigimonButton);
-
-    battleCardGame.toSummonPhase();
+    //add(summonDigimonButton);
+    add(confirmCompilationPhaseButton);
+    battleCardGame.toCompilationPhase();
+    //battleCardGame.toSummonPhase();
     //this.revealPlayerCards();
   }
 
@@ -179,13 +182,16 @@ class CardBattle extends FlameGame with HasGameRef {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-  }
-
-  void updateApHp(){
     apRival.text = 'AP:${battleCardGame.rival.attackPoints}';
     hpRival.text = 'HP:${battleCardGame.rival.healthPoints}';
     apPlayer.text = 'AP:${battleCardGame.player.attackPoints}';
     hpPlayer.text = 'HP:${battleCardGame.player.healthPoints}';
+
+    roundsWinPlayer.text = 'W:${battleCardGame.player.roundsWon}';
+    roundsWinRival.text = 'W:${battleCardGame.rival.roundsWon}';
+  }
+
+  void updateApHp(){
     apRival.update(1);
     hpRival.update(1);
     apPlayer.update(1);
@@ -193,10 +199,14 @@ class CardBattle extends FlameGame with HasGameRef {
   }
 
   void updateRounds(){
-    roundsWinPlayer.text = 'W:${battleCardGame.player.roundsWon}';
-    roundsWinRival.text = 'W:${battleCardGame.rival.roundsWon}';
     roundsWinPlayer.update(1);
     roundsWinRival.update(1);
+  }
+
+  void confirmCompilationPhase(){
+    battleCardGame.toSummonPhase();
+    remove(confirmCompilationPhaseButton);
+    add(summonDigimonButton);
   }
 
   void nextToBattlePhase(){
@@ -229,10 +239,43 @@ class CardBattle extends FlameGame with HasGameRef {
       updateApHp();
       //TODO Sleep de 2 segundos
       battleCardGame.toUpgradePhase();
+      remove(summonDigimonButton);
       add(activateEquipmentButton);
     }
   }
 
+  void activateEnergy(int internalCardId, CardEnergy energyCard){
+    EnergyEffect energyEffect = energyCard.getEnergyEffect();
+    if (energyEffect.isPositive()){
+      energyEffect.applyTo(battleCardGame.player);
+    }
+    else{
+      energyEffect.applyTo(battleCardGame.rival);
+    }
+
+    if (playerCards.card1.internalCardId == internalCardId){
+      remove(playerCards.card1);
+    }
+    if (playerCards.card2.internalCardId == internalCardId){
+      remove(playerCards.card2);
+    }
+    if (playerCards.card3.internalCardId == internalCardId){
+      remove(playerCards.card3);
+    }
+    if (playerCards.card4.internalCardId == internalCardId){
+      remove(playerCards.card4);
+    }
+    if (playerCards.card5.internalCardId == internalCardId){
+      remove(playerCards.card5);
+    }
+    if (playerCards.card6.internalCardId == internalCardId){
+      remove(playerCards.card6);
+    }
+
+    TextsCounters.updateComponents(textsCounters, battleCardGame.player.energiesCounters);
+    TextsCounters.updateComponents(textsCountersRival, battleCardGame.rival.energiesCounters);
+
+  }
 
   void activateEquipment(int internalCardId, CardEquipment equipmentEffect){
     selectedEquipmentCardIndex = internalCardId;
@@ -297,6 +340,7 @@ class CardBattle extends FlameGame with HasGameRef {
         victoryMessage.text = "Perdiste";
       }
       add(victoryMessage);
+      remove(activateEquipmentButton);
     }
     else{
       updateApHp();
@@ -308,8 +352,9 @@ class CardBattle extends FlameGame with HasGameRef {
       addCards();
       TextsCounters.updateComponents(textsCounters, battleCardGame.player.energiesCounters);
       TextsCounters.updateComponents(textsCountersRival, battleCardGame.rival.energiesCounters);
-      add(summonDigimonButton);
-      battleCardGame.toSummonPhase();
+      remove(activateEquipmentButton);
+      add(confirmCompilationPhaseButton);
+      battleCardGame.toCompilationPhase();
     }
   }
 
@@ -319,11 +364,9 @@ class CardBattle extends FlameGame with HasGameRef {
   }
 
   void setCardsWidgets(){
-    playerCards = CardWidgetFactory(battleCardGame.player, false, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment);
-    rivalCards = CardWidgetFactory(battleCardGame.rival, true, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment);
+    playerCards = CardWidgetFactory(battleCardGame.player, false, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
+    rivalCards = CardWidgetFactory(battleCardGame.rival, true, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
   }
-
-
 
   void addCards() async{
     add(playerCards.card1);
@@ -438,29 +481,33 @@ class CardBattle extends FlameGame with HasGameRef {
   }
 
   void addSelectedCard(int internalCardId) {
-    if (battleCardGame.isSummonPhase() && battleCardGame.player.hand.isDigimonCardSelected(internalCardId)){
+    if (battleCardGame.isSummonPhase() && battleCardGame.player.hand.isDigimonCardByInternalId(internalCardId)){
       battleCardGame.player.hand.selectCardByInternalId(internalCardId);
     }
 
-    if (battleCardGame.isUpgradePhase() && battleCardGame.player.hand.isEquipmentCardSelected(internalCardId)){
+    if (battleCardGame.isUpgradePhase() && battleCardGame.player.hand.isEquipmentCardByInternalId(internalCardId)){
       battleCardGame.player.hand.selectCardByInternalId(internalCardId);
     }
   }
 
   bool isEnabledToSummonDigimonCard(int internalCardId){
-    return battleCardGame.isSummonPhase() && battleCardGame.player.hand.isDigimonCardSelected(internalCardId);
+    return battleCardGame.isSummonPhase() && battleCardGame.player.hand.isDigimonCardByInternalId(internalCardId);
   }
 
   bool isEnabledToActivaEquipmentCard(int internalCardId){
-    return battleCardGame.isUpgradePhase() && battleCardGame.player.hand.isEquipmentCardSelected(internalCardId);
+    return battleCardGame.isUpgradePhase() && battleCardGame.player.hand.isEquipmentCardByInternalId(internalCardId);
   }
 
   bool isEnabledToSummonDigimonCardRival(int internalCardId){
-    return battleCardGame.isSummonPhase() && battleCardGame.rival.hand.isDigimonCardSelected(internalCardId);
+    return battleCardGame.isSummonPhase() && battleCardGame.rival.hand.isDigimonCardByInternalId(internalCardId);
   }
 
   bool isEnabledToActivaEquipmentCardRival(int internalCardId){
-    return battleCardGame.isUpgradePhase() && battleCardGame.rival.hand.isEquipmentCardSelected(internalCardId);
+    return battleCardGame.isUpgradePhase() && battleCardGame.rival.hand.isEquipmentCardByInternalId(internalCardId);
+  }
+
+  bool isEnabledToSelectEnergyCard(int internalCardId){
+    return battleCardGame.isCompilationPhase() && battleCardGame.player.hand.isEnergyCardByInternalId(internalCardId);
   }
 
 }

@@ -4,8 +4,9 @@ import 'package:net_monstrum_card_game/domain/card/equipment_effect.dart';
 
 import '../data/evolution.dart';
 
-class CardDigimon extends Card{
+class CardDigimon extends Card implements IColor{
   String digimonName;
+  @override
   String color;
   int attackPoints;
   int healthPoints;
@@ -30,11 +31,17 @@ class CardDigimon extends Card{
     return '$digimonName.jpg';
   }
 
+  @override
   bool isRedColor(){ return color == CardColor.RED; }
+  @override
   bool isBrownColor(){ return color == CardColor.BROWN; }
+  @override
   bool isBlueColor(){ return color == CardColor.BLUE; }
+  @override
   bool isWhiteColor(){ return color == CardColor.WHITE; }
+  @override
   bool isBlackColor(){ return color == CardColor.BLACK; }
+  @override
   bool isGreenColor(){ return color == CardColor.GREEN; }
 
   void applyEquipmentEffect(EquipmentEffect equipmentEffect){

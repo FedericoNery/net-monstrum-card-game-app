@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
 
+abstract class IColor{
+  late String color;
+
+  bool isRedColor();
+  bool isBrownColor();
+  bool isBlueColor();
+  bool isWhiteColor();
+  bool isBlackColor();
+  bool isGreenColor();
+}
 class CardColor {
   static const String RED = 'Red';
   static const String BLUE = 'Blue';

@@ -1,5 +1,6 @@
 import 'package:flame/extensions.dart';
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
+import 'package:net_monstrum_card_game/domain/card/color.dart';
 import 'package:net_monstrum_card_game/domain/game/energies_counters.dart';
 import 'package:collection/collection.dart';
 import '../card/card_base.dart';
@@ -66,10 +67,9 @@ class Hand {
 
   EnergiesCounters getEnergiesCounters(){
     EnergiesCounters energiesCounters = EnergiesCounters.initAllInZero();
-    var filteredDigimonCards = cards.where((card) => card.isDigimonCard());
-    Iterable<CardDigimon> digimonCards = filteredDigimonCards.cast<CardDigimon>();
-
-    for (CardDigimon card in digimonCards) {
+    Iterable<Card>  filteredDigimonCards = cards.where((card) => card.isDigimonCard() || card.isEnergyCard());
+    Iterable<IColor> casted = filteredDigimonCards.cast<IColor>();
+    for (IColor card in casted) {
       if (card.isRedColor()){
         energiesCounters.red += 1;
       }
@@ -92,13 +92,18 @@ class Hand {
     return energiesCounters;
   }
 
-  bool isDigimonCardSelected(int internalCardId){
+  bool isDigimonCardByInternalId(int internalCardId){
     var card = cards.firstWhereOrNull((card) => card.internalGameId == internalCardId);
     return card != null && card.isDigimonCard(); //&& selectedCardsInternalIds.contains(card.internalGameId!);
   }
 
-  bool isEquipmentCardSelected(int internalCardId){
+  bool isEquipmentCardByInternalId(int internalCardId){
     var card = cards.firstWhereOrNull((card) => card.internalGameId == internalCardId);
     return card != null && card.isEquipmentCard();
+  }
+
+  bool isEnergyCardByInternalId(int internalCardId){
+    var card = cards.firstWhereOrNull((card) => card.internalGameId == internalCardId);
+    return card != null && card.isEnergyCard();
   }
 }

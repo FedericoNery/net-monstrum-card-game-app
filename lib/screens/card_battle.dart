@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'dart:ui';
 
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
@@ -26,6 +28,9 @@ class CardBattle extends FlameGame with HasGameRef {
 
   late CardWidgetFactory playerCards;
   late CardWidgetFactory rivalCards;
+
+  double originalSizeX = 807.2727272727273;
+  double originalSizeY = 392.72727272727275;
 
 
   final summonDigimonButton = DefaultButton('Summon Digimon');
@@ -56,6 +61,8 @@ class CardBattle extends FlameGame with HasGameRef {
 
   @override
   Future<void> onLoad() async {
+    print(size.x);
+    print(size.y);
     pool = await FlameAudio.createPool(
       'sounds/card-battle-theme.mp3',
       minPlayers: 2,
@@ -129,14 +136,17 @@ class CardBattle extends FlameGame with HasGameRef {
     summonDigimonButton.position = Vector2(650, 50);
     summonDigimonButton.size = Vector2(100, 50);
     summonDigimonButton.tapUpCallback = nextPhase;
+    summonDigimonButton.scale = Vector2(size.x / originalSizeX, size.y / originalSizeY);
 
     activateEquipmentButton.position = Vector2(650, 50);
     activateEquipmentButton.size = Vector2(100, 50);
     activateEquipmentButton.tapUpCallback = nextToBattlePhase;
+    activateEquipmentButton.scale = Vector2(size.x / originalSizeX, size.y / originalSizeY);
 
     confirmCompilationPhaseButton.position = Vector2(650, 100);
     confirmCompilationPhaseButton.size = Vector2(100, 50);
     confirmCompilationPhaseButton.tapUpCallback = confirmCompilationPhase;
+    confirmCompilationPhaseButton.scale = Vector2(size.x / originalSizeX, size.y / originalSizeY);
 
     add(background);
     addCards();
@@ -181,15 +191,21 @@ class CardBattle extends FlameGame with HasGameRef {
 
   @override
   void render(Canvas canvas) {
+    canvas.save();
+    //canvas.translate( (1 - size.x / originalSizeX) * size.x, (1 - size.y / originalSizeY) * size.y);
+    canvas.scale(size.x / originalSizeX, size.y / originalSizeY);
     super.render(canvas);
-    apRival.text = 'AP:${battleCardGame.rival.attackPoints}';
+    canvas.restore();
+    //canvas.translate(dx, dy)
+
+/*     apRival.text = 'AP:${battleCardGame.rival.attackPoints}';
     hpRival.text = 'HP:${battleCardGame.rival.healthPoints}';
     apPlayer.text = 'AP:${battleCardGame.player.attackPoints}';
     hpPlayer.text = 'HP:${battleCardGame.player.healthPoints}';
 
     roundsWinPlayer.text = 'W:${battleCardGame.player.roundsWon}';
     roundsWinRival.text = 'W:${battleCardGame.rival.roundsWon}';
-  }
+ */  }
 
   void updateApHp(){
     apRival.update(1);

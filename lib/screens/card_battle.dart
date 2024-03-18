@@ -7,6 +7,7 @@ import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
+import 'package:net_monstrum_card_game/widgets/shared/fading_text.dart';
 import '../domain/card/equipment_effect.dart';
 import '../widgets/card_battle/color_counter.dart';
 import '../widgets/card_battle/texts_counters_player.dart';
@@ -41,6 +42,7 @@ class CardBattle extends PositionComponent
   late List<TextComponent> textsCounters;
   late List<TextComponent> textsCountersRival;
   late TextsCounters texts;
+  late FadingTextComponent fadingText;
 
   bool addedCardsToUi = false;
   bool removedNotSummonedCards = false;
@@ -63,6 +65,11 @@ class CardBattle extends PositionComponent
     if (enabledMusic) {
       startBgmMusic();
     }
+
+    fadingText = FadingTextComponent(scale: Vector2.all(0.6),
+      size: Vector2.all(10.0),
+      position: Vector2(0, 185)
+    );
 
     //TODO ANIMACION
     //battleCardGame.shuffleDeck();
@@ -168,11 +175,13 @@ class CardBattle extends PositionComponent
     await add(texts.whiteCounterTextRival);
     await add(confirmCompilationPhaseButton);
     await add(passPhaseButton);
+    await add(fadingText);
   }
 
   @override
   void onNewState(CardBattleState state) {
     if(state.battleCardGame.isCompilationPhase() && !addedCardsToUi){
+      fadingText.addText("Compilation Phase");
       playerCards = CardWidgetFactory(bloc.state.battleCardGame.player, false);
       rivalCards = CardWidgetFactory(bloc.state.battleCardGame.rival, true);
       addCards();
@@ -180,6 +189,7 @@ class CardBattle extends PositionComponent
     }
     
     if(state.battleCardGame.isUpgradePhase() && !removedNotSummonedCards){
+      fadingText.addText("Upgrade Phase");
       removeNotSummonedCardsByPlayer();
       playerCards.deselectCards();
       removeNotSummonedCardsByRival();
@@ -246,9 +256,11 @@ class CardBattle extends PositionComponent
     if (bloc.state.battleCardGame.isDrawPhase()) {
       if (bloc.state.battleCardGame.decksNotShuffled()){
         bloc.add(ShuffleDeck());
+        fadingText.addText("Shuffle");
       }
 
       bloc.add(DrawCards());
+      fadingText.addText("Draw Phase");
     }
 
     int? activatedEnergyCardId = bloc.state.battleCardGame.activatedEnergyCardId;

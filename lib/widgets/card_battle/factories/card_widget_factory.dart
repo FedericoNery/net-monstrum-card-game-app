@@ -1,5 +1,7 @@
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
+import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/cards/base_card.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/cards/summon_digimon_card.dart';
 
 import '../../../domain/card/card_base.dart';
 import '../../../domain/card/card_digimon.dart';
@@ -79,6 +81,10 @@ class CardWidgetFactory{
 
     if (card.isEquipmentCard()){
       return CardEquipmentWidget(card as CardEquipment, x, y, isHidden, isRival);
+    }
+
+    if (card.isSummonDigimonCard()){
+      return SummonDigimonCardComponent(card as CardSummonDigimon, x, y, isHidden, isRival);
     }
 
     return EnergyCardComponent(card as CardEnergy, x, y, isHidden, isRival);

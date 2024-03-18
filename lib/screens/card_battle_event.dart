@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
+import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 
 abstract class CardBattleEvent extends Equatable {
   const CardBattleEvent();
@@ -126,4 +127,13 @@ class BattlePhaseRivalAttacksPlayer extends CardBattleEvent {
 
   @override
   List<Object?> get props => [];
+}
+
+class ActivateSummonDigimonCard extends CardBattleEvent {
+  final CardSummonDigimon cardSummonDigimon;
+  const ActivateSummonDigimonCard(this.cardSummonDigimon);
+
+  @override
+  List<Object?> get props => [];
+
 }

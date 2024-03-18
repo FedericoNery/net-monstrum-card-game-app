@@ -180,5 +180,12 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
+
+    on<ActivateSummonDigimonCard>((event, emit){
+      BattleCardGame battleCardGame = state.battleCardGame;
+      //IMPLEMENTAR LÓGICA
+      BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
+      emit(state.copyWith(instance));
+    });
   }
 }

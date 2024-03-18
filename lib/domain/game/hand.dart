@@ -106,4 +106,9 @@ class Hand {
     var card = cards.firstWhereOrNull((card) => card.uniqueIdInGame == internalCardId);
     return card != null && card.isEnergyCard();
   }
+
+  bool isSummonDigimonCardByInternalId(int internalCardId){
+    var card = cards.firstWhereOrNull((card) => card.uniqueIdInGame == internalCardId);
+    return card != null && card.isSummonDigimonCard();
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
+import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 import 'package:net_monstrum_card_game/domain/card/color.dart';
 import 'package:net_monstrum_card_game/domain/data/evolution.dart';
 
@@ -28,9 +29,9 @@ class CardsService {
     CardDigimon(15, 'MagnaAngemon', CardColor.WHITE, 10, 10, Evolution('Seraphimon', CardColor.WHITE), 3),
     CardDigimon(16, 'Seraphimon', CardColor.WHITE, 10, 10, null, 4),
 
-    CardDigimon(17, 'Gatomon', CardColor.WHITE, 10, 10, Evolution('Greymon', CardColor.RED), 1),
-    CardDigimon(18, 'Angewomon', CardColor.WHITE, 10, 10, Evolution('Greymon', CardColor.RED), 2),
-    CardDigimon(19, 'Magnadramon', CardColor.WHITE, 10, 10, Evolution('Greymon', CardColor.RED), 3),
+    CardDigimon(17, 'Salamon', CardColor.WHITE, 10, 10, Evolution('Gatomon', CardColor.WHITE), 1),
+    CardDigimon(18, 'Gatomon', CardColor.WHITE, 10, 10, Evolution('Angewomon', CardColor.WHITE), 2),
+    CardDigimon(19, 'Angewomon', CardColor.WHITE, 10, 10, Evolution('Ophanimon', CardColor.WHITE), 3),
     CardDigimon(20, 'Ophanimon', CardColor.WHITE, 10, 10, null, 4),
 
     CardDigimon(21, 'Biyomon', CardColor.RED, 10, 10, Evolution('Birdramon', CardColor.RED), 1),
@@ -116,6 +117,17 @@ class CardsService {
     CardEnergy(95, "Blue Energy -1", CardColor.BLUE, -1),
     CardEnergy(96, "White Energy -1", CardColor.WHITE, -1),
     CardEnergy(97, "Brown Energy -1", CardColor.BROWN, -1),
+
+    CardSummonDigimon(98, "Summon Gatomon x2", 
+    [
+      CardDigimon(99, 'Gatomon', CardColor.WHITE, 10, 10, Evolution('Angewomon', CardColor.WHITE), 2),
+      CardDigimon(100, 'Gatomon', CardColor.WHITE, 10, 10, Evolution('Angewomon', CardColor.WHITE), 2),
+    ]),
+    CardSummonDigimon(101, "Summon Angemon x2", 
+    [
+      CardDigimon(102, 'Angemon', CardColor.WHITE, 10, 10, Evolution('MagnaAngemon', CardColor.WHITE), 2),
+      CardDigimon(103, 'Angemon', CardColor.WHITE, 10, 10, Evolution('MagnaAngemon', CardColor.WHITE), 2),
+    ]),
   ];
 
   CardsService();
@@ -128,6 +140,10 @@ class CardsService {
 
     if (card.isEquipmentCard()){
       return (card as CardEquipment).copyWith();
+    }
+
+    if (card.isSummonDigimonCard()){
+      return (card as CardSummonDigimon).copyWith();
     }
 
     return (card as CardEnergy).copyWith();

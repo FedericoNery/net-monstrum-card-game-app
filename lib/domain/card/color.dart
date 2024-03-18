@@ -21,6 +21,7 @@ class CardColor {
   // y el color que se utiliza acá es simplemente para diferenciarlo de la UI
   // ya que la carta no posee color por reglas
   static const String EQUIPMENT = 'Gray';
+  static const String SUMMON = 'Yellow';
 
   static List<String> getAllColors() {
     return [CardColor.RED, CardColor.BLUE, CardColor.BLACK, CardColor.BROWN, CardColor.WHITE, CardColor.GREEN];
@@ -35,6 +36,7 @@ class CardColor {
       CardColor.WHITE: Colors.white,
       CardColor.GREEN: Colors.green,
       CardColor.EQUIPMENT: Colors.grey,
+      CardColor.SUMMON: Colors.yellow,
     };
     return colorStringToColorsFlutterMap[color]!;
   }

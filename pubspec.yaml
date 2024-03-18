@@ -73,6 +73,7 @@ flutter:
     - assets/images/cards/
     - assets/images/equipments/
     - assets/images/energies/
+    - assets/images/summon_digimon/
     - assets/audio/sounds/
   #   - images/a_dot_ham.jpeg
 

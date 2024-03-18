@@ -1,3 +1,4 @@
+import 'package:net_monstrum_card_game/domain/card/equipment_effect.dart';
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 
 import 'card/card_base.dart';
@@ -9,15 +10,29 @@ class Phases {
   static const String SUMMON_PHASE = 'SUMMON_PHASE';
   static const String UPGRADE_PHASE = 'UPGRADE_PHASE';
   static const String BATTLE_PHASE = 'BATTLE_PHASE';
+  static const String FINISHED_ROUND = 'FINISHED_PHASE';
 }
 
 class BattleCardGame {
   Tamer player;
   Tamer rival;
   String phaseGame;
+  int? activatedEnergyCardId;
+  int? selectedEquipmentCardId;
+  int? targetDigimonId;
+  List<EquipmentEffect> equipmentsEffectSelected = [];
 
-  BattleCardGame(this.player, this.rival):
-  phaseGame = Phases.DRAW_PHASE;
+
+  BattleCardGame(this.player, this.rival): phaseGame = Phases.DRAW_PHASE;
+
+  BattleCardGame.fromInstance(BattleCardGame battleCardGame):
+    player = battleCardGame.player,
+    rival = battleCardGame.rival,
+    phaseGame = battleCardGame.phaseGame,
+    activatedEnergyCardId = null, //TEMPORAL FIX
+    targetDigimonId = battleCardGame.targetDigimonId,
+    selectedEquipmentCardId = battleCardGame.selectedEquipmentCardId,
+    equipmentsEffectSelected = battleCardGame.equipmentsEffectSelected;
 
   void shuffleDeck() {
     player.deck.shuffle();
@@ -89,6 +104,8 @@ class BattleCardGame {
 
     player.clearPoints();
     rival.clearPoints();
+
+    phaseGame = Phases.FINISHED_ROUND;
   }
 
   void startRound(){
@@ -131,4 +148,17 @@ class BattleCardGame {
   bool isBattlePhase(){
     return phaseGame == Phases.BATTLE_PHASE;
   }
+
+  bool isDrawPhase(){
+    return phaseGame == Phases.DRAW_PHASE;
+  }
+
+  bool isFinishedRound(){
+    return phaseGame == Phases.FINISHED_ROUND;
+  }
+
+  bool decksNotShuffled(){
+    return (player.roundsWon + rival.roundsWon) == 0;
+  }
+
 }

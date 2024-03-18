@@ -91,8 +91,8 @@ class DigimonZone {
     equipmentEffect.applyTo(cardDigimon);
   }
 
-  void applyEffectTo(int index, EquipmentEffect equipmentEffect){
-    int indexCard = cards.indexWhere((card) => card.internalGameId == index);
+  void applyEffectTo(int digimonCardUniqueId, EquipmentEffect equipmentEffect){
+    int indexCard = cards.indexWhere((card) => card.uniqueIdInGame == digimonCardUniqueId);
     cards[indexCard].applyEquipmentEffect(equipmentEffect);
   }
 }

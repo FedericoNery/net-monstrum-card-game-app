@@ -2,32 +2,32 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_event.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/cards/base_card.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_border.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
 
-import '../../domain/card/card_digimon.dart';
-import 'effects/effects.dart';
-import './card_widget_base.dart';
+import '../../../domain/card/card_digimon.dart';
+import '../effects/effects.dart';
 
-class CardDigimonWidget extends CardWidget with TapCallbacks {
+class DigimonCardComponent extends BaseCardComponent with TapCallbacks, 
+FlameBlocListenable<CardBattleBloc, CardBattleState>
+{
   final CardDigimon card;
-  Function targetOfEquipment = () => {};
-  Function isEnabledToBeEquip = () => {};
-
-  CardDigimonWidget(this.card, double x, double y, bool isHidden, callbackSelectCardFromHand, bool isRival, isEnabledToSelectCard, this.targetOfEquipment, this.isEnabledToBeEquip, int internalCardId):
+  DigimonCardComponent(this.card, double x, double y, bool isHidden, bool isRival):
         super(
         size: isHidden ? Vector2(64, 85) : Vector2.all(64),
         position: Vector2(x, y),
       ) {
     this.isHidden = isHidden;
     this.isRival = isRival;
-    this.callbackSelectCardFromHand = callbackSelectCardFromHand;
-    this.isEnabledToSelectCard = isEnabledToSelectCard;
     this.x = x;
     this.y = y;
-    this.internalCardId = internalCardId;
   }
 
   @override
@@ -60,15 +60,28 @@ class CardDigimonWidget extends CardWidget with TapCallbacks {
     isHidden = false;
     final uri = 'digimon/${card.digimonName}.jpg';
     sprite = await Sprite.load(uri);
+    update(1);
+  }
+
+  bool isEnabledToEquip() {
+    return bloc.state.battleCardGame.isUpgradePhase();
+  }
+
+  bool isEnabledToSummonDigimonCard(int internalCardId) {
+    return bloc.state.battleCardGame.isSummonPhase() && 
+    bloc.state.battleCardGame.player.hand.isDigimonCardByInternalId(internalCardId);
   }
 
   @override
   void onTapDown(TapDownEvent event) {
+    super.onTapDown(event);
+    bool isEnabledToSelect = isEnabledToSummonDigimonCard(card.uniqueIdInGame!);
+    bool isEnabledToBeEquipped = isEnabledToEquip();
+
     //TODO :: ver si conviene renderizar o utilizar otra clase para la carta rival
-    if(isEnabledToSelectCard(card.internalGameId) && !isRival){
-      super.onTapDown(event);
+    if(isEnabledToSelect && !isRival){
       isSelected = !isSelected;
-      callbackSelectCardFromHand(card.internalGameId);
+      //callbackSelectCardFromHand(card.internalGameId);
 
       final moveEffect = getUpAndDownEffect(isSelected, x, y);
       add(moveEffect);
@@ -81,12 +94,27 @@ class CardDigimonWidget extends CardWidget with TapCallbacks {
         children.first.add(RemoveEffect(delay: 0.1));
       }
 
+      bloc.add(SelectDigimonCardFromHandToSummon(card.uniqueIdInGame!));
+
       update(1);
     }
 
-    if(isEnabledToBeEquip()){
-      targetOfEquipment(card.internalGameId);
+    print("HOLA");
+    print(bloc.state.battleCardGame.isUpgradePhase());
+    if(isEnabledToBeEquipped){
+      //targetOfEquipment(card.internalGameId);
+      bloc.add(SelectDigimonCardToBeEquipped(card.uniqueIdInGame!));
     }
+}
+
+  @override
+  void onNewState(CardBattleState state) {
+
+  }
+  
+  @override
+  int getUniqueCardId() {
+    return card.uniqueIdInGame!;
   }
 }
 

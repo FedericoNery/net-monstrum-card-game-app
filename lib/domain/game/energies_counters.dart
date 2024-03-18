@@ -73,6 +73,7 @@ class EnergiesCounters {
   }
 
   void applyEffectByColor(String color, int value){
+    print(color);
     if (CardColor.RED == color){
       red = (red + value) > 0 ? red + value: 0;
     }
@@ -83,9 +84,11 @@ class EnergiesCounters {
       brown = (brown + value) > 0 ? brown + value: 0;
     }
     if (CardColor.BLACK == color){
+      print("ENTRO");
       black = (black + value) > 0 ? black + value: 0;
     }
     if (CardColor.BLUE == color){
+      print("ENTRO");
       blue = (blue + value) > 0 ? blue + value: 0;
     }
     if (CardColor.WHITE == color){

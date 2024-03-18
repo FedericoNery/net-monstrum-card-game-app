@@ -1,23 +1,22 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
+import 'package:flame_bloc/flame_bloc.dart';
+import 'package:net_monstrum_card_game/domain/game.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_event.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
-import '../domain/card/card_equipment.dart';
-import '../domain/card/energy_effect.dart';
 import '../domain/card/equipment_effect.dart';
-import '../domain/game.dart';
-import '../domain/game/tamer.dart';
-import '../services/aggregation_service.dart';
 import '../widgets/card_battle/color_counter.dart';
 import '../widgets/card_battle/texts_counters_player.dart';
 import '../widgets/card_battle/victory_message.dart';
 import '../widgets/shared/background_image.dart';
 import '../widgets/shared/button.dart';
 import 'package:flame_audio/flame_audio.dart';
-import 'package:flame/game.dart';
 
-class CardBattle extends FlameGame with HasGameRef {
+class CardBattle extends PositionComponent
+  with HasGameRef, FlameBlocListenable<CardBattleBloc, CardBattleState> {
   final background = BackgroundImage("playmat/playmat.png");
 
   final enabledMusic = false;
@@ -27,18 +26,11 @@ class CardBattle extends FlameGame with HasGameRef {
   late CardWidgetFactory playerCards;
   late CardWidgetFactory rivalCards;
 
-
   final summonDigimonButton = DefaultButton('Summon Digimon');
   final activateEquipmentButton = DefaultButton('Activate Equipment');
   final confirmCompilationPhaseButton = DefaultButton('Confirm compilation phase');
+  final passPhaseButton = DefaultButton('Pass');
 
-  final service = AggregationService();
-  late Aggregation player;
-  late Aggregation rival;
-
-  late Tamer playerTamer;
-  late Tamer rivalTamer;
-  late BattleCardGame battleCardGame;
   late TextComponent apRival;
   late TextComponent hpRival;
   late TextComponent apPlayer;
@@ -48,6 +40,12 @@ class CardBattle extends FlameGame with HasGameRef {
   late TextComponent roundsWinRival;
   late List<TextComponent> textsCounters;
   late List<TextComponent> textsCountersRival;
+  late TextsCounters texts;
+
+  bool addedCardsToUi = false;
+  bool removedNotSummonedCards = false;
+  int? activatedEnergyCardId;
+  int? activatedEquipmentCardId;
 
   CardBattle();
 
@@ -56,71 +54,66 @@ class CardBattle extends FlameGame with HasGameRef {
 
   @override
   Future<void> onLoad() async {
+    super.onLoad();
     pool = await FlameAudio.createPool(
       'sounds/card-battle-theme.mp3',
       minPlayers: 2,
       maxPlayers: 2,
     );
-    if (enabledMusic){
+    if (enabledMusic) {
       startBgmMusic();
     }
 
-    player = service.getAggregatioByUserId(1);
-    rival = service.getAggregatioByUserId(2);
-
-    playerTamer = Tamer(player.decksAggregations[0].cards, player.user.username);
-    rivalTamer = Tamer(rival.decksAggregations[0].cards, rival.user.username);
-
-    battleCardGame = BattleCardGame(playerTamer, rivalTamer);
+    //TODO ANIMACION
+    //battleCardGame.shuffleDeck();
 
     //TODO ANIMACION
-    battleCardGame.shuffleDeck();
+    //battleCardGame.drawCards();
 
-    //TODO ANIMACION
-    battleCardGame.drawCards();
     victoryMessage = VictoryMessage();
 
-    playerCards = CardWidgetFactory(battleCardGame.player, false, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-    rivalCards = CardWidgetFactory(battleCardGame.rival, true, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
+    //playerCards = CardWidgetFactory(battleCardGame.player, false, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
+    //rivalCards = CardWidgetFactory(battleCardGame.rival, true, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
 
-    textsCounters = TextsCounters.getComponents(battleCardGame.player.energiesCounters);
-    textsCountersRival = TextsCounters.getRivalComponents(battleCardGame.rival.energiesCounters);
+    texts = TextsCounters();
+    //textsCounters = TextsCounters.getComponents(battleCardGame.player.energiesCounters);
+    //textsCountersRival = TextsCounters.getRivalComponents(battleCardGame.rival.energiesCounters);
 
     roundsWinPlayer = TextComponent(
-      text: 'W:${battleCardGame.player.roundsWon}',
+      text: 'W:${0}',
       size: Vector2.all(10.0),
       position: Vector2(0, 370),
     );
 
     roundsWinRival = TextComponent(
-      text: 'W:${battleCardGame.rival.roundsWon}',
+      text: 'W:${0}',
       size: Vector2.all(10.0),
       position: Vector2(0, 0),
     );
 
     apRival = TextComponent(
-      text: 'AP:${battleCardGame.rival.attackPoints}',
+      text: 'AP:${0}',
       size: Vector2.all(10.0),
       position: Vector2(640, 0),
       scale: Vector2.all(0.8),
     );
 
     hpRival = TextComponent(
-      text: 'HP:${battleCardGame.rival.healthPoints}',
+      text: 'HP:${0}',
       size: Vector2.all(10.0),
       position: Vector2(700, 0),
       scale: Vector2.all(0.8),
     );
 
     apPlayer = TextComponent(
-      text: 'AP:${battleCardGame.player.attackPoints}',
+      text: 'AP:${0}',
       size: Vector2.all(10.0),
       position: Vector2(640, 370),
       scale: Vector2.all(0.8),
     );
 
     hpPlayer = TextComponent(
-      text: 'HP:${battleCardGame.player.healthPoints}',
+      text: 'HP:${0}',
       size: Vector2.all(10.0),
       position: Vector2(700, 370),
       scale: Vector2.all(0.8),
@@ -134,206 +127,83 @@ class CardBattle extends FlameGame with HasGameRef {
     activateEquipmentButton.size = Vector2(100, 50);
     activateEquipmentButton.tapUpCallback = nextToBattlePhase;
 
-    confirmCompilationPhaseButton.position = Vector2(650, 100);
+    confirmCompilationPhaseButton.position = Vector2(650, 50);
     confirmCompilationPhaseButton.size = Vector2(100, 50);
     confirmCompilationPhaseButton.tapUpCallback = confirmCompilationPhase;
 
-    add(background);
-    addCards();
-    add(colorCounterInstances.blueCounter);
-    add(colorCounterInstances.redCounter);
-    add(colorCounterInstances.brownCounter);
-    add(colorCounterInstances.whiteCounter);
-    add(colorCounterInstances.blackCounter);
-    add(colorCounterInstances.greenCounter);
-    add(colorCounterInstances.blueCounterRival);
-    add(colorCounterInstances.redCounterRival);
-    add(colorCounterInstances.brownCounterRival);
-    add(colorCounterInstances.whiteCounterRival);
-    add(colorCounterInstances.blackCounterRival);
-    add(colorCounterInstances.greenCounterRival);
-    add(roundsWinPlayer);
-    add(roundsWinRival);
-    add(apRival);
-    add(hpRival);
-    add(apPlayer);
-    add(hpPlayer);
+    passPhaseButton.position = Vector2(650, 110);
+    passPhaseButton.size = Vector2(100, 50);
+    passPhaseButton.tapUpCallback = passPhase;
 
-    for (var textCounterComponent in textsCounters) {
-      add(textCounterComponent);
-    }
-
-    for (var textCounterComponent in textsCountersRival) {
-      add(textCounterComponent);
-    }
-    //add(summonDigimonButton);
-    add(confirmCompilationPhaseButton);
-    battleCardGame.toCompilationPhase();
-    //battleCardGame.toSummonPhase();
-    //this.revealPlayerCards();
-  }
-
-
-  void startBgmMusic() {
-    FlameAudio.bgm.initialize();
-    FlameAudio.bgm.play('sounds/card-battle-theme.mp3');
+    await add(background);
+    await add(colorCounterInstances.blueCounter);
+    await add(colorCounterInstances.redCounter);
+    await add(colorCounterInstances.brownCounter);
+    await add(colorCounterInstances.whiteCounter);
+    await add(colorCounterInstances.blackCounter);
+    await add(colorCounterInstances.greenCounter);
+    await add(colorCounterInstances.blueCounterRival);
+    await add(colorCounterInstances.redCounterRival);
+    await add(colorCounterInstances.brownCounterRival);
+    await add(colorCounterInstances.whiteCounterRival);
+    await add(colorCounterInstances.blackCounterRival);
+    await add(colorCounterInstances.greenCounterRival);
+    await add(roundsWinPlayer);
+    await add(roundsWinRival);
+    await add(apRival);
+    await add(hpRival);
+    await add(apPlayer);
+    await add(hpPlayer);
+    await add(texts.blackCounterText);
+    await add(texts.blackCounterTextRival);
+    await add(texts.blueCounterText);
+    await add(texts.blueCounterTextRival);
+    await add(texts.brownCounterText);
+    await add(texts.brownCounterTextRival);
+    await add(texts.greenCounterText);
+    await add(texts.greenCounterTextRival);
+    await add(texts.redCounterText);
+    await add(texts.redCounterTextRival);
+    await add(texts.whiteCounterText);
+    await add(texts.whiteCounterTextRival);
+    await add(confirmCompilationPhaseButton);
+    await add(passPhaseButton);
   }
 
   @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    apRival.text = 'AP:${battleCardGame.rival.attackPoints}';
-    hpRival.text = 'HP:${battleCardGame.rival.healthPoints}';
-    apPlayer.text = 'AP:${battleCardGame.player.attackPoints}';
-    hpPlayer.text = 'HP:${battleCardGame.player.healthPoints}';
-
-    roundsWinPlayer.text = 'W:${battleCardGame.player.roundsWon}';
-    roundsWinRival.text = 'W:${battleCardGame.rival.roundsWon}';
-  }
-
-  void updateApHp(){
-    apRival.update(1);
-    hpRival.update(1);
-    apPlayer.update(1);
-    hpPlayer.update(1);
-  }
-
-  void updateRounds(){
-    roundsWinPlayer.update(1);
-    roundsWinRival.update(1);
-  }
-
-  void confirmCompilationPhase(){
-    battleCardGame.toSummonPhase();
-    remove(confirmCompilationPhaseButton);
-    add(summonDigimonButton);
-  }
-
-  void nextToBattlePhase(){
-    battlePhase();
-  }
-
-  void nextPhase() {
-    //TODO :: borrar esto más adelante al seguir desarrollando
-    battleCardGame.rival.selectAllDigimonThatCanBeSummoned();
-
-    if (battleCardGame.digimonsCanBeSummoned()) {
-      remove(summonDigimonButton);
-
-      battleCardGame.player.summonToDigimonZone();
-      battleCardGame.rival.summonToDigimonZone();
-
-      TextsCounters.updateComponents(textsCounters, battleCardGame.player.energiesCounters);
-      TextsCounters.updateComponents(textsCountersRival, battleCardGame.rival.energiesCounters);
-
-      battleCardGame.calculatePoints();
-
+  void onNewState(CardBattleState state) {
+    if(state.battleCardGame.isCompilationPhase() && !addedCardsToUi){
+      playerCards = CardWidgetFactory(bloc.state.battleCardGame.player, false);
+      rivalCards = CardWidgetFactory(bloc.state.battleCardGame.rival, true);
+      addCards();
+      addedCardsToUi = true;
+    }
+    
+    if(state.battleCardGame.isUpgradePhase() && !removedNotSummonedCards){
       removeNotSummonedCardsByPlayer();
       playerCards.deselectCards();
-      battleCardGame.player.removeSelectedCardsSummoned();
-
       removeNotSummonedCardsByRival();
       rivalCards.revealSelectedCards();
-      battleCardGame.rival.removeSelectedCardsSummoned();
 
-      updateApHp();
-      //TODO Sleep de 2 segundos
-      battleCardGame.toUpgradePhase();
+      removedNotSummonedCards = true;
+
       remove(summonDigimonButton);
       add(activateEquipmentButton);
     }
-  }
 
-  void activateEnergy(int internalCardId, CardEnergy energyCard){
-    EnergyEffect energyEffect = energyCard.getEnergyEffect();
-    if (energyEffect.isPositive()){
-      energyEffect.applyTo(battleCardGame.player);
-    }
-    else{
-      energyEffect.applyTo(battleCardGame.rival);
-    }
-
-    if (playerCards.card1.internalCardId == internalCardId){
-      remove(playerCards.card1);
-    }
-    if (playerCards.card2.internalCardId == internalCardId){
-      remove(playerCards.card2);
-    }
-    if (playerCards.card3.internalCardId == internalCardId){
-      remove(playerCards.card3);
-    }
-    if (playerCards.card4.internalCardId == internalCardId){
-      remove(playerCards.card4);
-    }
-    if (playerCards.card5.internalCardId == internalCardId){
-      remove(playerCards.card5);
-    }
-    if (playerCards.card6.internalCardId == internalCardId){
-      remove(playerCards.card6);
+    if (state.battleCardGame.isFinishedRound() && !state.battleCardGame.battleIsFinished()){
+      removeAllCards();
+      remove(activateEquipmentButton);
+      add(confirmCompilationPhaseButton);
+      addedCardsToUi = false;
+      removedNotSummonedCards= false;
+      bloc.add(ToDrawPhase());
     }
 
-    TextsCounters.updateComponents(textsCounters, battleCardGame.player.energiesCounters);
-    TextsCounters.updateComponents(textsCountersRival, battleCardGame.rival.energiesCounters);
-
-  }
-
-  void activateEquipment(int internalCardId, CardEquipment equipmentEffect){
-    selectedEquipmentCardIndex = internalCardId;
-    equipmentsEffectSelected = equipmentEffect.getEffects(battleCardGame.player.digimonZone);
-  }
-
-  void confirmApplyEffect(){
-    //TODO ver addSelectedCard(selectedEquipmentCardIndex!);
-    nextPhase();
-  }
-
-  void targetOfEquipment(int index){
-    int internalCardIdActivated = selectedEquipmentCardIndex!;
-    battleCardGame.player.hand.removeFromHand(selectedEquipmentCardIndex!);
-    battleCardGame.player.digimonZone.applyEffectTo(index, equipmentsEffectSelected.removeLast());
-    battleCardGame.player.calculatePoints();
-    updateApHp();
-
-    removeCardAfterEquipmentActivation(internalCardIdActivated);
-  }
-
-  void removeCardAfterEquipmentActivation(int internalCardIdActivated){
-    if (playerCards.card1.isMounted && playerCards.card1.internalCardId == internalCardIdActivated){
-      remove(playerCards.card1);
-    }
-    if (playerCards.card2.isMounted && playerCards.card2.internalCardId == internalCardIdActivated){
-      remove(playerCards.card2);
-    }
-    if (playerCards.card3.isMounted && playerCards.card3.internalCardId == internalCardIdActivated){
-      remove(playerCards.card3);
-    }
-    if (playerCards.card4.isMounted && playerCards.card4.internalCardId == internalCardIdActivated){
-      remove(playerCards.card4);
-    }
-    if (playerCards.card5.isMounted && playerCards.card5.internalCardId == internalCardIdActivated){
-      remove(playerCards.card5);
-    }
-    if (playerCards.card6.isMounted && playerCards.card6.internalCardId == internalCardIdActivated){
-      remove(playerCards.card6);
-    }
-  }
-
-  void battlePhase() async {
-    battleCardGame.battle();
-    //TODO SLEEP de 2 segundos
-    await Future.delayed(Duration(seconds: 5));
-    updateApHp();
-
-    battleCardGame.calculateWinner();
-    updateRounds();
-    battleCardGame.finishRound();
-
-    await Future.delayed(Duration(seconds: 5));
-
-    if (battleCardGame.battleIsFinished()){
+    if (state.battleCardGame.battleIsFinished()){
       //TODO Remover todos los elementos visuales
       removeAllCards();
-      if(battleCardGame.isPlayerWinner()){
+      if(state.battleCardGame.isPlayerWinner()){
         victoryMessage.text = "Ganaste";
       }
       else{
@@ -342,53 +212,162 @@ class CardBattle extends FlameGame with HasGameRef {
       add(victoryMessage);
       remove(activateEquipmentButton);
     }
-    else{
-      updateApHp();
-      battleCardGame.toDrawPhase();
-      battleCardGame.drawCards();
-      //TODO llamar método para agregar devuelta los widgets de cartas
-      removeAllCards();
-      setCardsWidgets();
-      addCards();
-      TextsCounters.updateComponents(textsCounters, battleCardGame.player.energiesCounters);
-      TextsCounters.updateComponents(textsCountersRival, battleCardGame.rival.energiesCounters);
-      remove(activateEquipmentButton);
-      add(confirmCompilationPhaseButton);
-      battleCardGame.toCompilationPhase();
+
+    if(state.battleCardGame.isUpgradePhase() && state.battleCardGame.selectedEquipmentCardId != null
+    && state.battleCardGame.targetDigimonId != null){
+      removeCardAfterEquipmentActivation(state.battleCardGame);
+      bloc.add(ClearActivatedEquipmentCard());
     }
   }
 
-
-  bool isEnabledToEquip(){
-    return battleCardGame.isUpgradePhase();
+  void startBgmMusic() {
+    FlameAudio.bgm.initialize();
+    FlameAudio.bgm.play('sounds/card-battle-theme.mp3');
   }
 
-  void setCardsWidgets(){
-    playerCards = CardWidgetFactory(battleCardGame.player, false, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-    rivalCards = CardWidgetFactory(battleCardGame.rival, true, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
+  void addCards() async {
+    await add(playerCards.card1);
+    await add(playerCards.card2);
+    await add(playerCards.card3);
+    await add(playerCards.card4);
+    await add(playerCards.card5);
+    await add(playerCards.card6);
+    await add(rivalCards.card1);
+    await add(rivalCards.card2);
+    await add(rivalCards.card3);
+    await add(rivalCards.card4);
+    await add(rivalCards.card5);
+    await add(rivalCards.card6);
   }
 
-  void addCards() async{
-    add(playerCards.card1);
-    add(playerCards.card2);
-    add(playerCards.card3);
-    add(playerCards.card4);
-    add(playerCards.card5);
-    add(playerCards.card6);
-    add(rivalCards.card1);
-    add(rivalCards.card2);
-    add(rivalCards.card3);
-    add(rivalCards.card4);
-    add(rivalCards.card5);
-    add(rivalCards.card6);
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    if (bloc.state.battleCardGame.isDrawPhase()) {
+      if (bloc.state.battleCardGame.decksNotShuffled()){
+        bloc.add(ShuffleDeck());
+      }
+
+      bloc.add(DrawCards());
+    }
+
+    int? activatedEnergyCardId = bloc.state.battleCardGame.activatedEnergyCardId;
+
+    texts.blackCounterText.text =
+        '${bloc.state.battleCardGame.player.energiesCounters.black}';
+    texts.blueCounterText.text =
+        '${bloc.state.battleCardGame.player.energiesCounters.blue}';
+    texts.brownCounterText.text =
+        '${bloc.state.battleCardGame.player.energiesCounters.brown}';
+    texts.greenCounterText.text =
+        '${bloc.state.battleCardGame.player.energiesCounters.green}';
+    texts.redCounterText.text =
+        '${bloc.state.battleCardGame.player.energiesCounters.red}';
+    texts.whiteCounterText.text =
+        '${bloc.state.battleCardGame.player.energiesCounters.white}';
+
+    texts.blackCounterTextRival.text =
+        '${bloc.state.battleCardGame.rival.energiesCounters.black}';
+    texts.blueCounterTextRival.text =
+        '${bloc.state.battleCardGame.rival.energiesCounters.blue}';
+    texts.brownCounterTextRival.text =
+        '${bloc.state.battleCardGame.rival.energiesCounters.brown}';
+    texts.greenCounterTextRival.text =
+        '${bloc.state.battleCardGame.rival.energiesCounters.green}';
+    texts.redCounterTextRival.text =
+        '${bloc.state.battleCardGame.rival.energiesCounters.red}';
+    texts.whiteCounterTextRival.text =
+        '${bloc.state.battleCardGame.rival.energiesCounters.white}';
+
+    apRival.text = 'AP:${bloc.state.battleCardGame.rival.attackPoints}';
+    hpRival.text = 'HP:${bloc.state.battleCardGame.rival.healthPoints}';
+    apPlayer.text = 'AP:${bloc.state.battleCardGame.player.attackPoints}';
+    hpPlayer.text = 'HP:${bloc.state.battleCardGame.player.healthPoints}';
+
+    roundsWinPlayer.text = 'W:${bloc.state.battleCardGame.player.roundsWon}';
+    roundsWinRival.text = 'W:${bloc.state.battleCardGame.rival.roundsWon}';
+
+    if(addedCardsToUi){
+      if (playerCards.card1.getUniqueCardId() == activatedEnergyCardId 
+      && playerCards.card1.card!.isDigimonOrEnergyCard()){
+        remove(playerCards.card1);
+      }
+      if (playerCards.card2.getUniqueCardId() == activatedEnergyCardId
+      && playerCards.card2.card!.isDigimonOrEnergyCard()){
+        remove(playerCards.card2);
+      }
+      if (playerCards.card3.getUniqueCardId() == activatedEnergyCardId
+      && playerCards.card3.card!.isDigimonOrEnergyCard()){
+        remove(playerCards.card3);
+      }
+      if (playerCards.card4.getUniqueCardId() == activatedEnergyCardId
+      && playerCards.card4.card!.isDigimonOrEnergyCard()){
+        remove(playerCards.card4);
+      }
+      if (playerCards.card5.getUniqueCardId() == activatedEnergyCardId
+      && playerCards.card5.card!.isDigimonOrEnergyCard()){
+        remove(playerCards.card5);
+      }
+      if (playerCards.card6.getUniqueCardId() == activatedEnergyCardId
+      && playerCards.card6.card!.isDigimonOrEnergyCard()){
+        remove(playerCards.card6);
+      }
+    }
   }
 
-  void updateCards(){
-    playerCards.updateCards();
-    rivalCards.updateCards();
+  void confirmCompilationPhase() {
+    remove(confirmCompilationPhaseButton);
+    add(summonDigimonButton);
+    bloc.add(ConfirmCompilationPhase());
   }
 
-  void removeAllCards(){
+  void passPhase(){
+
+  }
+
+  void nextToBattlePhase() {
+    battlePhase();
+  }
+
+  void nextPhase() {
+    bloc.add(SummonDigimonCardsToDigimonZone());
+  }
+
+  void removeCardAfterEquipmentActivation(BattleCardGame battleCardGame) {
+    if (playerCards.card1.isMounted && playerCards.card1.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+      remove(playerCards.card1);
+    }
+    if (playerCards.card2.isMounted && playerCards.card2.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+      remove(playerCards.card2);
+    }
+    if (playerCards.card3.isMounted && playerCards.card3.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+      remove(playerCards.card3);
+    }
+    if (playerCards.card4.isMounted && playerCards.card4.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+      remove(playerCards.card4);
+    }
+    if (playerCards.card5.isMounted && playerCards.card5.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+      remove(playerCards.card5);
+    }
+    if (playerCards.card6.isMounted && playerCards.card6.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+      remove(playerCards.card6);
+    }
+  }
+
+  void battlePhase() async {
+    bloc.add(BattlePhaseInit());
+    await Future.delayed(Duration(seconds: 5));
+
+    bloc.add(BattlePhasePlayerAttacksRival());
+    await Future.delayed(Duration(seconds: 5));
+    
+    bloc.add(BattlePhaseRivalAttacksPlayer());
+    await Future.delayed(Duration(seconds: 5));
+    
+    bloc.add(BattlePhaseFinishRound());
+  }
+
+  void removeAllCards() {
     if (playerCards.card1.isMounted){
       remove(playerCards.card1);
     }
@@ -427,87 +406,74 @@ class CardBattle extends FlameGame with HasGameRef {
     }
   }
 
-  void removeNotSummonedCardsByPlayer(){
-    if (isEnabledToSummonDigimonCard(playerCards.card1.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card1.internalCardId!)){
+  void removeNotSummonedCardsByPlayer() {
+    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card1.getUniqueCardId())
+    && playerCards.card1.isMounted
+    && playerCards.card1.card!.isDigimonOrEnergyCard()){
       playerCards.card1.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCard(playerCards.card2.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card2.internalCardId!)){
+    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card2.getUniqueCardId())
+    && playerCards.card2.isMounted
+    && playerCards.card2.card!.isDigimonOrEnergyCard()){
       playerCards.card2.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCard(playerCards.card3.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card3.internalCardId!)){
+    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card3.getUniqueCardId())
+    && playerCards.card3.isMounted
+    && playerCards.card3.card!.isDigimonOrEnergyCard()){
       playerCards.card3.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCard(playerCards.card4.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card4.internalCardId!)){
+    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card4.getUniqueCardId())
+    && playerCards.card4.isMounted
+    && playerCards.card4.card!.isDigimonOrEnergyCard()){
       playerCards.card4.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCard(playerCards.card5.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card5.internalCardId!)){
+    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card5.getUniqueCardId())
+    && playerCards.card5.isMounted
+    && playerCards.card5.card!.isDigimonOrEnergyCard()){
       playerCards.card5.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCard(playerCards.card6.internalCardId!) && !battleCardGame.player.wasSelectedCard(playerCards.card6.internalCardId!)){
+    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card6.getUniqueCardId())
+    && playerCards.card6.isMounted
+    && playerCards.card6.card!.isDigimonOrEnergyCard()){
       playerCards.card6.removeFromParent();
     }
-
   }
 
-  void removeNotSummonedCardsByRival(){
-    if (isEnabledToSummonDigimonCardRival(rivalCards.card1.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card1.internalCardId!)){
+  void removeNotSummonedCardsByRival() {
+     if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card1.getUniqueCardId())
+     && rivalCards.card1.isMounted){
       rivalCards.card1.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCardRival(rivalCards.card2.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card2.internalCardId!)){
+    if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card2.getUniqueCardId())
+    && rivalCards.card2.isMounted){
       rivalCards.card2.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCardRival(rivalCards.card3.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card3.internalCardId!)){
+    if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card3.getUniqueCardId())
+    && rivalCards.card3.isMounted){
       rivalCards.card3.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCardRival(rivalCards.card4.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card4.internalCardId!)){
+    if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card4.getUniqueCardId())
+    && rivalCards.card4.isMounted){
       rivalCards.card4.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCardRival(rivalCards.card5.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card5.internalCardId!)){
+    if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card5.getUniqueCardId())
+    && rivalCards.card5.isMounted){
       rivalCards.card5.removeFromParent();
     }
 
-    if (isEnabledToSummonDigimonCardRival(rivalCards.card6.internalCardId!) && !battleCardGame.rival.wasSelectedCard(rivalCards.card6.internalCardId!)){
+    if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card6.getUniqueCardId())
+    && rivalCards.card6.isMounted){
       rivalCards.card6.removeFromParent();
     }
-  }
-
-  void addSelectedCard(int internalCardId) {
-    if (battleCardGame.isSummonPhase() && battleCardGame.player.hand.isDigimonCardByInternalId(internalCardId)){
-      battleCardGame.player.hand.selectCardByInternalId(internalCardId);
-    }
-
-    if (battleCardGame.isUpgradePhase() && battleCardGame.player.hand.isEquipmentCardByInternalId(internalCardId)){
-      battleCardGame.player.hand.selectCardByInternalId(internalCardId);
-    }
-  }
-
-  bool isEnabledToSummonDigimonCard(int internalCardId){
-    return battleCardGame.isSummonPhase() && battleCardGame.player.hand.isDigimonCardByInternalId(internalCardId);
-  }
-
-  bool isEnabledToActivaEquipmentCard(int internalCardId){
-    return battleCardGame.isUpgradePhase() && battleCardGame.player.hand.isEquipmentCardByInternalId(internalCardId);
-  }
-
-  bool isEnabledToSummonDigimonCardRival(int internalCardId){
-    return battleCardGame.isSummonPhase() && battleCardGame.rival.hand.isDigimonCardByInternalId(internalCardId);
-  }
-
-  bool isEnabledToActivaEquipmentCardRival(int internalCardId){
-    return battleCardGame.isUpgradePhase() && battleCardGame.rival.hand.isEquipmentCardByInternalId(internalCardId);
-  }
-
-  bool isEnabledToSelectEnergyCard(int internalCardId){
-    return battleCardGame.isCompilationPhase() && battleCardGame.player.hand.isEnergyCardByInternalId(internalCardId);
   }
 
 }

@@ -1,17 +1,42 @@
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:net_monstrum_card_game/domain/game.dart';
+import 'package:net_monstrum_card_game/domain/game/tamer.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
+import 'package:net_monstrum_card_game/services/aggregation_service.dart';
 
 import 'screens/card_battle.dart';
+import 'screens/card_battle_component.dart';
 
+class GameView extends StatelessWidget {
+  const GameView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    AggregationService service = AggregationService();
+    Aggregation player = service.getAggregatioByUserId(1);
+    Aggregation rival = service.getAggregatioByUserId(2);
+
+    Tamer playerTamer = Tamer(player.decksAggregations[0].cards, player.user.username);
+    Tamer rivalTamer = Tamer(rival.decksAggregations[0].cards, rival.user.username);
+    BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer);
+    CardBattleComponent game = CardBattleComponent(battleCardGame);
+
+    return GameWidget(game: game);
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
 
-  final game = CardBattle();
-  runApp(GameWidget(game: game));
+  GameView cardBattleWidget = GameView();
+  runApp(cardBattleWidget);
 }
 
 

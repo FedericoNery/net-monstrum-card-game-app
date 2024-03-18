@@ -40,7 +40,7 @@ class AggregationService {
       int counter = 0;
       for (final idCard in deck.cardsIds){
         Card card = cardsService.getCardById(idCard);
-        card.internalGameId = counter;
+        card.uniqueIdInGame = counter;
         cards.add(card);
         counter++;
       }

@@ -58,6 +58,7 @@ class ColorCounterInstances {
     blackCounterRival.y = CountersMeasures.BLACK_RIVAL_Y;
     greenCounterRival.x = CountersMeasures.GREEN_RIVAL_X;
     greenCounterRival.y = CountersMeasures.GREEN_RIVAL_Y;
+
   }
 
 }

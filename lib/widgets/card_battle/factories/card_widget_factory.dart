@@ -1,13 +1,13 @@
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/cards/base_card.dart';
 
 import '../../../domain/card/card_base.dart';
 import '../../../domain/card/card_digimon.dart';
 import '../../../domain/card/card_equipment.dart';
 import '../../../domain/game/tamer.dart';
-import '../card_energy.dart';
-import '../card_widget_base.dart';
-import '../digimon_card.dart';
-import '../equipment_card.dart';
+import '../cards/energy_card.dart';
+import '../cards/digimon_card.dart';
+import '../cards/equipment_card.dart';
 
 //TODO :: analizar de renombrar la clase
 
@@ -43,66 +43,64 @@ class CardsMeasures{
 }
 
 class CardWidgetFactory{
-  late CardWidget card1;
-  late CardWidget card2;
-  late CardWidget card3;
-  late CardWidget card4;
-  late CardWidget card5;
-  late CardWidget card6;
+  late BaseCardComponent card1;
+  late BaseCardComponent card2;
+  late BaseCardComponent card3;
+  late BaseCardComponent card4;
+  late BaseCardComponent card5;
+  late BaseCardComponent card6;
   bool isRival;
   Tamer tamer;
 
-  CardWidgetFactory(this.tamer, this.isRival,
-      addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip,
-      isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy) {
+  CardWidgetFactory(this.tamer, this.isRival) {
 
     if(isRival){
-      card1 = _getInstance(tamer.hand.cards[0], CardsMeasures.card1Rivalx, CardsMeasures.card1Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-      card2 = _getInstance(tamer.hand.cards[1], CardsMeasures.card2Rivalx, CardsMeasures.card2Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-      card3 = _getInstance(tamer.hand.cards[2], CardsMeasures.card3Rivalx, CardsMeasures.card3Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-      card4 = _getInstance(tamer.hand.cards[3], CardsMeasures.card4Rivalx, CardsMeasures.card4Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-      card5 = _getInstance(tamer.hand.cards[4], CardsMeasures.card5Rivalx, CardsMeasures.card5Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-      card6 = _getInstance(tamer.hand.cards[5], CardsMeasures.card6Rivalx, CardsMeasures.card6Rivaly, true, addSelectedCard, true, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
+      card1 = _getInstance(tamer.hand.cards[0], CardsMeasures.card1Rivalx, CardsMeasures.card1Rivaly, true, true);
+      card2 = _getInstance(tamer.hand.cards[1], CardsMeasures.card2Rivalx, CardsMeasures.card2Rivaly, true, true);
+      card3 = _getInstance(tamer.hand.cards[2], CardsMeasures.card3Rivalx, CardsMeasures.card3Rivaly, true, true);
+      card4 = _getInstance(tamer.hand.cards[3], CardsMeasures.card4Rivalx, CardsMeasures.card4Rivaly, true, true);
+      card5 = _getInstance(tamer.hand.cards[4], CardsMeasures.card5Rivalx, CardsMeasures.card5Rivaly, true, true);
+      card6 = _getInstance(tamer.hand.cards[5], CardsMeasures.card6Rivalx, CardsMeasures.card6Rivaly, true, true);
     }
     else{
-      card1 = _getInstance(tamer.hand.cards[0], CardsMeasures.card1x, CardsMeasures.card1y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-      card2 = _getInstance(tamer.hand.cards[1], CardsMeasures.card2x, CardsMeasures.card2y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-      card3 = _getInstance(tamer.hand.cards[2], CardsMeasures.card3x, CardsMeasures.card3y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-      card4 = _getInstance(tamer.hand.cards[3], CardsMeasures.card4x, CardsMeasures.card4y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-      card5 = _getInstance(tamer.hand.cards[4], CardsMeasures.card5x, CardsMeasures.card5y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-      card6 = _getInstance(tamer.hand.cards[5], CardsMeasures.card6x, CardsMeasures.card6y, false, addSelectedCard, false, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
+      card1 = _getInstance(tamer.hand.cards[0], CardsMeasures.card1x, CardsMeasures.card1y, false, false);
+      card2 = _getInstance(tamer.hand.cards[1], CardsMeasures.card2x, CardsMeasures.card2y, false, false);
+      card3 = _getInstance(tamer.hand.cards[2], CardsMeasures.card3x, CardsMeasures.card3y, false, false);
+      card4 = _getInstance(tamer.hand.cards[3], CardsMeasures.card4x, CardsMeasures.card4y, false, false);
+      card5 = _getInstance(tamer.hand.cards[4], CardsMeasures.card5x, CardsMeasures.card5y, false, false);
+      card6 = _getInstance(tamer.hand.cards[5], CardsMeasures.card6x, CardsMeasures.card6y, false, false);
     }
   }
 
-  CardWidget _getInstance(Card card, double x, double y, bool isHidden, Function addSelectedCard, bool isRival, Function isEnabledToSummonDigimonCard, Function targetOfEquipment, Function isEnabledToEquip, Function isEnabledToActivaEquipmentCard, Function activateEquipment, Function isEnabledToSelectEnergyCard, activateEnergy){
+  BaseCardComponent _getInstance(Card card, double x, double y, bool isHidden, bool isRival){
     if (card.isDigimonCard()){
-      return CardDigimonWidget(card as CardDigimon, x, y, isHidden, addSelectedCard, isRival, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, card.internalGameId!);
+      return DigimonCardComponent(card as CardDigimon, x, y, isHidden, isRival);
     }
 
     if (card.isEquipmentCard()){
-      return CardEquipmentWidget(card as CardEquipment, x, y, isHidden, addSelectedCard, isRival, isEnabledToActivaEquipmentCard, activateEquipment, card.internalGameId!);
+      return CardEquipmentWidget(card as CardEquipment, x, y, isHidden, isRival);
     }
 
-    return CardEnergyWidget(card as CardEnergy, x, y, isHidden, isRival, card.internalGameId!, isEnabledToSelectEnergyCard, activateEnergy);
+    return EnergyCardComponent(card as CardEnergy, x, y, isHidden, isRival);
   }
 
   void revealSelectedCards() {
-     if (!card1.isRemoved && tamer.wasSelectedCard(card1.internalCardId!)){
+     if (!card1.isRemoved && tamer.wasSelectedCard(card1.getUniqueCardId())){
        card1.reveal();
      }
-     if (!card2.isRemoved && tamer.wasSelectedCard(card2.internalCardId!)){
+     if (!card2.isRemoved && tamer.wasSelectedCard(card2.getUniqueCardId())){
        card2.reveal();
      }
-     if (!card3.isRemoved && tamer.wasSelectedCard(card3.internalCardId!)){
+     if (!card3.isRemoved && tamer.wasSelectedCard(card3.getUniqueCardId())){
        card3.reveal();
      }
-     if (!card4.isRemoved && tamer.wasSelectedCard(card4.internalCardId!)){
+     if (!card4.isRemoved && tamer.wasSelectedCard(card4.getUniqueCardId())){
        card4.reveal();
      }
-     if (!card5.isRemoved && tamer.wasSelectedCard(card5.internalCardId!)){
+     if (!card5.isRemoved && tamer.wasSelectedCard(card5.getUniqueCardId())){
        card5.reveal();
      }
-     if (!card6.isRemoved && tamer.wasSelectedCard(card6.internalCardId!)){
+     if (!card6.isRemoved && tamer.wasSelectedCard(card6.getUniqueCardId())){
        card6.reveal();
      }
   }

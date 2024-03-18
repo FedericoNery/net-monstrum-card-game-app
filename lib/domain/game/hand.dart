@@ -16,7 +16,7 @@ class Hand {
   }
 
   void removeFromHand(int internalCardId) {
-    int index = cards.indexWhere((card) => card.internalGameId == internalCardId);
+    int index = cards.indexWhere((card) => card.uniqueIdInGame == internalCardId);
     if(index != -1){
       cards.removeAt(index);
     }
@@ -40,7 +40,7 @@ class Hand {
 
     if (selectedCardsInternalIds.isNotEmpty){
       for (int id in selectedCardsInternalIds){
-        Card? card = cards.firstWhereOrNull((card) => card.internalGameId == id);
+        Card? card = cards.firstWhereOrNull((card) => card.uniqueIdInGame == id);
         if (card != null && card.isDigimonCard()){
           selectedCards.add(card as CardDigimon);
         }
@@ -93,17 +93,17 @@ class Hand {
   }
 
   bool isDigimonCardByInternalId(int internalCardId){
-    var card = cards.firstWhereOrNull((card) => card.internalGameId == internalCardId);
+    var card = cards.firstWhereOrNull((card) => card.uniqueIdInGame == internalCardId);
     return card != null && card.isDigimonCard(); //&& selectedCardsInternalIds.contains(card.internalGameId!);
   }
 
   bool isEquipmentCardByInternalId(int internalCardId){
-    var card = cards.firstWhereOrNull((card) => card.internalGameId == internalCardId);
+    var card = cards.firstWhereOrNull((card) => card.uniqueIdInGame == internalCardId);
     return card != null && card.isEquipmentCard();
   }
 
   bool isEnergyCardByInternalId(int internalCardId){
-    var card = cards.firstWhereOrNull((card) => card.internalGameId == internalCardId);
+    var card = cards.firstWhereOrNull((card) => card.uniqueIdInGame == internalCardId);
     return card != null && card.isEnergyCard();
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';

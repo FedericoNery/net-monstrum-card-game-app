@@ -2,19 +2,23 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_event.dart';
+import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/cards/base_card.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_border.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
-import 'effects/effects.dart';
-import './card_widget_base.dart';
+import '../effects/effects.dart';
 
-class CardEnergyWidget extends CardWidget with TapCallbacks {
+class EnergyCardComponent extends BaseCardComponent with TapCallbacks , 
+FlameBlocListenable<CardBattleBloc, CardBattleState>
+{
   final CardEnergy card;
-  Function activateEnergy = () => {};
-
-  CardEnergyWidget(this.card, x, y, isHidden, isRival, internalCardId, isEnabledToSelectCard, activateEnergy):
+  EnergyCardComponent(this.card, x, y, isHidden, isRival):
         super(
         size: isHidden ? Vector2(64, 85) : Vector2.all(64),
         position: Vector2(x, y),
@@ -23,9 +27,6 @@ class CardEnergyWidget extends CardWidget with TapCallbacks {
     this.isRival = isRival;
     this.x = x;
     this.y = y;
-    this.internalCardId = internalCardId;
-    this.isEnabledToSelectCard = isEnabledToSelectCard;
-    this.activateEnergy = activateEnergy;
   }
 
   @override
@@ -56,17 +57,15 @@ class CardEnergyWidget extends CardWidget with TapCallbacks {
     isHidden = false;
     final uri = 'energies/${card.name}.png';
     sprite = await Sprite.load(uri);
+    update(1);
   }
 
   @override
-  void onTapDown(TapDownEvent event) {
-    // && !isRival
+  void onTapDown(TapDownEvent event) async {
+    super.onTapDown(event);
     //TODO :: TEMPORAL
-    if(isEnabledToSelectCard(card.internalGameId) && !isRival){
-      super.onTapDown(event);
+    if(isEnabledToSelectEnergyCard(card.uniqueIdInGame!) && !isRival){
       isSelected = !isSelected;
-      //callbackSelectCardFromHand(card.internalGameId);
-      //callbackActivateEquipment(card.internalGameId, card);
 
       final moveEffect = getUpAndDownEffect(isSelected, x, y);
       add(moveEffect);
@@ -74,13 +73,23 @@ class CardEnergyWidget extends CardWidget with TapCallbacks {
       if (isSelected){
         final shapeComponent = getFlickeringCardBorder();
         add(shapeComponent);
-        activateEnergy(card.internalGameId, card);
+        removeFromParent();
       }
       else{
         children.first.add(RemoveEffect(delay: 0.1));
       }
 
-      update(1);
+      bloc.add(ActivateEnergyCard(card));
     }
+  }
+
+  bool isEnabledToSelectEnergyCard(int internalCardId) {
+    return bloc.state.battleCardGame.isCompilationPhase() && 
+    bloc.state.battleCardGame.player.hand.isEnergyCardByInternalId(internalCardId);
+  }
+  
+  @override
+  int getUniqueCardId() {
+    return card.uniqueIdInGame!;
   }
 }

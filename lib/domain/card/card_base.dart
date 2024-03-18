@@ -6,13 +6,19 @@ abstract class ICard {
   bool isDigimonCard();
   bool isEquipmentCard();
   bool isEnergyCard();
+  bool isDigimonOrEnergyCard();
 }
 
 class Card implements ICard {
   int id;
-  int? internalGameId;
+  int? uniqueIdInGame;
 
   Card(this.id);
+
+  @override
+  bool isDigimonOrEnergyCard(){
+    return this is CardDigimon || this is CardEnergy;
+  }
 
   @override
   bool isDigimonCard() {

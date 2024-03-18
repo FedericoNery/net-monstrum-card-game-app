@@ -18,6 +18,8 @@ class Tamer {
   int healthPoints;
   int roundsWon;
 
+  int? selectedEquipmentCardId;
+
   Tamer(List<Card> deckCards, username)
       :
         deck = Deck(deckCards),
@@ -28,7 +30,8 @@ class Tamer {
         energiesCounters = EnergiesCounters.initAllInZero(),
         attackPoints = 0,
         healthPoints = 0,
-        roundsWon = 0;
+        roundsWon = 0,
+        selectedEquipmentCardId = null;
 
   void attack(Tamer rival) {
     rival.receiveAttack(attackPoints);
@@ -57,7 +60,7 @@ class Tamer {
         var cardDigimon = card as CardDigimon;
         if (energiesCounters.canBeDiscountedByColor(cardDigimon.color)) {
           energiesCounters.discountByColor(card.color);
-          hand.onlySelectCardByInternalId(card.internalGameId!);
+          hand.onlySelectCardByInternalId(card.uniqueIdInGame!);
         }
       }
     }
@@ -101,6 +104,10 @@ class Tamer {
 
   bool wasSelectedCard(int internalCardId){
     return hand.selectedCardsInternalIds.contains(internalCardId);
+  }
+
+  void selectEquipmentCardToEquip(int internalCardId){
+    selectedEquipmentCardId = internalCardId;
   }
 
 }

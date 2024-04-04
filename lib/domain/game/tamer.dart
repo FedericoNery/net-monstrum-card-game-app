@@ -1,4 +1,5 @@
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
+import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game/deck.dart';
 import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
 import 'package:net_monstrum_card_game/domain/game/energies_counters.dart';
@@ -108,6 +109,13 @@ class Tamer {
 
   void selectEquipmentCardToEquip(int internalCardId){
     selectedEquipmentCardId = internalCardId;
+  }
+
+  void specialSummonDigimon(CardSummonDigimon cardSummonDigimon){
+    for (var i = 0; i < cardSummonDigimon.digimonsCards.length; i++) {
+      digimonZone.addToDigimonZone(cardSummonDigimon.digimonsCards[i]);
+      calculatePoints();     
+    }
   }
 
 }

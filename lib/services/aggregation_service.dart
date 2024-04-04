@@ -1,3 +1,4 @@
+import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 import 'package:net_monstrum_card_game/services/cards_service.dart';
 import 'package:net_monstrum_card_game/services/deck_service.dart';
 import 'package:net_monstrum_card_game/services/user_service.dart';
@@ -43,6 +44,14 @@ class AggregationService {
         card.uniqueIdInGame = counter;
         cards.add(card);
         counter++;
+        if (card.isSummonDigimonCard()){
+          CardSummonDigimon csd = card as CardSummonDigimon;
+          counter++;
+          for (final cardDigimon in csd.digimonsCards){
+            cardDigimon.uniqueIdInGame = counter;
+            counter++;
+          }
+        }
       }
 
       DeckAggregation deckAggregation = DeckAggregation(deck.id, cards);

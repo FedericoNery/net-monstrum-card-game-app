@@ -2,10 +2,14 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:net_monstrum_card_game/domain/card/card_base.dart';
+import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
+import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
 import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/cards/digimon_card.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
 import 'package:net_monstrum_card_game/widgets/shared/fading_text.dart';
 import '../domain/card/equipment_effect.dart';
@@ -49,10 +53,14 @@ class CardBattle extends PositionComponent
   int? activatedEnergyCardId;
   int? activatedEquipmentCardId;
 
+  double xLastPositionCard = 600;
+  double yLastPositionCard = 250;
+
   CardBattle();
 
   int? selectedEquipmentCardIndex;
   List<EquipmentEffect> equipmentsEffectSelected = [];
+  List<DigimonCardComponent> digimonCardCompomponents = [];
 
   @override
   Future<void> onLoad() async {
@@ -228,6 +236,44 @@ class CardBattle extends PositionComponent
       removeCardAfterEquipmentActivation(state.battleCardGame);
       bloc.add(ClearActivatedEquipmentCard());
     }
+
+    if(state.battleCardGame.isUpgradePhase() && state.battleCardGame.wasSummonedDigimonSpecially){
+      updateDigimonZoneOnSummonDigimon(state.battleCardGame.player.digimonZone);
+    }
+  }
+
+  void updateDigimonZoneOnSummonDigimon(DigimonZone digimonZone) {
+    List<CardDigimon> cards = digimonZone.cards;
+
+    Card? card1 = playerCards.card1.card;
+    Card? card2 = playerCards.card2.card;
+    Card? card3 = playerCards.card3.card;
+    Card? card4 = playerCards.card4.card;
+    Card? card5 = playerCards.card5.card;
+    Card? card6 = playerCards.card6.card;
+    List<int?> cardsIdsList= [
+      card1?.uniqueIdInGame, 
+      card2?.uniqueIdInGame,
+      card3?.uniqueIdInGame,
+      card4?.uniqueIdInGame,
+      card5?.uniqueIdInGame,
+      card6?.uniqueIdInGame,
+    ];
+
+    for (var i = 0; i < cards.length; i++) {
+      if (!cardsIdsList.contains(cards[i].uniqueIdInGame) && cards[i].uniqueIdInGame != null){
+        addToUINewDigimonCard(cards[i]);
+      }
+    }
+
+    bloc.add(FinishedSpecialSummonDigimon());
+  }
+
+  void addToUINewDigimonCard(CardDigimon cardDigimon) {
+    DigimonCardComponent dcc = DigimonCardComponent(cardDigimon, xLastPositionCard, yLastPositionCard, false, false);
+    add(dcc);
+    digimonCardCompomponents.add(dcc);
+    xLastPositionCard = xLastPositionCard + 70;
   }
 
   void startBgmMusic() {
@@ -415,6 +461,12 @@ class CardBattle extends PositionComponent
     }
     if (rivalCards.card6.isMounted){
       remove(rivalCards.card6);
+    }
+
+    for (final digimonCardComponent in digimonCardCompomponents){
+      if (digimonCardComponent.isMounted){
+        remove(digimonCardComponent);
+      }
     }
   }
 

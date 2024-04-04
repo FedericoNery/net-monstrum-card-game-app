@@ -81,7 +81,6 @@ FlameBlocListenable<CardBattleBloc, CardBattleState>
     //TODO :: ver si conviene renderizar o utilizar otra clase para la carta rival
     if(isEnabledToSelect && !isRival){
       isSelected = !isSelected;
-      //callbackSelectCardFromHand(card.internalGameId);
 
       final moveEffect = getUpAndDownEffect(isSelected, x, y);
       add(moveEffect);
@@ -99,8 +98,6 @@ FlameBlocListenable<CardBattleBloc, CardBattleState>
       update(1);
     }
 
-    print("HOLA");
-    print(bloc.state.battleCardGame.isUpgradePhase());
     if(isEnabledToBeEquipped){
       //targetOfEquipment(card.internalGameId);
       bloc.add(SelectDigimonCardToBeEquipped(card.uniqueIdInGame!));

@@ -61,39 +61,31 @@ class FadingTextComponent extends TextComponent with HasOpacityProvider {
   set text(String value) {
     super.text = value;
     if(!value.isEmpty){
-      print("reset effect");
       add(effect);
       effect.apply(0);
       effect.reset();
-      print("added effect");
     }
   }
 
   void onCompleteAnimation(){
     remove(effect);
-    print("removed effect");
     if (texts.isNotEmpty){
       showNextMessage();
     }
     else{
       this.text = '';
-      print("ASIGNACION VACIA");
     }
   }
 
   void showNextMessage(){
     if (texts.isNotEmpty){
-      print("showNextMessage texts.isNotEmpty");
       this.text = texts.removeAt(0);
-      print(this.text);
     }
   }
 
   void addText(String text){
     texts.add(text);
-    print("addText");
     if (this.text.isEmpty) {
-      print("addText text.isempty");
       showNextMessage();
     }
   }

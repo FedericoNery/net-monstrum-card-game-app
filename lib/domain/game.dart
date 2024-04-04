@@ -21,6 +21,7 @@ class BattleCardGame {
   int? selectedEquipmentCardId;
   int? targetDigimonId;
   List<EquipmentEffect> equipmentsEffectSelected = [];
+  bool wasSummonedDigimonSpecially = false;
 
 
   BattleCardGame(this.player, this.rival): phaseGame = Phases.DRAW_PHASE;
@@ -32,7 +33,8 @@ class BattleCardGame {
     activatedEnergyCardId = null, //TEMPORAL FIX
     targetDigimonId = battleCardGame.targetDigimonId,
     selectedEquipmentCardId = battleCardGame.selectedEquipmentCardId,
-    equipmentsEffectSelected = battleCardGame.equipmentsEffectSelected;
+    equipmentsEffectSelected = battleCardGame.equipmentsEffectSelected,
+    wasSummonedDigimonSpecially = battleCardGame.wasSummonedDigimonSpecially;
 
   void shuffleDeck() {
     player.deck.shuffle();

@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
+import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 import 'package:net_monstrum_card_game/domain/card/energy_effect.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
@@ -183,7 +184,17 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
 
     on<ActivateSummonDigimonCard>((event, emit){
       BattleCardGame battleCardGame = state.battleCardGame;
-      //IMPLEMENTAR LÓGICA
+
+      CardSummonDigimon cardSummonDigimon = event.cardSummonDigimon;
+      battleCardGame.player.specialSummonDigimon(cardSummonDigimon);
+      battleCardGame.wasSummonedDigimonSpecially = true;
+      BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
+      emit(state.copyWith(instance));
+    });
+
+    on<FinishedSpecialSummonDigimon>((event, emit){
+      BattleCardGame battleCardGame = state.battleCardGame;
+      battleCardGame.wasSummonedDigimonSpecially = false;
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });

@@ -137,3 +137,10 @@ class ActivateSummonDigimonCard extends CardBattleEvent {
   List<Object?> get props => [];
 
 }
+
+class FinishedSpecialSummonDigimon extends CardBattleEvent {
+  const FinishedSpecialSummonDigimon();
+
+  @override
+  List<Object?> get props => [];
+}

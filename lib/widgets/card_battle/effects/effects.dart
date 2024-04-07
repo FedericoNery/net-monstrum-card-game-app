@@ -13,6 +13,20 @@ MoveEffect getUpAndDownEffect(bool selected, double x, double y){
   );
 }
 
+MoveEffect getDrawMoveEffect(double initialX, double initialY, double finalX, double finalY){
+  /* return MoveAlongPathEffect(
+  Path()..quadraticBezierTo(finalX, finalY, initialX, initialY),
+  EffectController(duration: 1.5),
+  ); */
+
+  return MoveEffect.to(Vector2(finalX, finalY),
+    EffectController(
+      duration: 0.4,
+      curve: Curves.easeOutBack,
+    ),
+  );
+}
+
 ColorEffect getFlickeringEffect(){
   return ColorEffect(
     Colors.green,

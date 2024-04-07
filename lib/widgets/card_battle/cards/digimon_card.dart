@@ -54,10 +54,8 @@ FlameBlocListenable<CardBattleBloc, CardBattleState>
   }
 
   void reveal() async{
-    if (isRival){
-      size = Vector2.all(64);
-    }
     isHidden = false;
+    size = Vector2.all(64);
     final uri = 'digimon/${card.digimonName}.jpg';
     sprite = await Sprite.load(uri);
     update(1);

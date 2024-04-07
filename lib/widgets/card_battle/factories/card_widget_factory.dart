@@ -1,7 +1,9 @@
+import 'package:flame/effects.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/cards/base_card.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/cards/summon_digimon_card.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
 
 import '../../../domain/card/card_base.dart';
 import '../../../domain/card/card_digimon.dart';
@@ -29,6 +31,10 @@ class CardsMeasures{
   static const card6x = offsetX + 450;
   static const card6y = offsetYPlayer;
 
+  static const OFFSET_Y_INITIAL = 250.0;
+  static const OFFSET_X_INITIAL = -100.0;
+
+
   static const offsetYCards = 25.0;
   static const card1Rivalx = offsetX + 10;
   static const card1Rivaly = offsetYCards;
@@ -55,7 +61,7 @@ class CardWidgetFactory{
   Tamer tamer;
 
   CardWidgetFactory(this.tamer, this.isRival) {
-
+    
     if(isRival){
       card1 = _getInstance(tamer.hand.cards[0], CardsMeasures.card1Rivalx, CardsMeasures.card1Rivaly, true, true);
       card2 = _getInstance(tamer.hand.cards[1], CardsMeasures.card2Rivalx, CardsMeasures.card2Rivaly, true, true);
@@ -65,13 +71,20 @@ class CardWidgetFactory{
       card6 = _getInstance(tamer.hand.cards[5], CardsMeasures.card6Rivalx, CardsMeasures.card6Rivaly, true, true);
     }
     else{
-      card1 = _getInstance(tamer.hand.cards[0], CardsMeasures.card1x, CardsMeasures.card1y, false, false);
+      card1 = _getInstance(tamer.hand.cards[0], CardsMeasures.OFFSET_X_INITIAL, CardsMeasures.OFFSET_Y_INITIAL, true, false);
+      card2 = _getInstance(tamer.hand.cards[1], CardsMeasures.OFFSET_X_INITIAL, CardsMeasures.OFFSET_Y_INITIAL, true, false);
+      card3 = _getInstance(tamer.hand.cards[2], CardsMeasures.OFFSET_X_INITIAL, CardsMeasures.OFFSET_Y_INITIAL, true, false);
+      card4 = _getInstance(tamer.hand.cards[3], CardsMeasures.OFFSET_X_INITIAL, CardsMeasures.OFFSET_Y_INITIAL, true, false);
+      card5 = _getInstance(tamer.hand.cards[4], CardsMeasures.OFFSET_X_INITIAL, CardsMeasures.OFFSET_Y_INITIAL, true, false);
+      card6 = _getInstance(tamer.hand.cards[5], CardsMeasures.OFFSET_X_INITIAL, CardsMeasures.OFFSET_Y_INITIAL, true, false);
+ 
+      /* card1 = _getInstance(tamer.hand.cards[0], CardsMeasures.card1x, CardsMeasures.card1y, false, false);
       card2 = _getInstance(tamer.hand.cards[1], CardsMeasures.card2x, CardsMeasures.card2y, false, false);
       card3 = _getInstance(tamer.hand.cards[2], CardsMeasures.card3x, CardsMeasures.card3y, false, false);
       card4 = _getInstance(tamer.hand.cards[3], CardsMeasures.card4x, CardsMeasures.card4y, false, false);
       card5 = _getInstance(tamer.hand.cards[4], CardsMeasures.card5x, CardsMeasures.card5y, false, false);
       card6 = _getInstance(tamer.hand.cards[5], CardsMeasures.card6x, CardsMeasures.card6y, false, false);
-    }
+    */ }
   }
 
   BaseCardComponent _getInstance(Card card, double x, double y, bool isHidden, bool isRival){
@@ -136,6 +149,58 @@ class CardWidgetFactory{
     card4.update(1);
     card5.update(1);
     card6.update(1);
+  }
+
+  void applyDrawEffect(){
+    MoveEffect moveEffect = getDrawMoveEffect(card1.x, card1.y, CardsMeasures.card1x, CardsMeasures.card1y);
+    MoveEffect moveEffect2 = getDrawMoveEffect(card2.x, card2.y, CardsMeasures.card2x, CardsMeasures.card2y);
+    MoveEffect moveEffect3 = getDrawMoveEffect(card3.x, card3.y, CardsMeasures.card3x, CardsMeasures.card3y);
+    MoveEffect moveEffect4 = getDrawMoveEffect(card4.x, card4.y, CardsMeasures.card4x, CardsMeasures.card4y);
+    MoveEffect moveEffect5 = getDrawMoveEffect(card5.x, card5.y, CardsMeasures.card5x, CardsMeasures.card5y);
+    MoveEffect moveEffect6 = getDrawMoveEffect(card6.x, card6.y, CardsMeasures.card6x, CardsMeasures.card6y);
+    moveEffect.onComplete = () {
+      card2.add(moveEffect2);
+    };
+
+    moveEffect2.onComplete = () {
+      card3.add(moveEffect3);
+    };
+
+    moveEffect3.onComplete = () {
+      card4.add(moveEffect4);
+    };
+
+    moveEffect4.onComplete = () {
+      card5.add(moveEffect5);
+    };
+
+    moveEffect5.onComplete = () {
+      card6.add(moveEffect6);
+    };
+
+    moveEffect6.onComplete = () {
+      card1.reveal();
+      card2.reveal();
+      card3.reveal();
+      card4.reveal();
+      card5.reveal();
+      card6.reveal();
+
+      card1.setPosition(CardsMeasures.card1x, CardsMeasures.card1y);
+      card2.setPosition(CardsMeasures.card2x, CardsMeasures.card2y);
+      card3.setPosition(CardsMeasures.card3x, CardsMeasures.card3y);
+      card4.setPosition(CardsMeasures.card4x, CardsMeasures.card4y);
+      card5.setPosition(CardsMeasures.card5x, CardsMeasures.card5y);
+      card6.setPosition(CardsMeasures.card6x, CardsMeasures.card6y);
+      //card1.children.first.add(RemoveEffect(delay: 0.1));
+      //card2.children.add(RemoveEffect(delay: 0.1));
+      //card3.children.add(RemoveEffect(delay: 0.1));
+      //card4.children.add(RemoveEffect(delay: 0.1));
+      //card5.children.add(RemoveEffect(delay: 0.1));
+      //card6.children.first.add(RemoveEffect(delay: 0.1));
+    };
+
+    card1.add(moveEffect);
   }
 
 }

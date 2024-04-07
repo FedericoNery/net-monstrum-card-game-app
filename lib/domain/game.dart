@@ -22,6 +22,8 @@ class BattleCardGame {
   int? targetDigimonId;
   List<EquipmentEffect> equipmentsEffectSelected = [];
   bool wasSummonedDigimonSpecially = false;
+  bool drawedCards = false;
+  bool decksShuffled = false;
 
 
   BattleCardGame(this.player, this.rival): phaseGame = Phases.DRAW_PHASE;
@@ -34,7 +36,9 @@ class BattleCardGame {
     targetDigimonId = battleCardGame.targetDigimonId,
     selectedEquipmentCardId = battleCardGame.selectedEquipmentCardId,
     equipmentsEffectSelected = battleCardGame.equipmentsEffectSelected,
-    wasSummonedDigimonSpecially = battleCardGame.wasSummonedDigimonSpecially;
+    wasSummonedDigimonSpecially = battleCardGame.wasSummonedDigimonSpecially,
+    drawedCards = battleCardGame.drawedCards,
+    decksShuffled = battleCardGame.decksShuffled;
 
   void shuffleDeck() {
     player.deck.shuffle();
@@ -50,6 +54,7 @@ class BattleCardGame {
 
     player.calculateEnergies();
     rival.calculateEnergies();
+    drawedCards = true;
   }
 
   bool digimonsCanBeSummoned(){
@@ -57,10 +62,8 @@ class BattleCardGame {
   }
 
   void calculatePoints(){
-    //if (digimonsCanBeSummoned()){
-      player.calculatePoints();
-      rival.calculatePoints();
-   // }
+    player.calculatePoints();
+    rival.calculatePoints();
   }
 
   void battle(){
@@ -70,11 +73,11 @@ class BattleCardGame {
   }
 
   bool battleIsFinished(){
-    return this.player.roundsWon == 2 || this.rival.roundsWon == 2;
+    return player.roundsWon == 2 || rival.roundsWon == 2;
   }
 
   bool isPlayerWinner(){
-    return this.player.roundsWon == 2;
+    return player.roundsWon == 2;
   }
 
   void calculateWinner(){
@@ -157,10 +160,6 @@ class BattleCardGame {
 
   bool isFinishedRound(){
     return phaseGame == Phases.FINISHED_ROUND;
-  }
-
-  bool decksNotShuffled(){
-    return (player.roundsWon + rival.roundsWon) == 0;
   }
 
 }

@@ -50,6 +50,7 @@ class CardBattle extends PositionComponent
 
   bool addedCardsToUi = false;
   bool removedNotSummonedCards = false;
+  bool drawCardsEffectWasApplied = false;
   int? activatedEnergyCardId;
   int? activatedEquipmentCardId;
 
@@ -188,14 +189,13 @@ class CardBattle extends PositionComponent
 
   @override
   void onNewState(CardBattleState state) {
-    if(state.battleCardGame.isCompilationPhase() && !addedCardsToUi){
-      fadingText.addText("Compilation Phase");
-      playerCards = CardWidgetFactory(bloc.state.battleCardGame.player, false);
-      rivalCards = CardWidgetFactory(bloc.state.battleCardGame.rival, true);
+    if (state.battleCardGame.isDrawPhase() && state.battleCardGame.decksShuffled && state.battleCardGame.drawedCards && !addedCardsToUi){
+      playerCards = CardWidgetFactory(state.battleCardGame.player, false);
+      rivalCards = CardWidgetFactory(state.battleCardGame.rival, true);
       addCards();
       addedCardsToUi = true;
     }
-    
+
     if(state.battleCardGame.isUpgradePhase() && !removedNotSummonedCards){
       fadingText.addText("Upgrade Phase");
       removeNotSummonedCardsByPlayer();
@@ -215,6 +215,7 @@ class CardBattle extends PositionComponent
       add(confirmCompilationPhaseButton);
       addedCardsToUi = false;
       removedNotSummonedCards= false;
+      drawCardsEffectWasApplied = false;
       bloc.add(ToDrawPhase());
     }
 
@@ -281,32 +282,40 @@ class CardBattle extends PositionComponent
     FlameAudio.bgm.play('sounds/card-battle-theme.mp3');
   }
 
-  void addCards() async {
-    await add(playerCards.card1);
-    await add(playerCards.card2);
-    await add(playerCards.card3);
-    await add(playerCards.card4);
-    await add(playerCards.card5);
-    await add(playerCards.card6);
-    await add(rivalCards.card1);
-    await add(rivalCards.card2);
-    await add(rivalCards.card3);
-    await add(rivalCards.card4);
-    await add(rivalCards.card5);
-    await add(rivalCards.card6);
+  void addCards() {
+    add(playerCards.card1);
+    add(playerCards.card2);
+    add(playerCards.card3);
+    add(playerCards.card4);
+    add(playerCards.card5);
+    add(playerCards.card6);
+    add(rivalCards.card1);
+    add(rivalCards.card2);
+    add(rivalCards.card3);
+    add(rivalCards.card4);
+    add(rivalCards.card5);
+    add(rivalCards.card6);
   }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    if (bloc.state.battleCardGame.isDrawPhase()) {
-      if (bloc.state.battleCardGame.decksNotShuffled()){
-        bloc.add(ShuffleDeck());
-        fadingText.addText("Shuffle");
-      }
 
-      bloc.add(DrawCards());
-      fadingText.addText("Draw Phase");
+    if (bloc.state.battleCardGame.isDrawPhase() && bloc.state.battleCardGame.decksShuffled && !bloc.state.battleCardGame.drawedCards){
+        bloc.add(DrawCards());
+        fadingText.addText("Draw Phase");
+    }
+
+    if (bloc.state.battleCardGame.isDrawPhase() && !bloc.state.battleCardGame.decksShuffled){
+      bloc.add(ShuffleDeck());
+      fadingText.addText("Shuffle");
+    }
+
+    if(bloc.state.battleCardGame.isDrawPhase() && bloc.state.battleCardGame.drawedCards && addedCardsToUi && !drawCardsEffectWasApplied){
+      playerCards.applyDrawEffect();
+      drawCardsEffectWasApplied = true;
+      bloc.add(ToCompilationPhase());
+      fadingText.addText("Compilation Phase");
     }
 
     int? activatedEnergyCardId = bloc.state.battleCardGame.activatedEnergyCardId;
@@ -414,13 +423,13 @@ class CardBattle extends PositionComponent
 
   void battlePhase() async {
     bloc.add(BattlePhaseInit());
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(Duration(seconds: 3));
 
     bloc.add(BattlePhasePlayerAttacksRival());
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(Duration(seconds: 3));
     
     bloc.add(BattlePhaseRivalAttacksPlayer());
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(Duration(seconds: 3));
     
     bloc.add(BattlePhaseFinishRound());
   }

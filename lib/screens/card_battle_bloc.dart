@@ -22,16 +22,26 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.player.deck.shuffle();
       battleCardGame.rival.deck.shuffle();
+      battleCardGame.decksShuffled = true;
 
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
 
     });
 
+    on<ToCompilationPhase>((event, emit) {
+      BattleCardGame battleCardGame = state.battleCardGame;
+      battleCardGame.toCompilationPhase();
+      battleCardGame.drawedCards = false; // VER ESTO
+      
+      BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
+      emit(state.copyWith(instance));
+    });
+
     on<DrawCards>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.drawCards();
-      battleCardGame.toCompilationPhase();
+      //battleCardGame.toCompilationPhase();
 
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));

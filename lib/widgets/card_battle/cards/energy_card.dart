@@ -51,11 +51,32 @@ FlameBlocListenable<CardBattleBloc, CardBattleState>
 
   @override
   void reveal() async{
-    size = Vector2.all(64);
-    isHidden = false;
-    final uri = 'energies/${card.name}.png';
-    sprite = await Sprite.load(uri);
-    update(1);
+    final effect = ScaleEffect.by(
+      Vector2(-1, 1),
+      EffectController(duration: 0.15),
+    );
+
+    final effect2 = ScaleEffect.by(
+      Vector2(-1,1),
+      EffectController(duration: 0.15),
+    );
+
+    final sizeEffect = SizeEffect.to(
+      Vector2(-1, 85),
+      EffectController(duration: 0.2, curve: Curves.easeOutExpo),
+    );
+
+    add(sizeEffect);
+    sizeEffect.onComplete = () async {
+      size = Vector2.all(64);
+      isHidden = false;
+      final uri = 'energies/${card.name}.png';
+      sprite = await Sprite.load(uri);
+      update(1);
+
+      //add(effect);
+    };
+    
   }
 
   @override

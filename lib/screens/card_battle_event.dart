@@ -144,3 +144,10 @@ class FinishedSpecialSummonDigimon extends CardBattleEvent {
   @override
   List<Object?> get props => [];
 }
+
+class ToCompilationPhase extends CardBattleEvent {
+  const ToCompilationPhase();
+
+  @override
+  List<Object?> get props => [];
+}

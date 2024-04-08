@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
 
 abstract class BaseCardComponent extends SpriteComponent {
   bool isHidden = false;
@@ -23,4 +24,10 @@ abstract class BaseCardComponent extends SpriteComponent {
       update(1);
     }
   }
+
+  void setPosition(double x, double y){
+    this.x = x;
+    this.y = y;
+  }
+
 }

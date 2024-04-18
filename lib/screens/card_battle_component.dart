@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/parallax.dart';
@@ -14,25 +16,40 @@ import 'package:net_monstrum_card_game/widgets/shared/background_image.dart';
 class CardBattleComponent extends FlameGame
 {
   final BattleCardGame battleCardGame;
-  final _imagesNames = [ParallaxImageData("backgrounds/fondo5.jpeg")];
-  CardBattleComponent(this.battleCardGame);
+
+  CardBattleComponent(this.battleCardGame)
+      : super(
+          camera: CameraComponent.withFixedResolution(width: 850, height: 400),
+        );
 
   @override
   Future<void> onLoad() async {
+
+    final backgroundImage = await images.load("backgrounds/fondo5.jpeg"); 
+    final _imagesNames = [ParallaxImageData("backgrounds/fondo5.jpeg")];
+
+    final screenSize = WidgetsBinding.instance!.window.physicalSize;
+    
+    final scaleX = screenSize.width / 850;//backgroundImage.width;
+    final scaleY = screenSize.height / 400; //backgroundImage.height;
+
     final parallax = await loadParallaxComponent(
       _imagesNames,
       baseVelocity: Vector2(30,-20),
       velocityMultiplierDelta: Vector2(1.8, 1.0),
       filterQuality: FilterQuality.none,
-      repeat: ImageRepeat.repeat
+      repeat: ImageRepeat.repeat,
+      scale: Vector2(scaleX, scaleY)
     );
     add(parallax);
-
+    world = CardBattle();
+    camera.world = world;
+    camera.moveTo(Vector2(400, 200));
     await add(
       FlameBlocProvider<CardBattleBloc, CardBattleState>(
         create: () => CardBattleBloc(battleCardGame),
         children: [
-          CardBattle()
+          world
         ],
       )
     );

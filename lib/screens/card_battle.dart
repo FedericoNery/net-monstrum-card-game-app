@@ -20,7 +20,7 @@ import '../widgets/shared/background_image.dart';
 import '../widgets/shared/button.dart';
 import 'package:flame_audio/flame_audio.dart';
 
-class CardBattle extends PositionComponent
+class CardBattle extends World
   with HasGameRef, FlameBlocListenable<CardBattleBloc, CardBattleState> {
   late ParallaxComponent backgroundParallax;
 

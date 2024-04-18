@@ -22,7 +22,7 @@ import 'package:flame_audio/flame_audio.dart';
 
 class CardBattle extends PositionComponent
   with HasGameRef, FlameBlocListenable<CardBattleBloc, CardBattleState> {
-  final background = BackgroundImage("playmat/playmat.png");
+  late ParallaxComponent backgroundParallax;
 
   final enabledMusic = false;
   late AudioPool pool;
@@ -80,20 +80,8 @@ class CardBattle extends PositionComponent
       position: Vector2(0, 185)
     );
 
-    //TODO ANIMACION
-    //battleCardGame.shuffleDeck();
-
-    //TODO ANIMACION
-    //battleCardGame.drawCards();
-
     victoryMessage = VictoryMessage();
-
-    //playerCards = CardWidgetFactory(battleCardGame.player, false, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-    //rivalCards = CardWidgetFactory(battleCardGame.rival, true, addSelectedCard, isEnabledToSummonDigimonCard, targetOfEquipment, isEnabledToEquip, isEnabledToActivaEquipmentCard, activateEquipment, isEnabledToSelectEnergyCard, activateEnergy);
-
     texts = TextsCounters();
-    //textsCounters = TextsCounters.getComponents(battleCardGame.player.energiesCounters);
-    //textsCountersRival = TextsCounters.getRivalComponents(battleCardGame.rival.energiesCounters);
 
     roundsWinPlayer = TextComponent(
       text: 'W:${0}',
@@ -151,7 +139,6 @@ class CardBattle extends PositionComponent
     passPhaseButton.size = Vector2(100, 50);
     passPhaseButton.tapUpCallback = passPhase;
 
-    await add(background);
     await add(colorCounterInstances.blueCounter);
     await add(colorCounterInstances.redCounter);
     await add(colorCounterInstances.brownCounter);

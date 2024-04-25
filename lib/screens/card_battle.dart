@@ -51,6 +51,11 @@ class CardBattle extends World
   bool addedCardsToUi = false;
   bool removedNotSummonedCards = false;
   bool drawCardsEffectWasApplied = false;
+  bool playerAttackRival = false;
+  bool playerAttackRivalFinished = false;
+  bool rivalAttackPlayer = false;
+  bool rivalAttackPlayerFinished = false;
+
   int? activatedEnergyCardId;
   int? activatedEquipmentCardId;
 
@@ -194,6 +199,18 @@ class CardBattle extends World
 
       remove(summonDigimonButton);
       add(activateEquipmentButton);
+    }
+
+    if (state.battleCardGame.isBattlePhase() && playerAttackRival && !playerAttackRivalFinished){
+      playerCards.attackAnimation();
+      playerAttackRival = false;
+      playerAttackRivalFinished = true;
+    }
+
+    if (state.battleCardGame.isBattlePhase() && rivalAttackPlayer && !rivalAttackPlayerFinished){
+      rivalCards.attackAnimation(); 
+      rivalAttackPlayer = false;
+      rivalAttackPlayerFinished = true;
     }
 
     if (state.battleCardGame.isFinishedRound() && !state.battleCardGame.battleIsFinished()){
@@ -410,15 +427,18 @@ class CardBattle extends World
 
   void battlePhase() async {
     bloc.add(BattlePhaseInit());
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(Duration(seconds: 1));
 
+    playerAttackRival = true;
     bloc.add(BattlePhasePlayerAttacksRival());
     await Future.delayed(Duration(seconds: 3));
     
+    rivalAttackPlayer = true;
     bloc.add(BattlePhaseRivalAttacksPlayer());
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(Duration(seconds: 6));
     
     bloc.add(BattlePhaseFinishRound());
+    await Future.delayed(Duration(seconds: 2));
   }
 
   void removeAllCards() {

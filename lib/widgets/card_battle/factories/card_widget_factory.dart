@@ -124,6 +124,33 @@ class CardWidgetFactory{
      }
   }
 
+  void attackAnimation(){
+    if(card1.card!.isDigimonCard()){
+      var cardDigimonComponent = card1 as DigimonCardComponent;
+      cardDigimonComponent.attack();
+    }
+    if(card2.card!.isDigimonCard()){
+      var cardDigimonComponent = card2 as DigimonCardComponent;
+      cardDigimonComponent.attack();
+    }
+    if(card3.card!.isDigimonCard()){
+      var cardDigimonComponent = card3 as DigimonCardComponent;
+      cardDigimonComponent.attack();
+    }
+    if(card4.card!.isDigimonCard()){
+      var cardDigimonComponent = card4 as DigimonCardComponent;
+      cardDigimonComponent.attack();
+    }
+    if(card5.card!.isDigimonCard()){
+      var cardDigimonComponent = card5 as DigimonCardComponent;
+      cardDigimonComponent.attack();
+    }
+    if(card6.card!.isDigimonCard()){
+      var cardDigimonComponent = card6 as DigimonCardComponent;
+      cardDigimonComponent.attack();
+    }
+  }
+
   void deselectCards(){
     card1.deselectCardEffect();
     card2.deselectCardEffect();

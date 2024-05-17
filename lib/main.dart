@@ -56,11 +56,11 @@ void main() async {
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
 
-  //GameView cardBattleWidget = GameView();
-  //runApp(cardBattleWidget);
+  GameView cardBattleWidget = GameView();
+  runApp(cardBattleWidget);
 
-  SocketView socketView = SocketView();
-  runApp(socketView);
+  /*  SocketView socketView = SocketView();
+  runApp(socketView); */
 }
 
 class MyApp extends StatelessWidget {

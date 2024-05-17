@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/list-rooms/button-widget-list.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/waiting-room.dart';
+import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:convert';
 
@@ -25,29 +27,22 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
   int _counter = 0;
   List<String> _listRoomsIds = [];
 
-  IO.Socket socket = IO.io(
-      'ws://192.168.0.23:8000',
-      IO.OptionBuilder()
-          .setTransports(['websocket']) // for Flutter or Dart VM
-          .disableAutoConnect() // disable auto-connection
-          .setExtraHeaders({'foo': 'bar'}) // optional
-          .build());
+  IO.Socket socket = SocketManager().socket!;
 
   void _incrementCounter() {
-    setState(() {
+/*     setState(() {
       _counter++;
+    }); */
+
+    socket.emit('createNewGame', {
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "Mi usuario"
     });
   }
 
   @override
   void initState() {
     super.initState();
-    socket.onConnect((_) {
-      print('connect');
-      socket.emit('msg', 'test');
-    });
-
-    socket.on('event', (data) => print(data));
     socket.on("send rooms", (data) {
       Map<String, dynamic> objetoDeserializado = json.decode(data);
       setState(() {
@@ -55,18 +50,28 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
             List<String>.from(objetoDeserializado["roomsConUnSoloJugador"]);
       });
     });
-    socket.on('fromServer', (_) => print(_));
 
-    socket.onDisconnect((_) => print('disconnect'));
-    socket.connect();
+    socket.on('new game created', (data) {
+      Map<String, dynamic> objetoDeserializado = json.decode(data);
+      print(data);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WaitingRoom(
+                gameId: objetoDeserializado["gameId"]!,
+                socketId: objetoDeserializado["mySocketId"]!),
+          ));
+    });
 
-    socket.emit('obtener rooms');
+    socket.emit('obtener rooms', null);
+
+    //socket.emit('obtener rooms');
   }
 
   @override
   void dispose() {
-    socket.disconnect();
-    socket.dispose();
+    //socket.disconnect();
+    //socket.dispose();
     super.dispose();
   }
 
@@ -77,10 +82,15 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
+      body: Center(child: MyButtonListWidget(roomsIds: _listRoomsIds)
+          /*  Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [MyButtonListWidget(roomsIds: _listRoomsIds)],
+          children: [
+/*             const Text(
+              'You have pushed the button this many times:',
+            ), */
+            MyButtonListWidget(roomsIds: _listRoomsIds)
+          ],
           /*  <Widget>[
             const Text(
               'You have pushed the button this many times:',
@@ -90,8 +100,8 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ], */
-        ),
-      ),
+        ), */
+          ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',

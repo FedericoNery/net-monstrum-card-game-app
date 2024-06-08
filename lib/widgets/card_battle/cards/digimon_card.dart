@@ -1,5 +1,7 @@
 import 'dart:ui';
+import 'package:flame/cache.dart';
 import 'package:flame/collisions.dart';
+import 'package:flame/particles.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
@@ -14,7 +16,6 @@ import 'package:net_monstrum_card_game/widgets/card_battle/cards/base_card.dart'
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_border.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
-
 import '../../../domain/card/card_digimon.dart';
 import '../effects/effects.dart';
 
@@ -196,4 +197,13 @@ class DigimonCardComponent extends BaseCardComponent
   int getUniqueCardId() {
     return card.uniqueIdInGame!;
   }
+
+  Future<Particle> imageParticle() async {
+    return ImageParticle(
+      size: Vector2.all(24),
+      image: await Flame.images.load('zap.png'),
+    );
+  }
 }
+
+

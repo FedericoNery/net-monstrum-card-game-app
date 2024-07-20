@@ -172,6 +172,17 @@ class CardBattle extends World
     await add(confirmCompilationPhaseButton);
     await add(passPhaseButton);
     await add(fadingText);
+
+    // Inside your game:
+  final pauseOverlayIdentifier = 'PauseMenu';
+  final handOverlayIdentifier = 'Hand';
+  final deckOverlayIdentifier = 'Deck';
+
+  // Marks 'PauseMenu' to be rendered.
+  //game.overlays.add(pauseOverlayIdentifier);
+  game.overlays.add(deckOverlayIdentifier);
+  // Marks 'PauseMenu' to not be rendered.
+  //game.overlays.remove(pauseOverlayIdentifier);
   }
 
   @override

@@ -257,7 +257,7 @@ class CardsService {
           QUANTITY.ALL,
           60),
     ]),
-    CardProgramming(110, "Flame Gatlin", CardColor.RED, [
+    CardProgramming(111, "Flame Gatlin", CardColor.RED, [
       Rule(
           ACTION.DEAL_DAMAGE_TO_ENEMY_FIELD,
           ZONE.ENEMY_FIELD,
@@ -272,7 +272,7 @@ class CardsService {
           QUANTITY.ALL,
           15),
     ]),
-    CardProgramming(110, "Fire Cannon", CardColor.RED, [
+    CardProgramming(112, "Fire Cannon", CardColor.RED, [
       Rule(
           ACTION.DEAL_DAMAGE_TO_ENEMY_FIELD,
           ZONE.ENEMY_FIELD,
@@ -282,7 +282,7 @@ class CardsService {
           QUANTITY.ONE,
           30),
     ]),
-    CardProgramming(110, "Darkness Gale", CardColor.BLACK, [
+    CardProgramming(113, "Darkness Gale", CardColor.BLACK, [
       Rule(
           ACTION.SEND_TO_ENEMY_TRASH,
           ZONE.ENEMY_FIELD,
@@ -297,11 +297,11 @@ class CardsService {
           QUANTITY.ALL,
           null),
     ]),
-    CardProgramming(110, "Deceive Clock", CardColor.BLACK, [
+    CardProgramming(114, "Deceive Clock", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_HAND, ZONE.DECK, FORM_OF_ACTION.NOT_APPLY, [], [],
           QUANTITY.ONE, null),
     ]),
-    CardProgramming(110, "Chaos Virus", CardColor.BLACK, [
+    CardProgramming(115, "Chaos Virus", CardColor.BLACK, [
       Rule(
           ACTION.SEND_TO_ENEMY_TRASH,
           ZONE.ENEMY_SUMMON_PROGRAMMING_ZONE,
@@ -316,15 +316,15 @@ class CardsService {
           QUANTITY.ONE,
           null),
     ]),
-    CardProgramming(110, "Vicious Hacking", CardColor.BLACK, [
+    CardProgramming(116, "Vicious Hacking", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_HAND, FORM_OF_ACTION.SELECTED,
           [], [], QUANTITY.ONE, null),
     ]),
-    CardProgramming(110, "Delete Matrix", CardColor.BLACK, [
+    CardProgramming(117, "Delete Matrix", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_FIELD, FORM_OF_ACTION.NOT_APPLY,
           [], [TYPE_TARGET_CARD.DIGIMON], QUANTITY.ALL, null),
     ]),
-    CardProgramming(110, "Misery Gate", CardColor.BLACK, [
+    CardProgramming(118, "Misery Gate", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_DECK, FORM_OF_ACTION.NOT_APPLY,
           [], [], QUANTITY.ONE, null),
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_DECK, FORM_OF_ACTION.NOT_APPLY,
@@ -332,7 +332,7 @@ class CardsService {
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_DECK, FORM_OF_ACTION.NOT_APPLY,
           [], [], QUANTITY.ONE, null),
     ]),
-    CardProgramming(110, "Desire Access", CardColor.BLACK, [
+    CardProgramming(119, "Desire Access", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_TRASH, ZONE.HAND, FORM_OF_ACTION.NOT_APPLY, [], [],
           QUANTITY.ALL, null),
       Rule(ACTION.SEND_TO_HAND, ZONE.DECK, FORM_OF_ACTION.NOT_APPLY, [], [],
@@ -348,11 +348,11 @@ class CardsService {
       Rule(ACTION.SEND_TO_HAND, ZONE.DECK, FORM_OF_ACTION.NOT_APPLY, [], [],
           QUANTITY.ONE, null),
     ]),
-    CardProgramming(110, "Revival Charge", CardColor.BLACK, [
+    CardProgramming(120, "Revival Charge", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_DECK, ZONE.TRASH, FORM_OF_ACTION.NOT_APPLY, [], [],
           QUANTITY.ALL, null),
     ]),
-    CardProgramming(110, "Chrono Balance", CardColor.BLACK, [
+    CardProgramming(121, "Chrono Balance", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_TRASH, ZONE.HAND, FORM_OF_ACTION.RANDOM, [], [],
           QUANTITY.ONE, 1),
       Rule(ACTION.SEND_TO_TRASH, ZONE.HAND, FORM_OF_ACTION.RANDOM, [], [],
@@ -366,7 +366,7 @@ class CardsService {
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_HAND, FORM_OF_ACTION.RANDOM,
           [], [], QUANTITY.ONE, 1),
     ]),
-    CardProgramming(110, "Security Hall", CardColor.BLACK, [
+    CardProgramming(122, "Security Hall", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_DECK, FORM_OF_ACTION.RANDOM,
           [], [], QUANTITY.ONE, null),
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_DECK, FORM_OF_ACTION.RANDOM,
@@ -378,26 +378,26 @@ class CardsService {
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_DECK, FORM_OF_ACTION.RANDOM,
           [], [], QUANTITY.ONE, null),
     ]),
-    CardProgramming(110, "Revival Charge", CardColor.BLACK, [
+    CardProgramming(123, "Revival Charge", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_DECK, ZONE.TRASH, FORM_OF_ACTION.NOT_APPLY, [], [],
           QUANTITY.ALL, null),
     ]),
 
-    CardProgramming(110, "Scramble Up", CardColor.BLACK, [
+    CardProgramming(124, "Scramble Up", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_FIELD, ZONE.HAND, FORM_OF_ACTION.SELECTED, [], [],
           QUANTITY.ONE, null),
     ]),
-    CardProgramming(110, "Charge Terminal", CardColor.BLACK, [
+    CardProgramming(125, "Charge Terminal", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_HAND, ZONE.HAND, FORM_OF_ACTION.NOT_APPLY, [], [],
           QUANTITY.ONE, null),
       Rule(ACTION.SEND_TO_HAND, ZONE.HAND, FORM_OF_ACTION.NOT_APPLY, [], [],
           QUANTITY.ONE, null),
     ]),
-    CardProgramming(110, "Digimon Charge", CardColor.BLACK, [
+    CardProgramming(126, "Digimon Charge", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_HAND, ZONE.DECK, FORM_OF_ACTION.SELECTED, [],
           [TYPE_TARGET_CARD.DIGIMON], QUANTITY.ONE, null),
     ]),
-    CardProgramming(110, "Program Charge", CardColor.BLACK, [
+    CardProgramming(127, "Program Charge", CardColor.BLACK, [
       Rule(
           ACTION.SEND_TO_HAND,
           ZONE.DECK,
@@ -413,13 +413,13 @@ class CardsService {
           null),
     ]),
 
-    CardProgramming(110, "Trade Charge", CardColor.BLACK, [
+    CardProgramming(128, "Trade Charge", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_HAND, ZONE.DECK, FORM_OF_ACTION.RANDOM, [], [],
           QUANTITY.ONE, null),
       Rule(ACTION.SEND_TO_TRASH, ZONE.HAND, FORM_OF_ACTION.SELECTED, [], [],
           QUANTITY.ONE, null),
     ]),
-    CardProgramming(110, "Illegal Access", CardColor.BLACK, [
+    CardProgramming(129, "Illegal Access", CardColor.BLACK, [
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_DECK, FORM_OF_ACTION.SELECTED, [], [],
           QUANTITY.ONE, null),
       Rule(ACTION.SEND_TO_ENEMY_TRASH, ZONE.ENEMY_DECK, FORM_OF_ACTION.SELECTED, [], [],

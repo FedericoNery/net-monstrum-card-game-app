@@ -6,15 +6,15 @@ import 'package:flame/parallax.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
-import 'package:net_monstrum_card_game/screens/card_battle.dart';
 import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
+import 'package:net_monstrum_card_game/screens/overlay/hand_widget.dart';
 
-class CardBattleComponent extends FlameGame
+class HandComponentOverlay extends FlameGame
 {
   final BattleCardGame battleCardGame;
 
-  CardBattleComponent(this.battleCardGame)
+  HandComponentOverlay(this.battleCardGame)
       : super(
           camera: CameraComponent.withFixedResolution(width: 850, height: 400),
         );
@@ -39,7 +39,7 @@ class CardBattleComponent extends FlameGame
       scale: Vector2(scaleX, scaleY)
     );
     add(parallax);
-    world = CardBattle();
+    world = Hand();
     camera.world = world;
     camera.moveTo(Vector2(400, 200));
     await add(

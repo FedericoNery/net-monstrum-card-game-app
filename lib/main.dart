@@ -1,19 +1,60 @@
-import 'dart:convert';
-
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
-import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/list-rooms.dart';
+import 'package:net_monstrum_card_game/screens/overlay/confirm_dialog.dart';
+import 'package:net_monstrum_card_game/screens/overlay/deck.dart';
+import 'package:net_monstrum_card_game/screens/overlay/hand.dart';
 import 'package:net_monstrum_card_game/services/aggregation_service.dart';
-
-import 'screens/card_battle.dart';
 import 'screens/card_battle_component.dart';
+
+class ConfirmDialogView extends StatelessWidget {
+final BattleCardGame battleCardGame;
+
+  const ConfirmDialogView({
+    Key? key,
+    required this.battleCardGame,
+  }) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    ConfirmDialogComponentOverlay confirmDialog = ConfirmDialogComponentOverlay(this.battleCardGame);
+    return GameWidget(game: confirmDialog);
+  }
+}
+
+class HandView extends StatelessWidget {
+final BattleCardGame battleCardGame;
+
+  const HandView({
+    Key? key,
+    required this.battleCardGame,
+  }) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    HandComponentOverlay confirmDialog = HandComponentOverlay(this.battleCardGame);
+    return GameWidget(game: confirmDialog);
+  }
+}
+
+class DeckView extends StatelessWidget {
+final BattleCardGame battleCardGame;
+
+  const DeckView({
+    Key? key,
+    required this.battleCardGame,
+  }) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    DeckComponentOverlay confirmDialog = DeckComponentOverlay(this.battleCardGame);
+    return GameWidget(game: confirmDialog);
+  }
+}
+
 
 class GameView extends StatelessWidget {
   const GameView({super.key});
@@ -29,9 +70,24 @@ class GameView extends StatelessWidget {
     Tamer rivalTamer =
         Tamer(rival.decksAggregations[0].cards, rival.user.username);
     BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer);
-    CardBattleComponent game = CardBattleComponent(battleCardGame);
 
-    return GameWidget(game: game);
+    CardBattleComponent game = CardBattleComponent(battleCardGame);
+    ConfirmDialogView confirmDialogView = ConfirmDialogView(battleCardGame: battleCardGame);
+    HandView handView = HandView(battleCardGame: battleCardGame);
+    DeckView deckView = DeckView(battleCardGame: battleCardGame);
+    
+    return GameWidget(game: game,
+      overlayBuilderMap: {
+        'PauseMenu': (BuildContext context, CardBattleComponent game) {
+          return confirmDialogView;
+        },
+        'Hand': (BuildContext context, CardBattleComponent game) {
+          return handView;
+        },
+        'Deck': (BuildContext context, CardBattleComponent game) {
+          return deckView;
+        },
+    });
   }
 }
 

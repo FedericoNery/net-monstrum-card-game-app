@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/domain/game.dart';
+import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
+import 'package:net_monstrum_card_game/views/card_battle_multiplayer_view.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class WaitingRoom extends StatefulWidget {
@@ -17,6 +22,23 @@ class _WaitingRoomState extends State<WaitingRoom> {
   @override
   void initState() {
     super.initState();
+
+    socket.on('start game', (data) {
+      Map<String, dynamic> objetoDeserializado = json.decode(data);
+      print(data);
+
+/*       Tamer playerTamer =
+          Tamer(player.decksAggregations[0].cards, player.user.username);
+      Tamer rivalTamer =
+          Tamer(rival.decksAggregations[0].cards, rival.user.username);
+      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
+
+      print(data);
+      /* Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const CardBattleMultiplayerView(battleCardGame))); */
+    });
   }
 
   @override

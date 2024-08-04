@@ -2,7 +2,7 @@ class Evolution {
   String digimonName;
   String color;
   int attackPoints = 0;
-  int deffensePoints = 0;
+  int healthPoints = 0;
 
   Evolution(this.digimonName, this.color);
 
@@ -10,4 +10,12 @@ class Evolution {
     return '$digimonName.jpg';
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      "digimonName": digimonName,
+      "color": color,
+      "attackPoints": attackPoints,
+      "healthPoints": healthPoints
+    };
+  }
 }

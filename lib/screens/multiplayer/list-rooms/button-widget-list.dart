@@ -1,4 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/services/aggregation_service.dart';
+import 'package:net_monstrum_card_game/services/socket_client.dart';
+import 'package:net_monstrum_card_game/views/card_battle_multiplayer_view.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../game/deck-selector.dart';
 
@@ -13,14 +19,30 @@ class MyButtonListWidget extends StatefulWidget {
 }
 
 class _MyButtonListWidgetState extends State<MyButtonListWidget> {
+  IO.Socket socket = SocketManager().socket!;
+
+  _MyButtonListWidgetState() {
+    socket.on("start game", (data) {
+      // Redirigir al widget de la batalla
+      Map<String, dynamic> objetoDeserializado = json.decode(data);
+      print(data);
+
+      /*       Tamer playerTamer =
+          Tamer(player.decksAggregations[0].cards, player.user.username);
+      Tamer rivalTamer =
+          Tamer(rival.decksAggregations[0].cards, rival.user.username);
+      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
+
+      //Convertir a BattleCardGame o delegarlo en el otro componente
+      /* Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const CardBattleMultiplayerView())); */
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Map<String, String>> cards = [
-      {'id': '1', 'name': 'Card 1'},
-      {'id': '2', 'name': 'Card 2'},
-      {'id': '3', 'name': 'Card 3'},
-    ];
-
     if (widget.roomsIds.length > 0) {
       return ListView.builder(
         itemCount: widget.roomsIds.length,
@@ -28,13 +50,20 @@ class _MyButtonListWidgetState extends State<MyButtonListWidget> {
           // Para cada elemento en la lista, crea un botón con el texto correspondiente
           return ElevatedButton(
             onPressed: () {
-              // Acción a realizar cuando se presiona el botón
-              print('Botón ${widget.roomsIds[index]} presionado');
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DeckSelector(cards: cards),
-                  ));
+              print("APRETO EL BOTON");
+              AggregationService service = AggregationService();
+              Aggregation player = service.getAggregatioByUserId(2);
+
+              String roomId = widget.roomsIds[index];
+              socket.emit('playerJoinGame', {
+                "deck": player.decksAggregations[0].cards,
+                "user": {
+                  "id": player.user.id,
+                  "username": player.user.username
+                },
+                "gameIdToJoin": roomId
+              });
+              print("EMITIO");
             },
             child: Text(widget.roomsIds[index]), // Texto del botón
           );

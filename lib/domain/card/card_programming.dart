@@ -8,14 +8,17 @@ class CardProgramming extends Card {
   String color;
   List<Rule> rules = [];
 
-  CardProgramming(id, this.name, this.color, this.rules) : super(id);
+  CardProgramming(id, this.name, this.color, this.rules) : super(id) {
+    type = "Programming";
+  }
 
   Map<String, dynamic> toJson() {
     return {
       "id": id,
       "name": name,
       "color": color,
-      "rules": rulesToJson(rules)
+      "rules": rulesToJson(rules),
+      "type": type
     };
   }
 
@@ -33,5 +36,10 @@ class CardProgramming extends Card {
       });
     }
     return rulesJsonified;
+  }
+
+  static CardProgramming getInstanceFromSocket(Map<String, dynamic> card) {
+    return CardProgramming(card["id"], card["name"], card["color"],
+        Rule.getRulesFromSocket(card["rules"]));
   }
 }

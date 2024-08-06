@@ -14,11 +14,12 @@ abstract class ICard {
 class Card implements ICard {
   int id;
   int? uniqueIdInGame;
+  late String type;
 
   Card(this.id);
 
   @override
-  bool isDigimonOrEnergyCard(){
+  bool isDigimonOrEnergyCard() {
     return this is CardDigimon || this is CardEnergy;
   }
 
@@ -41,5 +42,4 @@ class Card implements ICard {
   bool isSummonDigimonCard() {
     return this is CardSummonDigimon;
   }
-  
 }

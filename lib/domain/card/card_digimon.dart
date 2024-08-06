@@ -15,7 +15,9 @@ class CardDigimon extends Card implements IColor {
 
   CardDigimon(id, this.digimonName, this.color, this.attackPoints,
       this.healthPoints, this.evolution, this.energyCount)
-      : super(id);
+      : super(id) {
+    type = "Digimon";
+  }
 
   CardDigimon copyWith(
       {int? id,
@@ -83,7 +85,19 @@ class CardDigimon extends Card implements IColor {
       'attackPoints': attackPoints,
       'healthPoints': healthPoints,
       'energyCount': energyCount,
-      'evolution': evolution?.toJson()
+      'evolution': evolution?.toJson(),
+      "type": type
     };
+  }
+
+  static CardDigimon getInstanceFromSocket(Map<String, dynamic> card) {
+    return CardDigimon(
+        card["id"],
+        card["digimonName"],
+        card["color"],
+        card["attackPoints"],
+        card["healthPoints"],
+        Evolution.getInstanceFromSocket(card["evolution"]),
+        card["energyCount"]);
   }
 }

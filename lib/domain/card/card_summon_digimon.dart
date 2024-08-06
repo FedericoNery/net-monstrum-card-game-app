@@ -5,7 +5,9 @@ class CardSummonDigimon extends Card {
   String name;
   List<CardDigimon> digimonsCards = [];
 
-  CardSummonDigimon(id, this.name, this.digimonsCards) : super(id);
+  CardSummonDigimon(id, this.name, this.digimonsCards) : super(id) {
+    type = "SummonDigimon";
+  }
 
   CardSummonDigimon copyWith({
     int? id,
@@ -40,5 +42,19 @@ class CardSummonDigimon extends Card {
       });
     }
     return cardDigimonsJsonified;
+  }
+
+  static CardSummonDigimon getInstanceFromSocket(Map<String, dynamic> card) {
+    return CardSummonDigimon(card["id"], card["name"],
+        CardSummonDigimon.getListDigimonCardsFromSocket(card["digimonsCards"]));
+  }
+
+  static List<CardDigimon> getListDigimonCardsFromSocket(
+      List<Map<String, dynamic>> originalCards) {
+    List<CardDigimon> digimonCards = [];
+    for (var i = 0; i < originalCards.length; i++) {
+      digimonCards.add(CardDigimon.getInstanceFromSocket(originalCards[i]));
+    }
+    return digimonCards;
   }
 }

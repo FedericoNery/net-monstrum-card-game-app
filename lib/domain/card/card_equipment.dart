@@ -20,7 +20,9 @@ class CardEquipment extends Card {
 
   CardEquipment(id, this.name, this.attackPoints, this.healthPoints,
       this.targetScope, this.quantityOfTargets)
-      : super(id);
+      : super(id) {
+    type = "Equipment";
+  }
 
   CardEquipment copyWith(
       {int? id,
@@ -68,7 +70,13 @@ class CardEquipment extends Card {
       "attackPoints": this.attackPoints,
       "healthPoints": this.healthPoints,
       "targetScope": this.targetScope,
-      "quantityOfTargets": this.quantityOfTargets
+      "quantityOfTargets": this.quantityOfTargets,
+      "type": type
     };
+  }
+
+  static CardEquipment getInstanceFromSocket(Map<String, dynamic> card) {
+    return CardEquipment(card["id"], card["name"], card["attackPoints"],
+        card["healthPoints"], card["targetScope"], card["quantityOfTargets"]);
   }
 }

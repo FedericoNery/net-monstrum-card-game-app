@@ -22,7 +22,7 @@ class _WaitingRoomState extends State<WaitingRoom> {
   @override
   void initState() {
     super.initState();
-
+    print("ENTROOOO");
     socket.on('start game', (data) {
       Map<String, dynamic> objetoDeserializado = json.decode(data);
       print(data);

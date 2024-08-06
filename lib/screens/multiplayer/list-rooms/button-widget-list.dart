@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/adapters/list_card_adapter.dart';
+import 'package:net_monstrum_card_game/domain/game.dart';
+import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 import 'package:net_monstrum_card_game/services/aggregation_service.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:net_monstrum_card_game/views/card_battle_multiplayer_view.dart';
@@ -22,16 +25,21 @@ class _MyButtonListWidgetState extends State<MyButtonListWidget> {
   IO.Socket socket = SocketManager().socket!;
 
   _MyButtonListWidgetState() {
+    print("CONSTRUCTOR");
     socket.on("start game", (data) {
       // Redirigir al widget de la batalla
       Map<String, dynamic> objetoDeserializado = json.decode(data);
       print(data);
 
-      /*       Tamer playerTamer =
-          Tamer(player.decksAggregations[0].cards, player.user.username);
-      Tamer rivalTamer =
-          Tamer(rival.decksAggregations[0].cards, rival.user.username);
-      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
+      Tamer playerTamer = Tamer(
+          ListCardAdapter.getListOfCardsInstantiated(
+              data["gameData"]["game"]["field1"]["deck"]["cartas"]),
+          data["gameData"]["game"]["player1"]["username"]);
+      Tamer rivalTamer = Tamer(
+          ListCardAdapter.getListOfCardsInstantiated(
+              data["gameData"]["game"]["field2"]["deck"]["cartas"]),
+          data["gameData"]["game"]["player2"]["username"]);
+      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer);
 
       //Convertir a BattleCardGame o delegarlo en el otro componente
       /* Navigator.push(

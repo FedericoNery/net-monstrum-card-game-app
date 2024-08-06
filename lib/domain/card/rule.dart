@@ -49,22 +49,44 @@ class ZONE {
   static const String ENEMY_FIELD = 'ENEMY_FIELD';
   static const String ENEMY_HAND = 'ENEMY_HAND';
   static const String ENEMY_DECK = 'ENEMY_DECK';
-  static const String ENEMY_SUMMON_PROGRAMMING_ZONE = 'ENEMY_SUMMON_PROGRAMMING_ZONE';
+  static const String ENEMY_SUMMON_PROGRAMMING_ZONE =
+      'ENEMY_SUMMON_PROGRAMMING_ZONE';
 }
 
 class Rule {
   String action;
   String targetZone;
   String formOfAction;
-  List<String> targetColors = []; 
+  List<String> targetColors = [];
   //Si es vacia la lista aplica para cualquier color
   //Es decir, aquellos colores AFECTADOS por la carta
-  List<String> targetTypeCard = []; 
+  List<String> targetTypeCard = [];
   //Si es vacia la lista aplica para cualquier color
   //Es decir, aquellos tipos AFECTADOS por la carta
   String quantity;
 
   int? damage;
 
-  Rule(this.action, this.targetZone, this.formOfAction, this.targetColors, this.targetTypeCard, this.quantity, this.damage);
+  Rule(this.action, this.targetZone, this.formOfAction, this.targetColors,
+      this.targetTypeCard, this.quantity, this.damage);
+
+  static List<Rule> getRulesFromSocket(
+      List<Map<String, dynamic>> originalRules) {
+    List<Rule> rules = [];
+    for (var i = 0; i < originalRules.length; i++) {
+      rules.add(Rule.getInstance(originalRules[i]));
+    }
+    return rules;
+  }
+
+  static Rule getInstance(Map<String, dynamic> rule) {
+    return Rule(
+        rule["action"],
+        rule["targetZone"],
+        rule["formOfAction"],
+        rule["targetColors"],
+        rule["targetTypeCard"],
+        rule["quantity"],
+        rule["damage"]);
+  }
 }

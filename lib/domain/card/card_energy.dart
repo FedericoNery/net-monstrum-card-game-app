@@ -8,7 +8,9 @@ class CardEnergy extends Card implements IColor {
   String color;
   int energyCount;
 
-  CardEnergy(id, this.name, this.color, this.energyCount) : super(id);
+  CardEnergy(id, this.name, this.color, this.energyCount) : super(id) {
+    type = "Energy";
+  }
 
   CardEnergy copyWith(
       {int? id, String? name, String? color, int? energyCount}) {
@@ -51,6 +53,17 @@ class CardEnergy extends Card implements IColor {
   }
 
   Map<String, dynamic> toJson() {
-    return {"id": id, "name": name, "color": color, "energyCount": energyCount};
+    return {
+      "id": id,
+      "name": name,
+      "color": color,
+      "energyCount": energyCount,
+      "type": type
+    };
+  }
+
+  static CardEnergy getInstanceFromSocket(Map<String, dynamic> card) {
+    return CardEnergy(
+        card["id"], card["name"], card["color"], card["energyCount"]);
   }
 }

@@ -18,4 +18,12 @@ class Evolution {
       "healthPoints": healthPoints
     };
   }
+
+  static Evolution? getInstanceFromSocket(Map<String, dynamic>? evolution) {
+    if (evolution != null) {
+      return Evolution(evolution["digimonName"], evolution["color"]);
+    }
+
+    return null;
+  }
 }

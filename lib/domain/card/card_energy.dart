@@ -58,12 +58,16 @@ class CardEnergy extends Card implements IColor {
       "name": name,
       "color": color,
       "energyCount": energyCount,
-      "type": type
+      "type": type,
+      "uniqueIdInGame": uniqueIdInGame
     };
   }
 
   static CardEnergy getInstanceFromSocket(Map<String, dynamic> card) {
-    return CardEnergy(
+    CardEnergy cardEnergy = CardEnergy(
         card["id"], card["name"], card["color"], card["energyCount"]);
+
+    cardEnergy.uniqueIdInGame = card["uniqueIdInGame"];
+    return cardEnergy;
   }
 }

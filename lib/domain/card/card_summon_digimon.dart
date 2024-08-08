@@ -25,7 +25,9 @@ class CardSummonDigimon extends Card {
     return {
       "id": id,
       "name": name,
-      "digimonsCards": digimonsToJson(digimonsCards)
+      "digimonsCards": digimonsToJson(digimonsCards),
+      "type": type,
+      "uniqueIdInGame": uniqueIdInGame
     };
   }
 
@@ -33,6 +35,7 @@ class CardSummonDigimon extends Card {
     List<Map<String, dynamic>> cardDigimonsJsonified = [];
     for (var i = 0; i < cardDigimons.length; i++) {
       cardDigimonsJsonified.add({
+        "id": cardDigimons[i].id,
         "digimonName": cardDigimons[i].digimonName,
         "color": cardDigimons[i].color,
         "attackPoints": cardDigimons[i].attackPoints,
@@ -45,12 +48,16 @@ class CardSummonDigimon extends Card {
   }
 
   static CardSummonDigimon getInstanceFromSocket(Map<String, dynamic> card) {
-    return CardSummonDigimon(card["id"], card["name"],
+    CardSummonDigimon cardSummonDigimon = CardSummonDigimon(
+        card["id"],
+        card["name"],
         CardSummonDigimon.getListDigimonCardsFromSocket(card["digimonsCards"]));
+    cardSummonDigimon.uniqueIdInGame = card["uniqueIdInGame"];
+    return cardSummonDigimon;
   }
 
   static List<CardDigimon> getListDigimonCardsFromSocket(
-      List<Map<String, dynamic>> originalCards) {
+      List<dynamic> originalCards) {
     List<CardDigimon> digimonCards = [];
     for (var i = 0; i < originalCards.length; i++) {
       digimonCards.add(CardDigimon.getInstanceFromSocket(originalCards[i]));

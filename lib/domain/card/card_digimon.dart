@@ -86,12 +86,13 @@ class CardDigimon extends Card implements IColor {
       'healthPoints': healthPoints,
       'energyCount': energyCount,
       'evolution': evolution?.toJson(),
-      "type": type
+      "type": type,
+      "uniqueIdInGame": uniqueIdInGame
     };
   }
 
   static CardDigimon getInstanceFromSocket(Map<String, dynamic> card) {
-    return CardDigimon(
+    CardDigimon cardDigimon = CardDigimon(
         card["id"],
         card["digimonName"],
         card["color"],
@@ -99,5 +100,7 @@ class CardDigimon extends Card implements IColor {
         card["healthPoints"],
         Evolution.getInstanceFromSocket(card["evolution"]),
         card["energyCount"]);
+    cardDigimon.uniqueIdInGame = card["uniqueIdInGame"];
+    return cardDigimon;
   }
 }

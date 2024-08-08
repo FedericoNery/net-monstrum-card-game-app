@@ -18,7 +18,8 @@ class CardProgramming extends Card {
       "name": name,
       "color": color,
       "rules": rulesToJson(rules),
-      "type": type
+      "type": type,
+      "uniqueIdInGame": uniqueIdInGame
     };
   }
 
@@ -39,7 +40,10 @@ class CardProgramming extends Card {
   }
 
   static CardProgramming getInstanceFromSocket(Map<String, dynamic> card) {
-    return CardProgramming(card["id"], card["name"], card["color"],
-        Rule.getRulesFromSocket(card["rules"]));
+    CardProgramming cardProgramming = CardProgramming(card["id"], card["name"],
+        card["color"], Rule.getRulesFromSocket(card["rules"]));
+
+    cardProgramming.uniqueIdInGame = card["uniqueIdInGame"];
+    return cardProgramming;
   }
 }

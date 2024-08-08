@@ -71,12 +71,20 @@ class CardEquipment extends Card {
       "healthPoints": this.healthPoints,
       "targetScope": this.targetScope,
       "quantityOfTargets": this.quantityOfTargets,
-      "type": type
+      "type": type,
+      "uniqueIdInGame": uniqueIdInGame
     };
   }
 
   static CardEquipment getInstanceFromSocket(Map<String, dynamic> card) {
-    return CardEquipment(card["id"], card["name"], card["attackPoints"],
-        card["healthPoints"], card["targetScope"], card["quantityOfTargets"]);
+    CardEquipment cardEquipment = CardEquipment(
+        card["id"],
+        card["name"],
+        card["attackPoints"],
+        card["healthPoints"],
+        card["targetScope"],
+        card["quantityOfTargets"]);
+    cardEquipment.uniqueIdInGame = card["uniqueIdInGame"];
+    return cardEquipment;
   }
 }

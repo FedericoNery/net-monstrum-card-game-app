@@ -6,8 +6,7 @@ import 'package:net_monstrum_card_game/domain/card/card_programming.dart';
 import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 
 class ListCardAdapter {
-  static List<Card> getListOfCardsInstantiated(
-      List<Map<String, dynamic>> cards) {
+  static List<Card> getListOfCardsInstantiated(List<dynamic> cards) {
     List<Card> listOfCardsInstantiated = [];
     for (var i = 0; i < cards.length; i++) {
       listOfCardsInstantiated.add(ListCardAdapter.getInstanceCard(cards[i]));

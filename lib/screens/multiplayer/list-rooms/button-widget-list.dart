@@ -8,6 +8,7 @@ import 'package:net_monstrum_card_game/services/aggregation_service.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:net_monstrum_card_game/views/card_battle_multiplayer_view.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_common/src/util/event_emitter.dart';
 
 import '../game/deck-selector.dart';
 
@@ -26,27 +27,43 @@ class _MyButtonListWidgetState extends State<MyButtonListWidget> {
 
   _MyButtonListWidgetState() {
     print("CONSTRUCTOR");
-    socket.on("start game", (data) {
-      // Redirigir al widget de la batalla
-      Map<String, dynamic> objetoDeserializado = json.decode(data);
-      print(data);
+    socket.on(
+        "start game",
+        (data) {
+          // Redirigir al widget de la batalla
+          //Map<String, dynamic> objetoDeserializado = json.decode(data);
+          print(data);
+          var jsonMap = json.decode(data);
+          Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
 
-      Tamer playerTamer = Tamer(
-          ListCardAdapter.getListOfCardsInstantiated(
-              data["gameData"]["game"]["field1"]["deck"]["cartas"]),
-          data["gameData"]["game"]["player1"]["username"]);
-      Tamer rivalTamer = Tamer(
-          ListCardAdapter.getListOfCardsInstantiated(
-              data["gameData"]["game"]["field2"]["deck"]["cartas"]),
-          data["gameData"]["game"]["player2"]["username"]);
-      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer);
+          var playerCards =
+              flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"];
 
-      //Convertir a BattleCardGame o delegarlo en el otro componente
-      /* Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const CardBattleMultiplayerView())); */
-    });
+          String playerInfo =
+              flutterMap["gameData"]["game"]["player1"]["username"];
+
+          var rivalCards =
+              flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"];
+          String rivalInfo =
+              flutterMap["gameData"]["game"]["player2"]["username"];
+
+          Tamer playerTamer = Tamer(
+              ListCardAdapter.getListOfCardsInstantiated(playerCards),
+              playerInfo);
+          Tamer rivalTamer = Tamer(
+              ListCardAdapter.getListOfCardsInstantiated(rivalCards),
+              rivalInfo);
+
+          BattleCardGame battleCardGame =
+              BattleCardGame(playerTamer, rivalTamer);
+
+          //Convertir a BattleCardGame o delegarlo en el otro componente
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CardBattleMultiplayerView(
+                      battleCardGame: battleCardGame)));
+        } as EventHandler);
   }
 
   @override

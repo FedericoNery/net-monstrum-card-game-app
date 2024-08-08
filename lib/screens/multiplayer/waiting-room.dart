@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/adapters/list_card_adapter.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
@@ -24,7 +25,6 @@ class _WaitingRoomState extends State<WaitingRoom> {
     super.initState();
     print("ENTROOOO");
     socket.on('start game', (data) {
-      Map<String, dynamic> objetoDeserializado = json.decode(data);
       print(data);
 
 /*       Tamer playerTamer =
@@ -34,10 +34,32 @@ class _WaitingRoomState extends State<WaitingRoom> {
       BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
 
       print(data);
-      /* Navigator.push(
+      var jsonMap = json.decode(data);
+      Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
+
+      var playerCards =
+          flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"];
+
+      String playerInfo = flutterMap["gameData"]["game"]["player2"]["username"];
+
+      var rivalCards =
+          flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"];
+
+      String rivalInfo = flutterMap["gameData"]["game"]["player1"]["username"];
+
+      Tamer playerTamer = Tamer(
+          ListCardAdapter.getListOfCardsInstantiated(playerCards), playerInfo);
+      Tamer rivalTamer = Tamer(
+          ListCardAdapter.getListOfCardsInstantiated(rivalCards), rivalInfo);
+
+      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer);
+
+      Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const CardBattleMultiplayerView(battleCardGame))); */
+              builder: (context) => CardBattleMultiplayerView(
+                    battleCardGame: battleCardGame,
+                  )));
     });
   }
 

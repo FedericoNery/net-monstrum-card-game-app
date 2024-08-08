@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/list-rooms/button-widget-list.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/waiting-room.dart';
+import 'package:net_monstrum_card_game/services/aggregation_service.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
+import 'package:net_monstrum_card_game/views/card_battle_multiplayer_view.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:convert';
 
@@ -29,14 +32,13 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
 
   IO.Socket socket = SocketManager().socket!;
 
-  void _incrementCounter() {
-/*     setState(() {
-      _counter++;
-    }); */
+  void _createRoom() {
+    AggregationService service = AggregationService();
+    Aggregation player = service.getAggregatioByUserId(1);
 
     socket.emit('createNewGame', {
-      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      "Mi usuario"
+      "deck": player.decksAggregations[0].cards,
+      "user": {"id": player.user.id, "username": player.user.username}
     });
   }
 
@@ -57,9 +59,11 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
       Navigator.push(
           context,
           MaterialPageRoute(
+            //builder: (context) => const CardBattleMultiplayerView(),
             builder: (context) => WaitingRoom(
-                gameId: objetoDeserializado["gameId"]!,
-                socketId: objetoDeserializado["mySocketId"]!),
+              gameId: objetoDeserializado['gameId'],
+              socketId: objetoDeserializado["mySocketId"],
+            ),
           ));
     });
 
@@ -82,28 +86,9 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(child: MyButtonListWidget(roomsIds: _listRoomsIds)
-          /*  Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-/*             const Text(
-              'You have pushed the button this many times:',
-            ), */
-            MyButtonListWidget(roomsIds: _listRoomsIds)
-          ],
-          /*  <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ], */
-        ), */
-          ),
+      body: Center(child: MyButtonListWidget(roomsIds: _listRoomsIds)),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _createRoom,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.

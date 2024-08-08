@@ -1,6 +1,7 @@
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
+import 'package:net_monstrum_card_game/domain/card/card_programming.dart';
 import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 
 abstract class ICard {
@@ -9,16 +10,18 @@ abstract class ICard {
   bool isEnergyCard();
   bool isSummonDigimonCard();
   bool isDigimonOrEnergyCard();
+  bool isProgrammingCard();
 }
 
 class Card implements ICard {
   int id;
   int? uniqueIdInGame;
+  late String type;
 
   Card(this.id);
 
   @override
-  bool isDigimonOrEnergyCard(){
+  bool isDigimonOrEnergyCard() {
     return this is CardDigimon || this is CardEnergy;
   }
 
@@ -41,5 +44,9 @@ class Card implements ICard {
   bool isSummonDigimonCard() {
     return this is CardSummonDigimon;
   }
-  
+
+  @override
+  bool isProgrammingCard() {
+    return this is CardProgramming;
+  }
 }

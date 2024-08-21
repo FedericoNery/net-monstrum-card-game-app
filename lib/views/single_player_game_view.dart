@@ -2,7 +2,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_component.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/card_battle_component.dart';
 import 'package:net_monstrum_card_game/services/aggregation_service.dart';
 
 class SinglePlayerGameView extends StatelessWidget {

@@ -6,21 +6,21 @@ import 'package:flame/parallax.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_multiplayer.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/card_battle.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_state.dart';
 
-class CardBattleComponentMultiplayer extends FlameGame {
+class CardBattleComponent extends FlameGame {
   final BattleCardGame battleCardGame;
 
-  CardBattleComponentMultiplayer(this.battleCardGame)
+  CardBattleComponent(this.battleCardGame)
       : super(
           camera: CameraComponent.withFixedResolution(width: 850, height: 400),
         );
 
   @override
   Future<void> onLoad() async {
-    //final backgroundImage = await images.load("backgrounds/fondo5.jpeg");
+    final backgroundImage = await images.load("backgrounds/fondo5.jpeg");
     final _imagesNames = [ParallaxImageData("backgrounds/fondo5.jpeg")];
 
     final screenSize = WidgetsBinding.instance!.window.physicalSize;
@@ -35,7 +35,7 @@ class CardBattleComponentMultiplayer extends FlameGame {
         repeat: ImageRepeat.repeat,
         scale: Vector2(scaleX, scaleY));
     add(parallax);
-    world = CardBattleMultiplayer();
+    world = CardBattle();
     camera.world = world;
     camera.moveTo(Vector2(400, 200));
     await add(FlameBlocProvider<CardBattleBloc, CardBattleState>(

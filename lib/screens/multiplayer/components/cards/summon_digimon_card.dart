@@ -4,20 +4,21 @@ import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 import 'package:net_monstrum_card_game/domain/card/color.dart';
-import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_bloc.dart';
-import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_event.dart';
-import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_state.dart';
-import 'package:net_monstrum_card_game/widgets/card_battle/cards/base_card.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/base_card.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_border.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
-import '../effects/effects.dart';
 
 class SummonDigimonCardComponent extends BaseCardComponent
-    with TapCallbacks, FlameBlocListenable<CardBattleBloc, CardBattleState> {
+    with
+        TapCallbacks,
+        FlameBlocListenable<CardBattleMultiplayerBloc,
+            CardBattleMultiplayerState> {
   final CardSummonDigimon card;
   SummonDigimonCardComponent(this.card, x, y, isHidden, isRival)
       : super(
@@ -85,7 +86,7 @@ class SummonDigimonCardComponent extends BaseCardComponent
         children.first.add(RemoveEffect(delay: 0.1));
       }
 
-      bloc.add(ActivateSummonDigimonCard(card));
+      //bloc.add(ActivateSummonDigimonCard(card));
     }
   }
 

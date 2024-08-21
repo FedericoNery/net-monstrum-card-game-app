@@ -5,9 +5,9 @@ import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 import 'package:net_monstrum_card_game/domain/card/energy_effect.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
-import 'package:net_monstrum_card_game/screens/card_battle.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_event.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/card_battle.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_event.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_state.dart';
 
 class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
   CardBattleBloc(BattleCardGame battleCardGame)
@@ -18,7 +18,7 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       ),
     ); */
 
-    on<ShuffleDeck>((event, emit){
+    on<ShuffleDeck>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.player.deck.shuffle();
       battleCardGame.rival.deck.shuffle();
@@ -26,14 +26,13 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
 
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
-
     });
 
     on<ToCompilationPhase>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.toCompilationPhase();
       battleCardGame.drawedCards = false; // VER ESTO
-      
+
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
@@ -66,14 +65,14 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
 
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.targetDigimonId = digimonCardToBeEquippedId;
-      
+
       int selectedEquipmentCardId = battleCardGame.selectedEquipmentCardId!;
 
       battleCardGame.player.hand.removeFromHand(selectedEquipmentCardId);
-      battleCardGame.player.digimonZone
-          .applyEffectTo(digimonCardToBeEquippedId, battleCardGame.equipmentsEffectSelected.removeLast());
+      battleCardGame.player.digimonZone.applyEffectTo(digimonCardToBeEquippedId,
+          battleCardGame.equipmentsEffectSelected.removeLast());
       battleCardGame.player.calculatePoints();
-      
+
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
@@ -84,27 +83,28 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       BattleCardGame battleCardGame = state.battleCardGame;
 
       if (battleCardGame.isUpgradePhase() &&
-          battleCardGame.player.hand.isEquipmentCardByInternalId(cardEquipment.uniqueIdInGame!)) 
-      {
-        battleCardGame.player.hand.selectCardByInternalId(cardEquipment.uniqueIdInGame!);
+          battleCardGame.player.hand
+              .isEquipmentCardByInternalId(cardEquipment.uniqueIdInGame!)) {
+        battleCardGame.player.hand
+            .selectCardByInternalId(cardEquipment.uniqueIdInGame!);
         battleCardGame.selectedEquipmentCardId = cardEquipment.uniqueIdInGame!;
-        battleCardGame.equipmentsEffectSelected = cardEquipment.getEffects(battleCardGame.player.digimonZone);
+        battleCardGame.equipmentsEffectSelected =
+            cardEquipment.getEffects(battleCardGame.player.digimonZone);
       }
-      
+
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
 
-    on<ActivateEnergyCard>((event, emit){
+    on<ActivateEnergyCard>((event, emit) {
       CardEnergy cardEnergy = event.cardEnergy;
 
       BattleCardGame battleCardGame = state.battleCardGame;
 
       EnergyEffect energyEffect = cardEnergy.getEnergyEffect();
-      if (energyEffect.isPositive()){
+      if (energyEffect.isPositive()) {
         energyEffect.applyTo(battleCardGame.player);
-      }
-      else{
+      } else {
         energyEffect.applyTo(battleCardGame.rival);
       }
 
@@ -114,7 +114,7 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       emit(state.copyWith(instance));
     });
 
-    on<SummonDigimonCardsToDigimonZone>((event, emit){
+    on<SummonDigimonCardsToDigimonZone>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
       if (battleCardGame.digimonsCanBeSummoned()) {
         battleCardGame.player.summonToDigimonZone();
@@ -131,7 +131,7 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       }
     });
 
-    on<ConfirmCompilationPhase>((event, emit){
+    on<ConfirmCompilationPhase>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.toSummonPhase();
 
@@ -139,7 +139,7 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       emit(state.copyWith(instance));
     });
 
-    on<BattlePhaseInit>((event, emit){
+    on<BattlePhaseInit>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.toBattlePhase();
 
@@ -147,7 +147,7 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       emit(state.copyWith(instance));
     });
 
-    on<BattlePhasePlayerAttacksRival>((event, emit){
+    on<BattlePhasePlayerAttacksRival>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.player.attack(battleCardGame.rival); //Encapsular
 
@@ -155,7 +155,7 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       emit(state.copyWith(instance));
     });
 
-    on<BattlePhaseRivalAttacksPlayer>((event, emit){
+    on<BattlePhaseRivalAttacksPlayer>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.rival.attack(battleCardGame.player);
 
@@ -163,28 +163,28 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       emit(state.copyWith(instance));
     });
 
-    on<BattlePhaseFinishRound>((event, emit){
+    on<BattlePhaseFinishRound>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
-  
+
       battleCardGame.calculateWinner();
       battleCardGame.finishRound();
 
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
-    
-    on<ToDrawPhase>((event, emit){
+
+    on<ToDrawPhase>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
-  
+
       battleCardGame.toDrawPhase();
 
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
 
-    on<ClearActivatedEquipmentCard>((event, emit){
+    on<ClearActivatedEquipmentCard>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
-  
+
       battleCardGame.selectedEquipmentCardId = null;
       battleCardGame.targetDigimonId = null;
 
@@ -192,7 +192,7 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       emit(state.copyWith(instance));
     });
 
-    on<ActivateSummonDigimonCard>((event, emit){
+    on<ActivateSummonDigimonCard>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
 
       CardSummonDigimon cardSummonDigimon = event.cardSummonDigimon;
@@ -202,7 +202,7 @@ class CardBattleBloc extends Bloc<CardBattleEvent, CardBattleState> {
       emit(state.copyWith(instance));
     });
 
-    on<FinishedSpecialSummonDigimon>((event, emit){
+    on<FinishedSpecialSummonDigimon>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.wasSummonedDigimonSpecially = false;
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);

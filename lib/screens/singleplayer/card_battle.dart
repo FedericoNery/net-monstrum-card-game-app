@@ -6,21 +6,21 @@ import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_event.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_event.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_state.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/cards/digimon_card.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
 import 'package:net_monstrum_card_game/widgets/shared/fading_text.dart';
-import '../domain/card/equipment_effect.dart';
-import '../widgets/card_battle/color_counter.dart';
-import '../widgets/card_battle/texts_counters_player.dart';
-import '../widgets/card_battle/victory_message.dart';
-import '../widgets/shared/background_image.dart';
-import '../widgets/shared/button.dart';
+import '../../domain/card/equipment_effect.dart';
+import '../../widgets/card_battle/color_counter.dart';
+import '../../widgets/card_battle/texts_counters_player.dart';
+import '../../widgets/card_battle/victory_message.dart';
+import '../../widgets/shared/background_image.dart';
+import '../../widgets/shared/button.dart';
 import 'package:flame_audio/flame_audio.dart';
 
-class CardBattleMultiplayer extends World
+class CardBattle extends World
     with HasGameRef, FlameBlocListenable<CardBattleBloc, CardBattleState> {
   late ParallaxComponent backgroundParallax;
 
@@ -58,7 +58,7 @@ class CardBattleMultiplayer extends World
   double xLastPositionCard = 600;
   double yLastPositionCard = 250;
 
-  CardBattleMultiplayer();
+  CardBattle();
 
   int? selectedEquipmentCardIndex;
   List<EquipmentEffect> equipmentsEffectSelected = [];

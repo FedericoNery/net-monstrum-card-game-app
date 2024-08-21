@@ -1,12 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/list-rooms/button-widget-list.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/waiting-room.dart';
 import 'package:net_monstrum_card_game/services/aggregation_service.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
-import 'package:net_monstrum_card_game/views/card_battle_multiplayer_view.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'dart:convert';
 
 class ListRoomsPage extends StatefulWidget {
   const ListRoomsPage({super.key, required this.title});

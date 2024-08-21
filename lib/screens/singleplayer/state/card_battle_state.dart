@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 
-import '../domain/game/tamer.dart';
+import '../../../domain/game/tamer.dart';
 
 class CardBattleState extends Equatable {
   late BattleCardGame battleCardGame;

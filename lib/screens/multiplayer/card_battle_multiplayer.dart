@@ -1,27 +1,37 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:net_monstrum_card_game/adapters/energies_adapter.dart';
+import 'package:net_monstrum_card_game/adapters/list_card_adapter.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_bloc.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_event.dart';
-import 'package:net_monstrum_card_game/screens/card_battle_state.dart';
-import 'package:net_monstrum_card_game/widgets/card_battle/cards/digimon_card.dart';
-import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
+import 'package:net_monstrum_card_game/domain/game/energies_counters.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/digimon_card.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/components/factories/card_widget_factory.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_event.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
+import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:net_monstrum_card_game/widgets/shared/fading_text.dart';
-import '../domain/card/equipment_effect.dart';
-import '../widgets/card_battle/color_counter.dart';
-import '../widgets/card_battle/texts_counters_player.dart';
-import '../widgets/card_battle/victory_message.dart';
-import '../widgets/shared/background_image.dart';
-import '../widgets/shared/button.dart';
-import 'package:flame_audio/flame_audio.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class CardBattle extends World
-  with HasGameRef, FlameBlocListenable<CardBattleBloc, CardBattleState> {
+import '../../domain/card/equipment_effect.dart';
+import '../../widgets/card_battle/color_counter.dart';
+import '../../widgets/card_battle/texts_counters_player.dart';
+import '../../widgets/card_battle/victory_message.dart';
+import '../../widgets/shared/button.dart';
+
+class CardBattleMultiplayer extends World
+    with
+        HasGameRef,
+        FlameBlocListenable<CardBattleMultiplayerBloc,
+            CardBattleMultiplayerState> {
+  IO.Socket socket = SocketManager().socket!;
   late ParallaxComponent backgroundParallax;
 
   final enabledMusic = false;
@@ -33,7 +43,8 @@ class CardBattle extends World
 
   final summonDigimonButton = DefaultButton('Summon Digimon');
   final activateEquipmentButton = DefaultButton('Activate Equipment');
-  final confirmCompilationPhaseButton = DefaultButton('Confirm compilation phase');
+  final confirmCompilationPhaseButton =
+      DefaultButton('Confirm compilation phase');
   final passPhaseButton = DefaultButton('Pass');
 
   late TextComponent apRival;
@@ -57,7 +68,76 @@ class CardBattle extends World
   double xLastPositionCard = 600;
   double yLastPositionCard = 250;
 
-  CardBattle();
+  CardBattleMultiplayer() {
+    socket.on("start draw phase", (data) {
+      fadingText.addText("Shuffle");
+      //Sonido de mezcla de cartas
+
+      var jsonMap = json.decode(data);
+      Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
+
+      if (socket.id! == flutterMap["gameData"]["socketIdUsuarioA"]) {
+        List<Card> playerDeckCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"]);
+        List<Card> playerHandCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field1"]["hand"]["cartas"]);
+
+        List<Card> rivalDeckCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"]);
+        List<Card> rivalHandCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field2"]["hand"]["cartas"]);
+
+        EnergiesCounters energiesPlayer =
+            EnergiesAdapter.getEnergiesFromSocketInfo(
+                flutterMap["gameData"]["game"]["field1"]["cantidadesEnergias"]);
+        EnergiesCounters energiesRival =
+            EnergiesAdapter.getEnergiesFromSocketInfo(
+                flutterMap["gameData"]["game"]["field2"]["cantidadesEnergias"]);
+
+        bloc.add(UpdateHandAndDeckAfterDrawedPhase(
+            playerDeckCards,
+            playerHandCards,
+            rivalDeckCards,
+            rivalHandCards,
+            energiesPlayer,
+            energiesRival));
+      }
+
+      if (socket.id! == flutterMap["gameData"]["socketIdUsuarioB"]) {
+        List<Card> playerDeckCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"]);
+        List<Card> playerHandCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field1"]["hand"]["cartas"]);
+
+        List<Card> rivalDeckCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"]);
+        List<Card> rivalHandCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field2"]["hand"]["cartas"]);
+
+        EnergiesCounters energiesPlayer =
+            EnergiesAdapter.getEnergiesFromSocketInfo(
+                flutterMap["gameData"]["game"]["field1"]["cantidadesEnergias"]);
+        EnergiesCounters energiesRival =
+            EnergiesAdapter.getEnergiesFromSocketInfo(
+                flutterMap["gameData"]["game"]["field2"]["cantidadesEnergias"]);
+
+        bloc.add(UpdateHandAndDeckAfterDrawedPhase(
+            rivalDeckCards,
+            rivalHandCards,
+            playerDeckCards,
+            playerHandCards,
+            energiesRival,
+            energiesPlayer));
+      }
+
+      /*  Tamer playerTamer = Tamer(
+          ListCardAdapter.getListOfCardsInstantiated(playerCards), playerInfo);
+      Tamer rivalTamer = Tamer(
+          ListCardAdapter.getListOfCardsInstantiated(rivalCards), rivalInfo);
+
+      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
+    });
+  }
 
   int? selectedEquipmentCardIndex;
   List<EquipmentEffect> equipmentsEffectSelected = [];
@@ -75,10 +155,10 @@ class CardBattle extends World
       startBgmMusic();
     }
 
-    fadingText = FadingTextComponent(scale: Vector2.all(0.6),
-      size: Vector2.all(10.0),
-      position: Vector2(0, 185)
-    );
+    fadingText = FadingTextComponent(
+        scale: Vector2.all(0.6),
+        size: Vector2.all(10.0),
+        position: Vector2(0, 185));
 
     victoryMessage = VictoryMessage();
     texts = TextsCounters();
@@ -175,15 +255,18 @@ class CardBattle extends World
   }
 
   @override
-  void onNewState(CardBattleState state) {
-    if (state.battleCardGame.isDrawPhase() && state.battleCardGame.decksShuffled && state.battleCardGame.drawedCards && !addedCardsToUi){
+  void onNewState(CardBattleMultiplayerState state) {
+    if (state.battleCardGame.isDrawPhase() &&
+        state.battleCardGame.decksShuffled &&
+        state.battleCardGame.drawedCards &&
+        !addedCardsToUi) {
       playerCards = CardWidgetFactory(state.battleCardGame.player, false);
       rivalCards = CardWidgetFactory(state.battleCardGame.rival, true);
       addCards();
       addedCardsToUi = true;
     }
 
-    if(state.battleCardGame.isUpgradePhase() && !removedNotSummonedCards){
+    if (state.battleCardGame.isUpgradePhase() && !removedNotSummonedCards) {
       fadingText.addText("Upgrade Phase");
       removeNotSummonedCardsByPlayer();
       playerCards.deselectCards();
@@ -196,36 +279,38 @@ class CardBattle extends World
       add(activateEquipmentButton);
     }
 
-    if (state.battleCardGame.isFinishedRound() && !state.battleCardGame.battleIsFinished()){
+    if (state.battleCardGame.isFinishedRound() &&
+        !state.battleCardGame.battleIsFinished()) {
       removeAllCards();
       remove(activateEquipmentButton);
       add(confirmCompilationPhaseButton);
       addedCardsToUi = false;
-      removedNotSummonedCards= false;
+      removedNotSummonedCards = false;
       drawCardsEffectWasApplied = false;
-      bloc.add(ToDrawPhase());
+      //bloc.add(ToDrawPhase());
     }
 
-    if (state.battleCardGame.battleIsFinished()){
+    if (state.battleCardGame.battleIsFinished()) {
       //TODO Remover todos los elementos visuales
       removeAllCards();
-      if(state.battleCardGame.isPlayerWinner()){
+      if (state.battleCardGame.isPlayerWinner()) {
         victoryMessage.text = "Ganaste";
-      }
-      else{
+      } else {
         victoryMessage.text = "Perdiste";
       }
       add(victoryMessage);
       remove(activateEquipmentButton);
     }
 
-    if(state.battleCardGame.isUpgradePhase() && state.battleCardGame.selectedEquipmentCardId != null
-    && state.battleCardGame.targetDigimonId != null){
+    if (state.battleCardGame.isUpgradePhase() &&
+        state.battleCardGame.selectedEquipmentCardId != null &&
+        state.battleCardGame.targetDigimonId != null) {
       removeCardAfterEquipmentActivation(state.battleCardGame);
-      bloc.add(ClearActivatedEquipmentCard());
+      //bloc.add(ClearActivatedEquipmentCard());
     }
 
-    if(state.battleCardGame.isUpgradePhase() && state.battleCardGame.wasSummonedDigimonSpecially){
+    if (state.battleCardGame.isUpgradePhase() &&
+        state.battleCardGame.wasSummonedDigimonSpecially) {
       updateDigimonZoneOnSummonDigimon(state.battleCardGame.player.digimonZone);
     }
   }
@@ -239,8 +324,8 @@ class CardBattle extends World
     Card? card4 = playerCards.card4.card;
     Card? card5 = playerCards.card5.card;
     Card? card6 = playerCards.card6.card;
-    List<int?> cardsIdsList= [
-      card1?.uniqueIdInGame, 
+    List<int?> cardsIdsList = [
+      card1?.uniqueIdInGame,
       card2?.uniqueIdInGame,
       card3?.uniqueIdInGame,
       card4?.uniqueIdInGame,
@@ -249,16 +334,18 @@ class CardBattle extends World
     ];
 
     for (var i = 0; i < cards.length; i++) {
-      if (!cardsIdsList.contains(cards[i].uniqueIdInGame) && cards[i].uniqueIdInGame != null){
+      if (!cardsIdsList.contains(cards[i].uniqueIdInGame) &&
+          cards[i].uniqueIdInGame != null) {
         addToUINewDigimonCard(cards[i]);
       }
     }
 
-    bloc.add(FinishedSpecialSummonDigimon());
+    //bloc.add(FinishedSpecialSummonDigimon());
   }
 
   void addToUINewDigimonCard(CardDigimon cardDigimon) {
-    DigimonCardComponent dcc = DigimonCardComponent(cardDigimon, xLastPositionCard, yLastPositionCard, false, false);
+    DigimonCardComponent dcc = DigimonCardComponent(
+        cardDigimon, xLastPositionCard, yLastPositionCard, false, false);
     add(dcc);
     digimonCardCompomponents.add(dcc);
     xLastPositionCard = xLastPositionCard + 70;
@@ -288,24 +375,31 @@ class CardBattle extends World
   void render(Canvas canvas) {
     super.render(canvas);
 
-    if (bloc.state.battleCardGame.isDrawPhase() && bloc.state.battleCardGame.decksShuffled && !bloc.state.battleCardGame.drawedCards){
-        bloc.add(DrawCards());
-        fadingText.addText("Draw Phase");
+    if (bloc.state.battleCardGame.isDrawPhase() &&
+        bloc.state.battleCardGame.decksShuffled &&
+        !bloc.state.battleCardGame.drawedCards) {
+      bloc.add(DrawCards());
+      fadingText.addText("Draw Phase");
     }
 
-    if (bloc.state.battleCardGame.isDrawPhase() && !bloc.state.battleCardGame.decksShuffled){
+/*     if (bloc.state.battleCardGame.isDrawPhase() &&
+        !bloc.state.battleCardGame.decksShuffled) {
       bloc.add(ShuffleDeck());
       fadingText.addText("Shuffle");
-    }
+    } */
 
-    if(bloc.state.battleCardGame.isDrawPhase() && bloc.state.battleCardGame.drawedCards && addedCardsToUi && !drawCardsEffectWasApplied){
+    if (bloc.state.battleCardGame.isDrawPhase() &&
+        bloc.state.battleCardGame.drawedCards &&
+        addedCardsToUi &&
+        !drawCardsEffectWasApplied) {
       playerCards.applyDrawEffect();
       drawCardsEffectWasApplied = true;
-      bloc.add(ToCompilationPhase());
+      //bloc.add(ToCompilationPhase());
       fadingText.addText("Compilation Phase");
     }
 
-    int? activatedEnergyCardId = bloc.state.battleCardGame.activatedEnergyCardId;
+    int? activatedEnergyCardId =
+        bloc.state.battleCardGame.activatedEnergyCardId;
 
     texts.blackCounterText.text =
         '${bloc.state.battleCardGame.player.energiesCounters.black}';
@@ -341,29 +435,29 @@ class CardBattle extends World
     roundsWinPlayer.text = 'W:${bloc.state.battleCardGame.player.roundsWon}';
     roundsWinRival.text = 'W:${bloc.state.battleCardGame.rival.roundsWon}';
 
-    if(addedCardsToUi){
-      if (playerCards.card1.getUniqueCardId() == activatedEnergyCardId 
-      && playerCards.card1.card!.isDigimonOrEnergyCard()){
+    if (addedCardsToUi) {
+      if (playerCards.card1.getUniqueCardId() == activatedEnergyCardId &&
+          playerCards.card1.card!.isDigimonOrEnergyCard()) {
         remove(playerCards.card1);
       }
-      if (playerCards.card2.getUniqueCardId() == activatedEnergyCardId
-      && playerCards.card2.card!.isDigimonOrEnergyCard()){
+      if (playerCards.card2.getUniqueCardId() == activatedEnergyCardId &&
+          playerCards.card2.card!.isDigimonOrEnergyCard()) {
         remove(playerCards.card2);
       }
-      if (playerCards.card3.getUniqueCardId() == activatedEnergyCardId
-      && playerCards.card3.card!.isDigimonOrEnergyCard()){
+      if (playerCards.card3.getUniqueCardId() == activatedEnergyCardId &&
+          playerCards.card3.card!.isDigimonOrEnergyCard()) {
         remove(playerCards.card3);
       }
-      if (playerCards.card4.getUniqueCardId() == activatedEnergyCardId
-      && playerCards.card4.card!.isDigimonOrEnergyCard()){
+      if (playerCards.card4.getUniqueCardId() == activatedEnergyCardId &&
+          playerCards.card4.card!.isDigimonOrEnergyCard()) {
         remove(playerCards.card4);
       }
-      if (playerCards.card5.getUniqueCardId() == activatedEnergyCardId
-      && playerCards.card5.card!.isDigimonOrEnergyCard()){
+      if (playerCards.card5.getUniqueCardId() == activatedEnergyCardId &&
+          playerCards.card5.card!.isDigimonOrEnergyCard()) {
         remove(playerCards.card5);
       }
-      if (playerCards.card6.getUniqueCardId() == activatedEnergyCardId
-      && playerCards.card6.card!.isDigimonOrEnergyCard()){
+      if (playerCards.card6.getUniqueCardId() == activatedEnergyCardId &&
+          playerCards.card6.card!.isDigimonOrEnergyCard()) {
         remove(playerCards.card6);
       }
     }
@@ -372,168 +466,189 @@ class CardBattle extends World
   void confirmCompilationPhase() {
     remove(confirmCompilationPhaseButton);
     add(summonDigimonButton);
-    bloc.add(ConfirmCompilationPhase());
+    //bloc.add(ConfirmCompilationPhase());
   }
 
-  void passPhase(){
-
-  }
+  void passPhase() {}
 
   void nextToBattlePhase() {
     battlePhase();
   }
 
   void nextPhase() {
-    bloc.add(SummonDigimonCardsToDigimonZone());
+    //bloc.add(SummonDigimonCardsToDigimonZone());
   }
 
   void removeCardAfterEquipmentActivation(BattleCardGame battleCardGame) {
-    if (playerCards.card1.isMounted && playerCards.card1.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+    if (playerCards.card1.isMounted &&
+        playerCards.card1.card!.uniqueIdInGame ==
+            battleCardGame.selectedEquipmentCardId) {
       remove(playerCards.card1);
     }
-    if (playerCards.card2.isMounted && playerCards.card2.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+    if (playerCards.card2.isMounted &&
+        playerCards.card2.card!.uniqueIdInGame ==
+            battleCardGame.selectedEquipmentCardId) {
       remove(playerCards.card2);
     }
-    if (playerCards.card3.isMounted && playerCards.card3.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+    if (playerCards.card3.isMounted &&
+        playerCards.card3.card!.uniqueIdInGame ==
+            battleCardGame.selectedEquipmentCardId) {
       remove(playerCards.card3);
     }
-    if (playerCards.card4.isMounted && playerCards.card4.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+    if (playerCards.card4.isMounted &&
+        playerCards.card4.card!.uniqueIdInGame ==
+            battleCardGame.selectedEquipmentCardId) {
       remove(playerCards.card4);
     }
-    if (playerCards.card5.isMounted && playerCards.card5.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+    if (playerCards.card5.isMounted &&
+        playerCards.card5.card!.uniqueIdInGame ==
+            battleCardGame.selectedEquipmentCardId) {
       remove(playerCards.card5);
     }
-    if (playerCards.card6.isMounted && playerCards.card6.card!.uniqueIdInGame == battleCardGame.selectedEquipmentCardId){
+    if (playerCards.card6.isMounted &&
+        playerCards.card6.card!.uniqueIdInGame ==
+            battleCardGame.selectedEquipmentCardId) {
       remove(playerCards.card6);
     }
   }
 
   void battlePhase() async {
-    bloc.add(BattlePhaseInit());
+    //bloc.add(BattlePhaseInit());
     await Future.delayed(Duration(seconds: 3));
 
-    bloc.add(BattlePhasePlayerAttacksRival());
+    //bloc.add(BattlePhasePlayerAttacksRival());
     await Future.delayed(Duration(seconds: 3));
-    
-    bloc.add(BattlePhaseRivalAttacksPlayer());
+
+    //bloc.add(BattlePhaseRivalAttacksPlayer());
     await Future.delayed(Duration(seconds: 3));
-    
-    bloc.add(BattlePhaseFinishRound());
+
+    //bloc.add(BattlePhaseFinishRound());
   }
 
   void removeAllCards() {
-    if (playerCards.card1.isMounted){
+    if (playerCards.card1.isMounted) {
       remove(playerCards.card1);
     }
-    if (playerCards.card2.isMounted){
+    if (playerCards.card2.isMounted) {
       remove(playerCards.card2);
     }
-    if (playerCards.card3.isMounted){
+    if (playerCards.card3.isMounted) {
       remove(playerCards.card3);
     }
-    if (playerCards.card4.isMounted){
+    if (playerCards.card4.isMounted) {
       remove(playerCards.card4);
     }
-    if (playerCards.card5.isMounted){
+    if (playerCards.card5.isMounted) {
       remove(playerCards.card5);
     }
-    if (playerCards.card6.isMounted){
+    if (playerCards.card6.isMounted) {
       remove(playerCards.card6);
     }
-    if (rivalCards.card1.isMounted){
+    if (rivalCards.card1.isMounted) {
       remove(rivalCards.card1);
     }
-    if (rivalCards.card2.isMounted){
+    if (rivalCards.card2.isMounted) {
       remove(rivalCards.card2);
     }
-    if (rivalCards.card3.isMounted){
+    if (rivalCards.card3.isMounted) {
       remove(rivalCards.card3);
     }
-    if (rivalCards.card4.isMounted){
+    if (rivalCards.card4.isMounted) {
       remove(rivalCards.card4);
     }
-    if (rivalCards.card5.isMounted){
+    if (rivalCards.card5.isMounted) {
       remove(rivalCards.card5);
     }
-    if (rivalCards.card6.isMounted){
+    if (rivalCards.card6.isMounted) {
       remove(rivalCards.card6);
     }
 
-    for (final digimonCardComponent in digimonCardCompomponents){
-      if (digimonCardComponent.isMounted){
+    for (final digimonCardComponent in digimonCardCompomponents) {
+      if (digimonCardComponent.isMounted) {
         remove(digimonCardComponent);
       }
     }
   }
 
   void removeNotSummonedCardsByPlayer() {
-    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card1.getUniqueCardId())
-    && playerCards.card1.isMounted
-    && playerCards.card1.card!.isDigimonOrEnergyCard()){
+    if (!bloc.state.battleCardGame.player
+            .wasSelectedCard(playerCards.card1.getUniqueCardId()) &&
+        playerCards.card1.isMounted &&
+        playerCards.card1.card!.isDigimonOrEnergyCard()) {
       playerCards.card1.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card2.getUniqueCardId())
-    && playerCards.card2.isMounted
-    && playerCards.card2.card!.isDigimonOrEnergyCard()){
+    if (!bloc.state.battleCardGame.player
+            .wasSelectedCard(playerCards.card2.getUniqueCardId()) &&
+        playerCards.card2.isMounted &&
+        playerCards.card2.card!.isDigimonOrEnergyCard()) {
       playerCards.card2.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card3.getUniqueCardId())
-    && playerCards.card3.isMounted
-    && playerCards.card3.card!.isDigimonOrEnergyCard()){
+    if (!bloc.state.battleCardGame.player
+            .wasSelectedCard(playerCards.card3.getUniqueCardId()) &&
+        playerCards.card3.isMounted &&
+        playerCards.card3.card!.isDigimonOrEnergyCard()) {
       playerCards.card3.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card4.getUniqueCardId())
-    && playerCards.card4.isMounted
-    && playerCards.card4.card!.isDigimonOrEnergyCard()){
+    if (!bloc.state.battleCardGame.player
+            .wasSelectedCard(playerCards.card4.getUniqueCardId()) &&
+        playerCards.card4.isMounted &&
+        playerCards.card4.card!.isDigimonOrEnergyCard()) {
       playerCards.card4.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card5.getUniqueCardId())
-    && playerCards.card5.isMounted
-    && playerCards.card5.card!.isDigimonOrEnergyCard()){
+    if (!bloc.state.battleCardGame.player
+            .wasSelectedCard(playerCards.card5.getUniqueCardId()) &&
+        playerCards.card5.isMounted &&
+        playerCards.card5.card!.isDigimonOrEnergyCard()) {
       playerCards.card5.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.player.wasSelectedCard(playerCards.card6.getUniqueCardId())
-    && playerCards.card6.isMounted
-    && playerCards.card6.card!.isDigimonOrEnergyCard()){
+    if (!bloc.state.battleCardGame.player
+            .wasSelectedCard(playerCards.card6.getUniqueCardId()) &&
+        playerCards.card6.isMounted &&
+        playerCards.card6.card!.isDigimonOrEnergyCard()) {
       playerCards.card6.removeFromParent();
     }
   }
 
   void removeNotSummonedCardsByRival() {
-     if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card1.getUniqueCardId())
-     && rivalCards.card1.isMounted){
+    if (!bloc.state.battleCardGame.rival
+            .wasSelectedCard(rivalCards.card1.getUniqueCardId()) &&
+        rivalCards.card1.isMounted) {
       rivalCards.card1.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card2.getUniqueCardId())
-    && rivalCards.card2.isMounted){
+    if (!bloc.state.battleCardGame.rival
+            .wasSelectedCard(rivalCards.card2.getUniqueCardId()) &&
+        rivalCards.card2.isMounted) {
       rivalCards.card2.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card3.getUniqueCardId())
-    && rivalCards.card3.isMounted){
+    if (!bloc.state.battleCardGame.rival
+            .wasSelectedCard(rivalCards.card3.getUniqueCardId()) &&
+        rivalCards.card3.isMounted) {
       rivalCards.card3.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card4.getUniqueCardId())
-    && rivalCards.card4.isMounted){
+    if (!bloc.state.battleCardGame.rival
+            .wasSelectedCard(rivalCards.card4.getUniqueCardId()) &&
+        rivalCards.card4.isMounted) {
       rivalCards.card4.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card5.getUniqueCardId())
-    && rivalCards.card5.isMounted){
+    if (!bloc.state.battleCardGame.rival
+            .wasSelectedCard(rivalCards.card5.getUniqueCardId()) &&
+        rivalCards.card5.isMounted) {
       rivalCards.card5.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.rival.wasSelectedCard(rivalCards.card6.getUniqueCardId())
-    && rivalCards.card6.isMounted){
+    if (!bloc.state.battleCardGame.rival
+            .wasSelectedCard(rivalCards.card6.getUniqueCardId()) &&
+        rivalCards.card6.isMounted) {
       rivalCards.card6.removeFromParent();
     }
   }
-
 }

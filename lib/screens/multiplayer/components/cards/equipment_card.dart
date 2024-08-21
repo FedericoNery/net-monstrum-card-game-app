@@ -4,22 +4,24 @@ import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
-import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
+import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
 import 'package:net_monstrum_card_game/domain/card/color.dart';
-import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_bloc.dart';
-import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_event.dart';
-import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_state.dart';
-import 'package:net_monstrum_card_game/widgets/card_battle/cards/base_card.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/base_card.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_border.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
-import '../effects/effects.dart';
 
-class SummonDigimonCardComponent extends BaseCardComponent
-    with TapCallbacks, FlameBlocListenable<CardBattleBloc, CardBattleState> {
-  final CardSummonDigimon card;
-  SummonDigimonCardComponent(this.card, x, y, isHidden, isRival)
+class CardEquipmentWidget extends BaseCardComponent
+    with
+        TapCallbacks,
+        FlameBlocListenable<CardBattleMultiplayerBloc,
+            CardBattleMultiplayerState> {
+  final CardEquipment card;
+
+  CardEquipmentWidget(this.card, x, y, isHidden, isRival)
       : super(
           size: isHidden ? Vector2(64, 85) : Vector2.all(64),
           position: Vector2(x, y),
@@ -33,7 +35,7 @@ class SummonDigimonCardComponent extends BaseCardComponent
   @override
   Future<void> onLoad() async {
     final uri =
-        isHidden ? 'cards/card_back4.webp' : 'summon_digimon/${card.name}.png';
+        isHidden ? 'cards/card_back4.webp' : 'equipments/${card.name}.png';
     sprite = await Sprite.load(uri);
   }
 
@@ -41,9 +43,9 @@ class SummonDigimonCardComponent extends BaseCardComponent
   void render(Canvas canvas) async {
     super.render(canvas);
     if (!isHidden) {
-      drawCardColor(canvas, CardColor.SUMMON);
+      drawCardColor(canvas, CardColor.EQUIPMENT);
       drawBackgroundApHp(canvas);
-      drawEquipmentText(canvas, "(SUM)");
+      drawEquipmentText(canvas, " (EQG) ");
     }
   }
 
@@ -61,18 +63,25 @@ class SummonDigimonCardComponent extends BaseCardComponent
     sizeEffect.onComplete = () async {
       size = Vector2.all(64);
       isHidden = false;
-      final uri = 'summon_digimon/${card.name}.png';
+      final uri = 'equipments/${card.name}.png';
       sprite = await Sprite.load(uri);
       update(1);
     };
   }
 
+  bool isEnabledToSelectCard(int internalCardId) {
+    return bloc.state.battleCardGame.isUpgradePhase() &&
+        bloc.state.battleCardGame.player.hand
+            .isEquipmentCardByInternalId(internalCardId);
+  }
+
   @override
-  void onTapDown(TapDownEvent event) async {
+  void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-    //TODO :: TEMPORAL
-    if (isEnabledToSelectSummonDigimonCard(card.uniqueIdInGame!) && !isRival) {
+    if (isEnabledToSelectCard(card.uniqueIdInGame!) && !isRival) {
       isSelected = !isSelected;
+      //callbackSelectCardFromHand(card.internalGameId);
+      //callbackActivateEquipment(card.internalGameId, card);
 
       final moveEffect = getUpAndDownEffect(isSelected, x, y);
       add(moveEffect);
@@ -80,19 +89,13 @@ class SummonDigimonCardComponent extends BaseCardComponent
       if (isSelected) {
         final shapeComponent = getFlickeringCardBorder();
         add(shapeComponent);
-        removeFromParent();
       } else {
         children.first.add(RemoveEffect(delay: 0.1));
       }
 
-      bloc.add(ActivateSummonDigimonCard(card));
+      //bloc.add(SelectEquipmentCardFromHandTo(card));
+      update(1);
     }
-  }
-
-  bool isEnabledToSelectSummonDigimonCard(int internalCardId) {
-    return bloc.state.battleCardGame.isUpgradePhase() &&
-        bloc.state.battleCardGame.player.hand
-            .isSummonDigimonCardByInternalId(internalCardId);
   }
 
   @override

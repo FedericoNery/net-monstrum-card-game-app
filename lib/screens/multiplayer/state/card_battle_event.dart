@@ -27,3 +27,10 @@ class DrawCards extends CardBattleMultiplayerEvent {
   @override
   List<Object?> get props => [];
 }
+
+class ToCompilationPhase extends CardBattleMultiplayerEvent {
+  const ToCompilationPhase();
+
+  @override
+  List<Object?> get props => [];
+}

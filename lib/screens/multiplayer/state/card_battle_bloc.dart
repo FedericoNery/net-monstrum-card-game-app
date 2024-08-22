@@ -35,6 +35,16 @@ class CardBattleMultiplayerBloc
       battleCardGame.decksShuffled = true;
       battleCardGame.drawedCards = true;
 
+      //battleCardGame.toCompilationPhase();
+
+      BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
+      emit(state.copyWith(instance));
+    });
+
+    on<ToCompilationPhase>((event, emit) {
+      BattleCardGame battleCardGame = state.battleCardGame;
+      battleCardGame.toCompilationPhase();
+
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });

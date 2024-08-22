@@ -8,10 +8,12 @@ import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/base_card.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
+import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_border.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class EnergyCardComponent extends BaseCardComponent
     with
@@ -69,6 +71,8 @@ class EnergyCardComponent extends BaseCardComponent
 
   @override
   void onTapDown(TapDownEvent event) async {
+    IO.Socket socket = SocketManager().socket!;
+
     super.onTapDown(event);
     //TODO :: TEMPORAL
     if (isEnabledToSelectEnergyCard(card.uniqueIdInGame!) && !isRival) {
@@ -80,6 +84,11 @@ class EnergyCardComponent extends BaseCardComponent
       if (isSelected) {
         final shapeComponent = getFlickeringCardBorder();
         add(shapeComponent);
+        socket.emit('activateEnergyCard', {
+          "cardId": card.uniqueIdInGame,
+          "userId": bloc.state.battleCardGame.player.username,
+          "socketId": socket.id
+        });
         removeFromParent();
       } else {
         children.first.add(RemoveEffect(delay: 0.1));

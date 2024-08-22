@@ -80,8 +80,6 @@ class CardEquipmentWidget extends BaseCardComponent
     super.onTapDown(event);
     if (isEnabledToSelectCard(card.uniqueIdInGame!) && !isRival) {
       isSelected = !isSelected;
-      //callbackSelectCardFromHand(card.internalGameId);
-      //callbackActivateEquipment(card.internalGameId, card);
 
       final moveEffect = getUpAndDownEffect(isSelected, x, y);
       add(moveEffect);

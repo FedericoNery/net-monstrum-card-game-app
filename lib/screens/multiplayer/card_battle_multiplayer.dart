@@ -137,6 +137,72 @@ class CardBattleMultiplayer extends World
 
       BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
     });
+
+    socket.on("UPDATE GAME DATA", (data) {
+      var jsonMap = json.decode(data);
+      Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
+
+      if (socket.id! == flutterMap["gameData"]["socketIdUsuarioA"]) {
+        List<Card> playerDeckCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"]);
+        List<Card> playerHandCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field1"]["hand"]["cartas"]);
+
+        List<Card> rivalDeckCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"]);
+        List<Card> rivalHandCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field2"]["hand"]["cartas"]);
+
+        EnergiesCounters energiesPlayer =
+            EnergiesAdapter.getEnergiesFromSocketInfo(
+                flutterMap["gameData"]["game"]["field1"]["cantidadesEnergias"]);
+        EnergiesCounters energiesRival =
+            EnergiesAdapter.getEnergiesFromSocketInfo(
+                flutterMap["gameData"]["game"]["field2"]["cantidadesEnergias"]);
+
+        bloc.add(UpdateHandAndDeckAfterDrawedPhase(
+            playerDeckCards,
+            playerHandCards,
+            rivalDeckCards,
+            rivalHandCards,
+            energiesPlayer,
+            energiesRival));
+      }
+
+      if (socket.id! == flutterMap["gameData"]["socketIdUsuarioB"]) {
+        List<Card> playerDeckCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"]);
+        List<Card> playerHandCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field1"]["hand"]["cartas"]);
+
+        List<Card> rivalDeckCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"]);
+        List<Card> rivalHandCards = ListCardAdapter.getListOfCardsInstantiated(
+            flutterMap["gameData"]["game"]["field2"]["hand"]["cartas"]);
+
+        EnergiesCounters energiesPlayer =
+            EnergiesAdapter.getEnergiesFromSocketInfo(
+                flutterMap["gameData"]["game"]["field1"]["cantidadesEnergias"]);
+        EnergiesCounters energiesRival =
+            EnergiesAdapter.getEnergiesFromSocketInfo(
+                flutterMap["gameData"]["game"]["field2"]["cantidadesEnergias"]);
+
+        bloc.add(UpdateHandAndDeckAfterDrawedPhase(
+            rivalDeckCards,
+            rivalHandCards,
+            playerDeckCards,
+            playerHandCards,
+            energiesRival,
+            energiesPlayer));
+      }
+
+      /*  Tamer playerTamer = Tamer(
+          ListCardAdapter.getListOfCardsInstantiated(playerCards), playerInfo);
+      Tamer rivalTamer = Tamer(
+          ListCardAdapter.getListOfCardsInstantiated(rivalCards), rivalInfo);
+
+      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
+    });
   }
 
   int? selectedEquipmentCardIndex;
@@ -394,7 +460,7 @@ class CardBattleMultiplayer extends World
         !drawCardsEffectWasApplied) {
       playerCards.applyDrawEffect();
       drawCardsEffectWasApplied = true;
-      //bloc.add(ToCompilationPhase());
+      bloc.add(ToCompilationPhase());
       fadingText.addText("Compilation Phase");
     }
 

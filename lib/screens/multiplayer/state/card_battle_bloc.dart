@@ -22,6 +22,8 @@ class CardBattleMultiplayerBloc
       List<Card> handRival = event.handRival;
       EnergiesCounters energiesPlayer = event.energiesPlayer;
       EnergiesCounters energiesRival = event.energiesRival;
+      String phaseGame = event.phaseGame;
+      bool playerSummonedDigimons = event.playerSummonedDigimons;
 
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.player.hand.cards = handPlayer;
@@ -32,10 +34,17 @@ class CardBattleMultiplayerBloc
       battleCardGame.rival.deck.cards = deckRival;
       battleCardGame.rival.energiesCounters = energiesRival;
 
-      battleCardGame.decksShuffled = true;
-      battleCardGame.drawedCards = true;
+      battleCardGame.decksShuffled = true; //GENERAR EVENTO DIFERENTE
+      battleCardGame.drawedCards = true; //GENERAR EVENTO DIFERENTE
 
-      //battleCardGame.toCompilationPhase();
+      battleCardGame.phaseGame = phaseGame;
+      battleCardGame.playerSummonedDigimons = playerSummonedDigimons;
+
+      battleCardGame.player.attackPoints = event.apPlayer;
+      battleCardGame.player.healthPoints = event.hpPlayer;
+
+      battleCardGame.rival.attackPoints = event.apRival;
+      battleCardGame.rival.healthPoints = event.hpRival;
 
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
@@ -53,6 +62,20 @@ class CardBattleMultiplayerBloc
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.drawedCards = true;
       //battleCardGame.toCompilationPhase();
+
+      BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
+      emit(state.copyWith(instance));
+    });
+
+    on<SelectDigimonCardFromHandToSummon>((event, emit) {
+      int internalCardId = event.cardId;
+      BattleCardGame battleCardGame = state.battleCardGame;
+
+      if (battleCardGame.isSummonPhase() &&
+          battleCardGame.player.hand
+              .isDigimonCardByInternalId(internalCardId)) {
+        battleCardGame.player.hand.selectCardByInternalId(internalCardId);
+      }
 
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));

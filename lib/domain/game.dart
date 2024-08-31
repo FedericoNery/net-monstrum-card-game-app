@@ -10,7 +10,8 @@ class Phases {
   static const String SUMMON_PHASE = 'SUMMON_PHASE';
   static const String UPGRADE_PHASE = 'UPGRADE_PHASE';
   static const String BATTLE_PHASE = 'BATTLE_PHASE';
-  static const String FINISHED_ROUND = 'FINISHED_PHASE';
+  static const String FINISHED_ROUND = 'FINISHED_ROUND';
+  static const String FINISHED_GAME = 'FINISHED_GAME';
 }
 
 class BattleCardGame {
@@ -24,21 +25,23 @@ class BattleCardGame {
   bool wasSummonedDigimonSpecially = false;
   bool drawedCards = false;
   bool decksShuffled = false;
+  bool playerSummonedDigimons = false;
 
+  BattleCardGame(this.player, this.rival) : phaseGame = Phases.DRAW_PHASE;
 
-  BattleCardGame(this.player, this.rival): phaseGame = Phases.DRAW_PHASE;
-
-  BattleCardGame.fromInstance(BattleCardGame battleCardGame):
-    player = battleCardGame.player,
-    rival = battleCardGame.rival,
-    phaseGame = battleCardGame.phaseGame,
-    activatedEnergyCardId = null, //TEMPORAL FIX
-    targetDigimonId = battleCardGame.targetDigimonId,
-    selectedEquipmentCardId = battleCardGame.selectedEquipmentCardId,
-    equipmentsEffectSelected = battleCardGame.equipmentsEffectSelected,
-    wasSummonedDigimonSpecially = battleCardGame.wasSummonedDigimonSpecially,
-    drawedCards = battleCardGame.drawedCards,
-    decksShuffled = battleCardGame.decksShuffled;
+  BattleCardGame.fromInstance(BattleCardGame battleCardGame)
+      : player = battleCardGame.player,
+        rival = battleCardGame.rival,
+        phaseGame = battleCardGame.phaseGame,
+        activatedEnergyCardId = null, //TEMPORAL FIX
+        targetDigimonId = battleCardGame.targetDigimonId,
+        selectedEquipmentCardId = battleCardGame.selectedEquipmentCardId,
+        equipmentsEffectSelected = battleCardGame.equipmentsEffectSelected,
+        wasSummonedDigimonSpecially =
+            battleCardGame.wasSummonedDigimonSpecially,
+        drawedCards = battleCardGame.drawedCards,
+        decksShuffled = battleCardGame.decksShuffled,
+        playerSummonedDigimons = battleCardGame.playerSummonedDigimons;
 
   void shuffleDeck() {
     player.deck.shuffle();
@@ -57,46 +60,45 @@ class BattleCardGame {
     drawedCards = true;
   }
 
-  bool digimonsCanBeSummoned(){
-    return player.canSummonAllDigimonSelected() && rival.canSummonAllDigimonSelected();
+  bool digimonsCanBeSummoned() {
+    return player.canSummonAllDigimonSelected() &&
+        rival.canSummonAllDigimonSelected();
   }
 
-  void calculatePoints(){
+  void calculatePoints() {
     player.calculatePoints();
     rival.calculatePoints();
   }
 
-  void battle(){
+  void battle() {
     phaseGame = Phases.BATTLE_PHASE;
     player.attack(rival);
     rival.attack(player);
   }
 
-  bool battleIsFinished(){
+  bool battleIsFinished() {
     return player.roundsWon == 2 || rival.roundsWon == 2;
   }
 
-  bool isPlayerWinner(){
+  bool isPlayerWinner() {
     return player.roundsWon == 2;
   }
 
-  void calculateWinner(){
+  void calculateWinner() {
     //TODO ANALIZAR POSIBLES FORMAS DE DESEMPATAR
     // REGLAS ALEATORIAS -> mayor cantidad de energias
     // mayor cartas restantes en las manos
     // mayor cantidad de attackPoints
-    if (player.healthPoints > rival.healthPoints){
+    if (player.healthPoints > rival.healthPoints) {
       player.roundsWon += 1;
-    }
-    else if(rival.healthPoints > player.healthPoints){
+    } else if (rival.healthPoints > player.healthPoints) {
       rival.roundsWon += 1;
-    }
-    else{
+    } else {
       rival.roundsWon += 1;
     }
   }
 
-  void finishRound(){
+  void finishRound() {
     //DESCARTAR TODAS LAS CARTAS QUE QUEDAN EN LA MANO A LA BASURA
     List<Card> handCardsPlayer = player.hand.cards;
     List<Card> handCardsRival = rival.hand.cards;
@@ -113,53 +115,52 @@ class BattleCardGame {
     phaseGame = Phases.FINISHED_ROUND;
   }
 
-  void startRound(){
+  void startRound() {
     phaseGame = Phases.DRAW_PHASE;
     drawCards();
   }
 
-  void toCompilationPhase(){
+  void toCompilationPhase() {
     phaseGame = Phases.COMPILATION_PHASE;
   }
 
-  void toDrawPhase(){
+  void toDrawPhase() {
     phaseGame = Phases.DRAW_PHASE;
   }
 
-  void toSummonPhase(){
+  void toSummonPhase() {
     phaseGame = Phases.SUMMON_PHASE;
   }
 
-  void toUpgradePhase(){
+  void toUpgradePhase() {
     phaseGame = Phases.UPGRADE_PHASE;
   }
 
-  void toBattlePhase(){
+  void toBattlePhase() {
     phaseGame = Phases.BATTLE_PHASE;
   }
 
-  bool isCompilationPhase(){
+  bool isCompilationPhase() {
     return phaseGame == Phases.COMPILATION_PHASE;
   }
 
-  bool isSummonPhase(){
+  bool isSummonPhase() {
     return phaseGame == Phases.SUMMON_PHASE;
   }
 
-  bool isUpgradePhase(){
+  bool isUpgradePhase() {
     return phaseGame == Phases.UPGRADE_PHASE;
   }
 
-  bool isBattlePhase(){
+  bool isBattlePhase() {
     return phaseGame == Phases.BATTLE_PHASE;
   }
 
-  bool isDrawPhase(){
+  bool isDrawPhase() {
     return phaseGame == Phases.DRAW_PHASE;
   }
 
-  bool isFinishedRound(){
+  bool isFinishedRound() {
     return phaseGame == Phases.FINISHED_ROUND;
   }
-
 }

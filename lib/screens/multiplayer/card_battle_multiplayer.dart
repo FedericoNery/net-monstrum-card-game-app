@@ -26,6 +26,19 @@ import '../../widgets/card_battle/texts_counters_player.dart';
 import '../../widgets/card_battle/victory_message.dart';
 import '../../widgets/shared/button.dart';
 
+class PlayerActions {
+  static const String FINISH_COMPILATION_PHASE = 'FINISH_COMPILATION_PHASE';
+  static const String SUMMON_DIGIMONS = 'SUMMON_DIGIMONS';
+  static const String ACTIVATE_ENERGY_CARD = 'ACTIVATE_ENERGY_CARD';
+  static const String ACTIVATE_PROGRAMM_CARD = 'ACTIVATE_PROGRAMM_CARD';
+  static const String FINISH_UPGRADE_PHASE = 'FINISH_UPGRADE_PHASE';
+}
+
+class ServerActions {
+  static const String UPDATE_GAME_DATA = 'UPDATE GAME DATA';
+  static const String START_BATTLE = 'START_BATTLE';
+}
+
 class CardBattleMultiplayer extends World
     with
         HasGameRef,
@@ -69,75 +82,6 @@ class CardBattleMultiplayer extends World
   double yLastPositionCard = 250;
 
   CardBattleMultiplayer() {
-    socket.on("start draw phase", (data) {
-      fadingText.addText("Shuffle");
-      //Sonido de mezcla de cartas
-
-      var jsonMap = json.decode(data);
-      Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
-
-      if (socket.id! == flutterMap["gameData"]["socketIdUsuarioA"]) {
-        List<Card> playerDeckCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"]);
-        List<Card> playerHandCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field1"]["hand"]["cartas"]);
-
-        List<Card> rivalDeckCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"]);
-        List<Card> rivalHandCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field2"]["hand"]["cartas"]);
-
-        EnergiesCounters energiesPlayer =
-            EnergiesAdapter.getEnergiesFromSocketInfo(
-                flutterMap["gameData"]["game"]["field1"]["cantidadesEnergias"]);
-        EnergiesCounters energiesRival =
-            EnergiesAdapter.getEnergiesFromSocketInfo(
-                flutterMap["gameData"]["game"]["field2"]["cantidadesEnergias"]);
-
-        bloc.add(UpdateHandAndDeckAfterDrawedPhase(
-            playerDeckCards,
-            playerHandCards,
-            rivalDeckCards,
-            rivalHandCards,
-            energiesPlayer,
-            energiesRival));
-      }
-
-      if (socket.id! == flutterMap["gameData"]["socketIdUsuarioB"]) {
-        List<Card> playerDeckCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"]);
-        List<Card> playerHandCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field1"]["hand"]["cartas"]);
-
-        List<Card> rivalDeckCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"]);
-        List<Card> rivalHandCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field2"]["hand"]["cartas"]);
-
-        EnergiesCounters energiesPlayer =
-            EnergiesAdapter.getEnergiesFromSocketInfo(
-                flutterMap["gameData"]["game"]["field1"]["cantidadesEnergias"]);
-        EnergiesCounters energiesRival =
-            EnergiesAdapter.getEnergiesFromSocketInfo(
-                flutterMap["gameData"]["game"]["field2"]["cantidadesEnergias"]);
-
-        bloc.add(UpdateHandAndDeckAfterDrawedPhase(
-            rivalDeckCards,
-            rivalHandCards,
-            playerDeckCards,
-            playerHandCards,
-            energiesRival,
-            energiesPlayer));
-      }
-
-      /*  Tamer playerTamer = Tamer(
-          ListCardAdapter.getListOfCardsInstantiated(playerCards), playerInfo);
-      Tamer rivalTamer = Tamer(
-          ListCardAdapter.getListOfCardsInstantiated(rivalCards), rivalInfo);
-
-      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
-    });
-
     socket.on("UPDATE GAME DATA", (data) {
       var jsonMap = json.decode(data);
       Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
@@ -160,13 +104,30 @@ class CardBattleMultiplayer extends World
             EnergiesAdapter.getEnergiesFromSocketInfo(
                 flutterMap["gameData"]["game"]["field2"]["cantidadesEnergias"]);
 
+        String phaseGame = flutterMap["gameData"]["game"]["estadoDeLaRonda"];
+
+        bool player1SummonCards =
+            flutterMap["gameData"]["game"]["player1SummonCards"];
+
+        int apPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
+        int apRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
+
+        int hpPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
+        int hpRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
+
         bloc.add(UpdateHandAndDeckAfterDrawedPhase(
             playerDeckCards,
             playerHandCards,
             rivalDeckCards,
             rivalHandCards,
             energiesPlayer,
-            energiesRival));
+            energiesRival,
+            phaseGame,
+            player1SummonCards,
+            apPlayer,
+            apRival,
+            hpPlayer,
+            hpRival));
       }
 
       if (socket.id! == flutterMap["gameData"]["socketIdUsuarioB"]) {
@@ -187,13 +148,31 @@ class CardBattleMultiplayer extends World
             EnergiesAdapter.getEnergiesFromSocketInfo(
                 flutterMap["gameData"]["game"]["field2"]["cantidadesEnergias"]);
 
+        String phaseGame = flutterMap["gameData"]["game"]["estadoDeLaRonda"];
+
+        bool player2SummonCards =
+            flutterMap["gameData"]["game"]["player2SummonCards"];
+
+        int apPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
+        int apRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
+
+        int hpPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
+        int hpRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
+
         bloc.add(UpdateHandAndDeckAfterDrawedPhase(
-            rivalDeckCards,
-            rivalHandCards,
-            playerDeckCards,
-            playerHandCards,
-            energiesRival,
-            energiesPlayer));
+          rivalDeckCards,
+          rivalHandCards,
+          playerDeckCards,
+          playerHandCards,
+          energiesRival,
+          energiesPlayer,
+          phaseGame,
+          player2SummonCards,
+          apRival,
+          apPlayer,
+          hpRival,
+          hpPlayer,
+        ));
       }
 
       /*  Tamer playerTamer = Tamer(
@@ -202,6 +181,22 @@ class CardBattleMultiplayer extends World
           ListCardAdapter.getListOfCardsInstantiated(rivalCards), rivalInfo);
 
       BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
+    });
+
+    socket.on("start summon phase", (data) {
+      add(summonDigimonButton);
+    });
+
+    socket.on('start compile phase', (data) {
+      /* if (bloc.state.battleCardGame.isDrawPhase() &&
+          bloc.state.battleCardGame.drawedCards &&
+          addedCardsToUi &&
+          !drawCardsEffectWasApplied) {
+        playerCards.applyDrawEffect();
+        drawCardsEffectWasApplied = true;
+        bloc.add(ToCompilationPhase());
+        fadingText.addText("Compilation Phase");
+      } */
     });
   }
 
@@ -271,7 +266,7 @@ class CardBattleMultiplayer extends World
 
     summonDigimonButton.position = Vector2(650, 50);
     summonDigimonButton.size = Vector2(100, 50);
-    summonDigimonButton.tapUpCallback = nextPhase;
+    summonDigimonButton.tapUpCallback = summonToDigimonZone;
 
     activateEquipmentButton.position = Vector2(650, 50);
     activateEquipmentButton.size = Vector2(100, 50);
@@ -332,6 +327,12 @@ class CardBattleMultiplayer extends World
       addedCardsToUi = true;
     }
 
+    if (summonDigimonButton.isMounted &&
+        state.battleCardGame.playerSummonedDigimons) {
+      remove(this.summonDigimonButton);
+      playerCards.deselectCards();
+    }
+
     if (state.battleCardGame.isUpgradePhase() && !removedNotSummonedCards) {
       fadingText.addText("Upgrade Phase");
       removeNotSummonedCardsByPlayer();
@@ -341,7 +342,7 @@ class CardBattleMultiplayer extends World
 
       removedNotSummonedCards = true;
 
-      remove(summonDigimonButton);
+      //remove(summonDigimonButton);
       add(activateEquipmentButton);
     }
 
@@ -530,8 +531,12 @@ class CardBattleMultiplayer extends World
   }
 
   void confirmCompilationPhase() {
+    socket.emit(PlayerActions.FINISH_COMPILATION_PHASE, {
+      "socketId": socket.id,
+      "usuarioId": bloc.state.battleCardGame.player.username,
+    });
+
     remove(confirmCompilationPhaseButton);
-    add(summonDigimonButton);
     //bloc.add(ConfirmCompilationPhase());
   }
 
@@ -541,8 +546,13 @@ class CardBattleMultiplayer extends World
     battlePhase();
   }
 
-  void nextPhase() {
-    //bloc.add(SummonDigimonCardsToDigimonZone());
+  void summonToDigimonZone() {
+    socket.emit(PlayerActions.SUMMON_DIGIMONS, {
+      "socketId": socket.id,
+      "usuarioId": bloc.state.battleCardGame.player.username,
+      "cardDigimonsToSummonIds":
+          bloc.state.battleCardGame.player.hand.selectedCardsInternalIds,
+    });
   }
 
   void removeCardAfterEquipmentActivation(BattleCardGame battleCardGame) {

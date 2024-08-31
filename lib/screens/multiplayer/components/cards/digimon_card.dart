@@ -5,6 +5,7 @@ import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/base_card.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
@@ -100,7 +101,7 @@ class DigimonCardComponent extends BaseCardComponent
         children.first.add(RemoveEffect(delay: 0.1));
       }
 
-      //bloc.add(SelectDigimonCardFromHandToSummon(card.uniqueIdInGame!));
+      bloc.add(SelectDigimonCardFromHandToSummon(card.uniqueIdInGame!));
 
       update(1);
     }

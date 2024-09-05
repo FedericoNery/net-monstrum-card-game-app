@@ -22,8 +22,7 @@ class Tamer {
   int? selectedEquipmentCardId;
 
   Tamer(List<Card> deckCards, username)
-      :
-        deck = Deck(deckCards),
+      : deck = Deck(deckCards),
         username = username,
         trash = Trash([]),
         hand = Hand([]),
@@ -57,7 +56,7 @@ class Tamer {
     EnergiesCounters energiesCounters = this.energiesCounters.getCopy();
 
     for (Card card in hand.cards) {
-      if (card.isDigimonCard()){
+      if (card.isDigimonCard()) {
         var cardDigimon = card as CardDigimon;
         if (energiesCounters.canBeDiscountedByColor(cardDigimon.color)) {
           energiesCounters.discountByColor(card.color);
@@ -68,54 +67,66 @@ class Tamer {
   }
 
   //TODO Tomar el color de energia y la CANTIDAD de energias que consume la carta
-  bool canSummonAllDigimonSelected(){
+  bool canSummonAllDigimonSelected() {
     List<CardDigimon> digimonsToSummon = hand.getSelectedCards();
     EnergiesCounters energiesCountersCopy = energiesCounters.getCopy();
-    if (digimonsToSummon.isNotEmpty){
-      for (CardDigimon card in digimonsToSummon){
+    if (digimonsToSummon.isNotEmpty) {
+      for (CardDigimon card in digimonsToSummon) {
         energiesCountersCopy.discountByColor(card.color);
       }
     }
     return energiesCountersCopy.allEnergiesAreZeroOrMore();
   }
 
-  void summonToDigimonZone(){
+  void summonToDigimonZone() {
     List<CardDigimon> cardsToSummon = this.hand.getSelectedCards();
     discountEnergiesToSummon(cardsToSummon);
     digimonZone.cards = cardsToSummon;
   }
 
-  void removeSelectedCardsSummoned(){
+  void removeSelectedCardsSummoned() {
     hand.removeSelectedCards();
     hand.selectedCardsInternalIds.clear();
   }
 
-  void discountEnergiesToSummon(List<CardDigimon> cardsToSummon){
-    if (cardsToSummon.isNotEmpty){
-      for (CardDigimon card in cardsToSummon){
+  void discountEnergiesToSummon(List<CardDigimon> cardsToSummon) {
+    if (cardsToSummon.isNotEmpty) {
+      for (CardDigimon card in cardsToSummon) {
         energiesCounters.discountByColor(card.color);
       }
     }
   }
 
-  void clearPoints(){
+  void clearPoints() {
     attackPoints = 0;
     healthPoints = 0;
   }
 
-  bool wasSelectedCard(int internalCardId){
+  bool wasSelectedCard(int internalCardId) {
     return hand.selectedCardsInternalIds.contains(internalCardId);
   }
 
-  void selectEquipmentCardToEquip(int internalCardId){
+  bool wasSummonedCard(int internalCardId) {
+    return digimonZone.cards
+        .any((card) => card.uniqueIdInGame! == internalCardId);
+  }
+
+  bool isInHand(int internalCardId) {
+    return hand.cards.any((card) => card.uniqueIdInGame! == internalCardId);
+  }
+
+  bool wasDiscarded(int internalCardId) {
+    return !wasSummonedCard(internalCardId) && !isInHand(internalCardId);
+  }
+
+  void selectEquipmentCardToEquip(int internalCardId) {
     selectedEquipmentCardId = internalCardId;
   }
 
-  void specialSummonDigimon(CardSummonDigimon cardSummonDigimon){
+  void specialSummonDigimon(CardSummonDigimon cardSummonDigimon) {
     for (var i = 0; i < cardSummonDigimon.digimonsCards.length; i++) {
       digimonZone.addToDigimonZone(cardSummonDigimon.digimonsCards[i]);
-      calculatePoints();     
+      calculatePoints();
     }
   }
-
 }

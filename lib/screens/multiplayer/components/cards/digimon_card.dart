@@ -7,10 +7,12 @@ import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/base
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
+import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_border.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../../../../domain/card/card_digimon.dart';
 
@@ -71,8 +73,10 @@ class DigimonCardComponent extends BaseCardComponent
     };
   }
 
-  bool isEnabledToEquip() {
-    return bloc.state.battleCardGame.isUpgradePhase();
+  bool isEnabledToEquip(int internalCardId) {
+    return bloc.state.battleCardGame.isUpgradePhase() &&
+        bloc.state.battleCardGame.player.hand
+            .isDigimonCardByInternalId(internalCardId);
   }
 
   bool isEnabledToSummonDigimonCard(int internalCardId) {
@@ -83,12 +87,14 @@ class DigimonCardComponent extends BaseCardComponent
 
   @override
   void onTapDown(TapDownEvent event) {
+    IO.Socket socket = SocketManager().socket!;
     super.onTapDown(event);
-    bool isEnabledToSelect = isEnabledToSummonDigimonCard(card.uniqueIdInGame!);
-    bool isEnabledToBeEquipped = isEnabledToEquip();
+    bool isEnabledToSelectAndIsSummonPhase =
+        isEnabledToSummonDigimonCard(card.uniqueIdInGame!);
+    bool isEnabledToBeEquipped = isEnabledToEquip(card.uniqueIdInGame!);
 
     //TODO :: ver si conviene renderizar o utilizar otra clase para la carta rival
-    if (isEnabledToSelect && !isRival) {
+    if (isEnabledToSelectAndIsSummonPhase && !isRival) {
       isSelected = !isSelected;
 
       final moveEffect = getUpAndDownEffect(isSelected, x, y);
@@ -107,8 +113,15 @@ class DigimonCardComponent extends BaseCardComponent
     }
 
     if (isEnabledToBeEquipped) {
-      //targetOfEquipment(card.internalGameId);
+      //TAL VEZ NO SEA NECESARIO ESTE EVENTO
       //bloc.add(SelectDigimonCardToBeEquipped(card.uniqueIdInGame!));
+      socket.emit('activateEquipmentCard', {
+        "cardDigimonId": card.uniqueIdInGame,
+        "cardEquipmentId":
+            bloc.state.battleCardGame.player.selectedEquipmentCardId!,
+        "userId": bloc.state.battleCardGame.player.username,
+        "socketId": socket.id
+      });
     }
   }
 

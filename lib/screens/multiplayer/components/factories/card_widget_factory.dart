@@ -117,23 +117,29 @@ class CardWidgetFactory {
   }
 
   void revealSelectedCards() {
-    if (!card1.isRemoved && tamer.wasSelectedCard(card1.getUniqueCardId())) {
+    if (!card1.isRemoved && tamer.wasSummonedCard(card1.getUniqueCardId())) {
       card1.reveal();
+      card1.update(1);
     }
-    if (!card2.isRemoved && tamer.wasSelectedCard(card2.getUniqueCardId())) {
+    if (!card2.isRemoved && tamer.wasSummonedCard(card2.getUniqueCardId())) {
       card2.reveal();
+      card2.update(1);
     }
-    if (!card3.isRemoved && tamer.wasSelectedCard(card3.getUniqueCardId())) {
+    if (!card3.isRemoved && tamer.wasSummonedCard(card3.getUniqueCardId())) {
       card3.reveal();
+      card3.update(1);
     }
-    if (!card4.isRemoved && tamer.wasSelectedCard(card4.getUniqueCardId())) {
+    if (!card4.isRemoved && tamer.wasSummonedCard(card4.getUniqueCardId())) {
       card4.reveal();
+      card4.update(1);
     }
-    if (!card5.isRemoved && tamer.wasSelectedCard(card5.getUniqueCardId())) {
+    if (!card5.isRemoved && tamer.wasSummonedCard(card5.getUniqueCardId())) {
       card5.reveal();
+      card5.update(1);
     }
-    if (!card6.isRemoved && tamer.wasSelectedCard(card6.getUniqueCardId())) {
+    if (!card6.isRemoved && tamer.wasSummonedCard(card6.getUniqueCardId())) {
       card6.reveal();
+      card6.update(1);
     }
   }
 

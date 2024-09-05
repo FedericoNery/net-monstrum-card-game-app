@@ -8,6 +8,7 @@ import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
 import 'package:net_monstrum_card_game/domain/card/color.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/base_card.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.dart';
@@ -87,11 +88,12 @@ class CardEquipmentWidget extends BaseCardComponent
       if (isSelected) {
         final shapeComponent = getFlickeringCardBorder();
         add(shapeComponent);
+        bloc.add(SelectEquipmentCardFromHand(card.uniqueIdInGame!));
       } else {
         children.first.add(RemoveEffect(delay: 0.1));
+        bloc.add(RefuseEquipmentCardFromHand(card.uniqueIdInGame!));
       }
 
-      //bloc.add(SelectEquipmentCardFromHandTo(card));
       update(1);
     }
   }

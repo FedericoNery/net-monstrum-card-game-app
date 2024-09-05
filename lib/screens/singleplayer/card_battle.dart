@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
@@ -12,13 +13,12 @@ import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_st
 import 'package:net_monstrum_card_game/widgets/card_battle/cards/digimon_card.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
 import 'package:net_monstrum_card_game/widgets/shared/fading_text.dart';
+
 import '../../domain/card/equipment_effect.dart';
 import '../../widgets/card_battle/color_counter.dart';
 import '../../widgets/card_battle/texts_counters_player.dart';
 import '../../widgets/card_battle/victory_message.dart';
-import '../../widgets/shared/background_image.dart';
 import '../../widgets/shared/button.dart';
-import 'package:flame_audio/flame_audio.dart';
 
 class CardBattle extends World
     with HasGameRef, FlameBlocListenable<CardBattleBloc, CardBattleState> {

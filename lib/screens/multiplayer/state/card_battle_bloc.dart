@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:net_monstrum_card_game/domain/card/card_base.dart';
+import 'package:net_monstrum_card_game/adapters/battle_card_game_adapter.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
-import 'package:net_monstrum_card_game/domain/game/energies_counters.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
 
@@ -16,35 +15,33 @@ class CardBattleMultiplayerBloc
     ); */
 
     on<UpdateHandAndDeckAfterDrawedPhase>((event, emit) {
-      List<Card> deckPlayer = event.deckPlayer;
-      List<Card> handPlayer = event.handPlayer;
-      List<Card> deckRival = event.deckRival;
-      List<Card> handRival = event.handRival;
-      EnergiesCounters energiesPlayer = event.energiesPlayer;
-      EnergiesCounters energiesRival = event.energiesRival;
-      String phaseGame = event.phaseGame;
-      bool playerSummonedDigimons = event.playerSummonedDigimons;
+      BattleCardGameFromJSON bcgFromJson = event.bcgFromJson;
 
       BattleCardGame battleCardGame = state.battleCardGame;
-      battleCardGame.player.hand.cards = handPlayer;
-      battleCardGame.player.deck.cards = deckPlayer;
-      battleCardGame.player.energiesCounters = energiesPlayer;
+      battleCardGame.player.hand.cards = bcgFromJson.playerHandCards;
+      battleCardGame.player.deck.cards = bcgFromJson.playerDeckCards;
+      battleCardGame.player.digimonZone.cards =
+          bcgFromJson.playerDigimonZoneCards;
+      battleCardGame.player.energiesCounters = bcgFromJson.energiesPlayer;
 
-      battleCardGame.rival.hand.cards = handRival;
-      battleCardGame.rival.deck.cards = deckRival;
-      battleCardGame.rival.energiesCounters = energiesRival;
+      battleCardGame.rival.hand.cards = bcgFromJson.rivalHandCards;
+      battleCardGame.rival.deck.cards = bcgFromJson.rivalDeckCards;
+      battleCardGame.rival.digimonZone.cards =
+          bcgFromJson.rivalDigimonZoneCards;
+      battleCardGame.rival.energiesCounters = bcgFromJson.energiesRival;
 
       battleCardGame.decksShuffled = true; //GENERAR EVENTO DIFERENTE
       battleCardGame.drawedCards = true; //GENERAR EVENTO DIFERENTE
 
-      battleCardGame.phaseGame = phaseGame;
-      battleCardGame.playerSummonedDigimons = playerSummonedDigimons;
+      battleCardGame.phaseGame = bcgFromJson.phaseGame;
+      battleCardGame.playerSummonedDigimons =
+          bcgFromJson.playerSummonedDigimons;
 
-      battleCardGame.player.attackPoints = event.apPlayer;
-      battleCardGame.player.healthPoints = event.hpPlayer;
+      battleCardGame.player.attackPoints = bcgFromJson.apPlayer;
+      battleCardGame.player.healthPoints = bcgFromJson.hpPlayer;
 
-      battleCardGame.rival.attackPoints = event.apRival;
-      battleCardGame.rival.healthPoints = event.hpRival;
+      battleCardGame.rival.attackPoints = bcgFromJson.apRival;
+      battleCardGame.rival.healthPoints = bcgFromJson.hpRival;
 
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
@@ -80,5 +77,29 @@ class CardBattleMultiplayerBloc
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
+
+    on<SelectEquipmentCardFromHand>((event, emit) {
+      BattleCardGame battleCardGame = state.battleCardGame;
+      //AGREGAR QUE SELECCIONÉ LA CARTA DE EQUIPAMIENTO
+      battleCardGame.player.selectedEquipmentCardId = event.cardId;
+      BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
+      emit(state.copyWith(instance));
+    });
+
+    on<RefuseEquipmentCardFromHand>((event, emit) {
+      BattleCardGame battleCardGame = state.battleCardGame;
+      battleCardGame.player.selectedEquipmentCardId = null;
+      //QUITAR QUE SELECCIONÉ LA CARTA DE EQUIPAMIENTO
+      BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
+      emit(state.copyWith(instance));
+    });
+
+/*     on<SelectDigimonCardToBeEquipped>((event, emit) {
+      BattleCardGame battleCardGame = state.battleCardGame;
+      //COMO PARAMETRO RECIBE EL ID DE LA CARTA DIGIMON TARGET
+
+      BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
+      emit(state.copyWith(instance));
+    }); */
   }
 }

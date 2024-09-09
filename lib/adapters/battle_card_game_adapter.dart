@@ -15,7 +15,8 @@ class BattleCardGameAdapter {
         flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"]);
     List<Card> playerHandCards = ListCardAdapter.getListOfCardsInstantiated(
         flutterMap["gameData"]["game"]["field1"]["hand"]["cartas"]);
-
+    List<Card> playerTrashCards = ListCardAdapter.getListOfCardsInstantiated(
+        flutterMap["gameData"]["game"]["field1"]["trash"]["cartas"]);
     List<CardDigimon> playerDigimonZoneCards =
         ListCardAdapter.getListOfDigimonCardsInstantiated(
             flutterMap["gameData"]["game"]["field1"]["digimonZone"]["cartas"]);
@@ -24,6 +25,8 @@ class BattleCardGameAdapter {
         flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"]);
     List<Card> rivalHandCards = ListCardAdapter.getListOfCardsInstantiated(
         flutterMap["gameData"]["game"]["field2"]["hand"]["cartas"]);
+    List<Card> rivalTrashCards = ListCardAdapter.getListOfCardsInstantiated(
+        flutterMap["gameData"]["game"]["field2"]["trash"]["cartas"]);
     List<CardDigimon> rivalDigimonZoneCards =
         ListCardAdapter.getListOfDigimonCardsInstantiated(
             flutterMap["gameData"]["game"]["field2"]["digimonZone"]["cartas"]);
@@ -55,10 +58,12 @@ class BattleCardGameAdapter {
         playerHandCards: isPlayer ? playerHandCards : rivalHandCards,
         playerDigimonZoneCards:
             isPlayer ? playerDigimonZoneCards : rivalDigimonZoneCards,
+        playerTrashCards: isPlayer ? playerTrashCards : rivalTrashCards,
         rivalDeckCards: isPlayer ? rivalDeckCards : playerDeckCards,
         rivalHandCards: isPlayer ? rivalHandCards : playerHandCards,
         rivalDigimonZoneCards:
             isPlayer ? rivalDigimonZoneCards : playerDigimonZoneCards,
+        rivalTrashCards: isPlayer ? rivalTrashCards : playerTrashCards,
         energiesPlayer: isPlayer ? energiesPlayer : energiesRival,
         energiesRival: isPlayer ? energiesRival : energiesPlayer,
         apPlayer: isPlayer ? apPlayer : apRival,
@@ -77,9 +82,11 @@ class BattleCardGameFromJSON {
   late List<Card> playerDeckCards;
   late List<Card> playerHandCards;
   late List<CardDigimon> playerDigimonZoneCards;
+  late List<Card> playerTrashCards;
   late List<Card> rivalDeckCards;
   late List<Card> rivalHandCards;
   late List<CardDigimon> rivalDigimonZoneCards;
+  late List<Card> rivalTrashCards;
   late EnergiesCounters energiesPlayer;
   late EnergiesCounters energiesRival;
   late String phaseGame;
@@ -95,9 +102,11 @@ class BattleCardGameFromJSON {
       {required this.playerDeckCards,
       required this.playerHandCards,
       required this.playerDigimonZoneCards,
+      required this.playerTrashCards,
       required this.rivalDeckCards,
       required this.rivalHandCards,
       required this.rivalDigimonZoneCards,
+      required this.rivalTrashCards,
       required this.energiesPlayer,
       required this.energiesRival,
       required this.apPlayer,

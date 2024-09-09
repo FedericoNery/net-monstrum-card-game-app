@@ -99,7 +99,11 @@ class CardBattleMultiplayer extends World
 
     socket.on("finished game", (data) {});
 
-    socket.on("START NEXT ROUND", (data) {});
+    socket.on("START NEXT ROUND", (data) {
+      fadingText.addText("Start next round");
+      //removeAllCards();
+      resetLocalStateBloc(data);
+    });
 
     socket.on('start compile phase', (data) {
       /* if (bloc.state.battleCardGame.isDrawPhase() &&
@@ -128,6 +132,18 @@ class CardBattleMultiplayer extends World
             data, socket.id! == flutterMap["gameData"]["socketIdUsuarioA"]);
 
     bloc.add(UpdateHandAndDeckAfterDrawedPhase(battleCardGameFromJSON));
+  }
+
+  void resetLocalStateBloc(data) {
+    var jsonMap = json.decode(data);
+    Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
+
+    //socket.id! == flutterMap["gameData"]["socketIdUsuarioB"]
+    BattleCardGameFromJSON battleCardGameFromJSON =
+        battleCardGameAdapter.getBattleCardGameFromSocket(
+            data, socket.id! == flutterMap["gameData"]["socketIdUsuarioA"]);
+
+    bloc.add(ResetLocalState(battleCardGameFromJSON));
   }
 
   @override
@@ -252,7 +268,7 @@ class CardBattleMultiplayer extends World
     if (state.battleCardGame.isFinishedRound() &&
         !state.battleCardGame.battleIsFinished()) {
       removeAllCards();
-      remove(activateEquipmentButton);
+      //remove(activateEquipmentButton);
       add(confirmCompilationPhaseButton);
       addedCardsToUi = false;
       removedNotSummonedCards = false;

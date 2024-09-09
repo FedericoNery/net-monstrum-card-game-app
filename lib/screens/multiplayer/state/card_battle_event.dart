@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:net_monstrum_card_game/adapters/battle_card_game_adapter.dart';
+import 'package:net_monstrum_card_game/domain/game.dart';
 
 abstract class CardBattleMultiplayerEvent extends Equatable {
   const CardBattleMultiplayerEvent();
@@ -53,6 +54,16 @@ class RefuseEquipmentCardFromHand extends CardBattleMultiplayerEvent {
   @override
   List<Object?> get props => [];
 }
+
+class ResetLocalState extends CardBattleMultiplayerEvent {
+  final BattleCardGameFromJSON bcgFromJson;
+
+  const ResetLocalState(this.bcgFromJson);
+
+  @override
+  List<Object?> get props => [];
+}
+
 
 /* class SelectDigimonCardToBeEquipped extends CardBattleMultiplayerEvent {
   final int cardDigimonId;

@@ -22,12 +22,15 @@ class CardBattleMultiplayerBloc
       battleCardGame.player.deck.cards = bcgFromJson.playerDeckCards;
       battleCardGame.player.digimonZone.cards =
           bcgFromJson.playerDigimonZoneCards;
+      battleCardGame.player.trash.cards = bcgFromJson.playerTrashCards;
       battleCardGame.player.energiesCounters = bcgFromJson.energiesPlayer;
 
       battleCardGame.rival.hand.cards = bcgFromJson.rivalHandCards;
       battleCardGame.rival.deck.cards = bcgFromJson.rivalDeckCards;
       battleCardGame.rival.digimonZone.cards =
           bcgFromJson.rivalDigimonZoneCards;
+      battleCardGame.rival.trash.cards = bcgFromJson.rivalTrashCards;
+
       battleCardGame.rival.energiesCounters = bcgFromJson.energiesRival;
 
       battleCardGame.decksShuffled = true; //GENERAR EVENTO DIFERENTE
@@ -93,6 +96,49 @@ class CardBattleMultiplayerBloc
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.player.selectedEquipmentCardId = null;
       //QUITAR QUE SELECCIONÉ LA CARTA DE EQUIPAMIENTO
+      BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
+      emit(state.copyWith(instance));
+    });
+
+    on<ResetLocalState>((event, emit) {
+      BattleCardGameFromJSON bcgFromJson = event.bcgFromJson;
+      BattleCardGame battleCardGame = state.battleCardGame;
+      battleCardGame.activatedEnergyCardId = null;
+      /* battleCardGame.decksShuffled = true;
+      battleCardGame.drawedCards = false; */
+      battleCardGame.equipmentsEffectSelected = [];
+      battleCardGame.playerSummonedDigimons = false;
+      battleCardGame.selectedEquipmentCardId = null;
+      battleCardGame.targetDigimonId = null;
+      battleCardGame.wasSummonedDigimonSpecially = false;
+
+      battleCardGame.player.hand.cards = bcgFromJson.playerHandCards;
+      battleCardGame.player.deck.cards = bcgFromJson.playerDeckCards;
+      battleCardGame.player.digimonZone.cards =
+          bcgFromJson.playerDigimonZoneCards;
+      battleCardGame.player.trash.cards = bcgFromJson.playerTrashCards;
+      battleCardGame.player.energiesCounters = bcgFromJson.energiesPlayer;
+
+      battleCardGame.rival.hand.cards = bcgFromJson.rivalHandCards;
+      battleCardGame.rival.deck.cards = bcgFromJson.rivalDeckCards;
+      battleCardGame.rival.digimonZone.cards =
+          bcgFromJson.rivalDigimonZoneCards;
+      battleCardGame.rival.trash.cards = bcgFromJson.rivalTrashCards;
+      battleCardGame.rival.energiesCounters = bcgFromJson.energiesRival;
+
+      battleCardGame.phaseGame = bcgFromJson.phaseGame;
+      battleCardGame.playerSummonedDigimons =
+          bcgFromJson.playerSummonedDigimons;
+
+      battleCardGame.player.attackPoints = bcgFromJson.apPlayer;
+      battleCardGame.player.healthPoints = bcgFromJson.hpPlayer;
+
+      battleCardGame.rival.attackPoints = bcgFromJson.apRival;
+      battleCardGame.rival.healthPoints = bcgFromJson.hpRival;
+
+      battleCardGame.player.roundsWon = bcgFromJson.wonRoundsPlayer;
+      battleCardGame.rival.roundsWon = bcgFromJson.wonRoundsRival;
+
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });

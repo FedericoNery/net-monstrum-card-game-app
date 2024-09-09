@@ -43,6 +43,9 @@ class CardBattleMultiplayerBloc
       battleCardGame.rival.attackPoints = bcgFromJson.apRival;
       battleCardGame.rival.healthPoints = bcgFromJson.hpRival;
 
+      battleCardGame.player.roundsWon = bcgFromJson.wonRoundsPlayer;
+      battleCardGame.rival.roundsWon = bcgFromJson.wonRoundsRival;
+
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });

@@ -47,6 +47,9 @@ class BattleCardGameAdapter {
     int hpPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
     int hpRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
 
+    int wonRoundsPlayer = flutterMap["gameData"]["game"]["roundsPlayer1"];
+    int wonRoundsRival = flutterMap["gameData"]["game"]["roundsPlayer2"];
+
     return BattleCardGameFromJSON(
         playerDeckCards: isPlayer ? playerDeckCards : rivalDeckCards,
         playerHandCards: isPlayer ? playerHandCards : rivalHandCards,
@@ -64,7 +67,9 @@ class BattleCardGameAdapter {
         hpRival: isPlayer ? hpRival : hpPlayer,
         phaseGame: phaseGame,
         playerSummonedDigimons:
-            isPlayer ? player1SummonCards : player2SummonCards);
+            isPlayer ? player1SummonCards : player2SummonCards,
+        wonRoundsPlayer: isPlayer ? wonRoundsPlayer : wonRoundsRival,
+        wonRoundsRival: isPlayer ? wonRoundsRival : wonRoundsPlayer);
   }
 }
 
@@ -83,6 +88,8 @@ class BattleCardGameFromJSON {
   late int apRival;
   late int hpPlayer;
   late int hpRival;
+  late int wonRoundsPlayer;
+  late int wonRoundsRival;
 
   BattleCardGameFromJSON(
       {required this.playerDeckCards,
@@ -98,5 +105,7 @@ class BattleCardGameFromJSON {
       required this.hpPlayer,
       required this.hpRival,
       required this.phaseGame,
-      required this.playerSummonedDigimons});
+      required this.playerSummonedDigimons,
+      required this.wonRoundsPlayer,
+      required this.wonRoundsRival});
 }

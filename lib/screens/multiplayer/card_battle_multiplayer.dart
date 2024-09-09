@@ -74,20 +74,32 @@ class CardBattleMultiplayer extends World
 
   CardBattleMultiplayer() {
     socket.on("UPDATE GAME DATA", (data) {
-      var jsonMap = json.decode(data);
-      Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
-
-      //socket.id! == flutterMap["gameData"]["socketIdUsuarioB"]
-      BattleCardGameFromJSON battleCardGameFromJSON =
-          battleCardGameAdapter.getBattleCardGameFromSocket(
-              data, socket.id! == flutterMap["gameData"]["socketIdUsuarioA"]);
-
-      bloc.add(UpdateHandAndDeckAfterDrawedPhase(battleCardGameFromJSON));
+      updateBattleCardGameBloc(data);
     });
 
-    socket.on("start summon phase", (data) {
-      add(summonDigimonButton);
+    socket.on("START_BATTLE", (data) {
+      fadingText.addText("Battle Phase");
+      updateBattleCardGameBloc(data);
     });
+
+    socket.on("PLAYER 1 ATTACKS", (data) {
+      //TODO ANIMACION ATAQUE
+      updateBattleCardGameBloc(data);
+    });
+
+    socket.on("PLAYER 2 ATTACKS", (data) {
+      //TODO ANIMACION ATAQUE
+      updateBattleCardGameBloc(data);
+    });
+
+    socket.on('finish battle phase', (data) {
+      //AGREGAR CARTEL O ALGO QUE INDIQUE GANADOR DE LA RONDA
+      updateBattleCardGameBloc(data);
+    });
+
+    socket.on("finished game", (data) {});
+
+    socket.on("START NEXT ROUND", (data) {});
 
     socket.on('start compile phase', (data) {
       /* if (bloc.state.battleCardGame.isDrawPhase() &&
@@ -100,6 +112,22 @@ class CardBattleMultiplayer extends World
         fadingText.addText("Compilation Phase");
       } */
     });
+
+    socket.on("start summon phase", (data) {
+      add(summonDigimonButton);
+    });
+  }
+
+  void updateBattleCardGameBloc(data) {
+    var jsonMap = json.decode(data);
+    Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
+
+    //socket.id! == flutterMap["gameData"]["socketIdUsuarioB"]
+    BattleCardGameFromJSON battleCardGameFromJSON =
+        battleCardGameAdapter.getBattleCardGameFromSocket(
+            data, socket.id! == flutterMap["gameData"]["socketIdUsuarioA"]);
+
+    bloc.add(UpdateHandAndDeckAfterDrawedPhase(battleCardGameFromJSON));
   }
 
   @override

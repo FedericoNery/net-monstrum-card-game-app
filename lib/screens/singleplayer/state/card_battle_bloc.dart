@@ -4,8 +4,6 @@ import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
 import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 import 'package:net_monstrum_card_game/domain/card/energy_effect.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
-import 'package:net_monstrum_card_game/domain/game/tamer.dart';
-import 'package:net_monstrum_card_game/screens/singleplayer/card_battle.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_state.dart';
 

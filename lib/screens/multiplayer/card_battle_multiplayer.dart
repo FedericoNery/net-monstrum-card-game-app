@@ -4,19 +4,19 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
-import 'package:net_monstrum_card_game/adapters/energies_adapter.dart';
-import 'package:net_monstrum_card_game/adapters/list_card_adapter.dart';
+import 'package:net_monstrum_card_game/adapters/battle_card_game_adapter.dart';
+import 'package:net_monstrum_card_game/communication/socket_events_names.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
-import 'package:net_monstrum_card_game/domain/game/energies_counters.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/digimon_card.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/factories/card_widget_factory.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/ap_hp.dart';
 import 'package:net_monstrum_card_game/widgets/shared/fading_text.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -26,25 +26,14 @@ import '../../widgets/card_battle/texts_counters_player.dart';
 import '../../widgets/card_battle/victory_message.dart';
 import '../../widgets/shared/button.dart';
 
-class PlayerActions {
-  static const String FINISH_COMPILATION_PHASE = 'FINISH_COMPILATION_PHASE';
-  static const String SUMMON_DIGIMONS = 'SUMMON_DIGIMONS';
-  static const String ACTIVATE_ENERGY_CARD = 'ACTIVATE_ENERGY_CARD';
-  static const String ACTIVATE_PROGRAMM_CARD = 'ACTIVATE_PROGRAMM_CARD';
-  static const String FINISH_UPGRADE_PHASE = 'FINISH_UPGRADE_PHASE';
-}
-
-class ServerActions {
-  static const String UPDATE_GAME_DATA = 'UPDATE GAME DATA';
-  static const String START_BATTLE = 'START_BATTLE';
-}
-
 class CardBattleMultiplayer extends World
     with
         HasGameRef,
         FlameBlocListenable<CardBattleMultiplayerBloc,
             CardBattleMultiplayerState> {
   IO.Socket socket = SocketManager().socket!;
+  BattleCardGameAdapter battleCardGameAdapter = BattleCardGameAdapter();
+
   late ParallaxComponent backgroundParallax;
 
   final enabledMusic = false;
@@ -58,13 +47,11 @@ class CardBattleMultiplayer extends World
   final activateEquipmentButton = DefaultButton('Activate Equipment');
   final confirmCompilationPhaseButton =
       DefaultButton('Confirm compilation phase');
+  final confirmUpgradePhaseButton = DefaultButton('Confirm upgrade phase');
   final passPhaseButton = DefaultButton('Pass');
 
-  late TextComponent apRival;
-  late TextComponent hpRival;
-  late TextComponent apPlayer;
-  late TextComponent hpPlayer;
   final ColorCounterInstances colorCounterInstances = ColorCounterInstances();
+  final ApHPInstances apHpInstances = ApHPInstances();
   late TextComponent roundsWinPlayer;
   late TextComponent roundsWinRival;
   late List<TextComponent> textsCounters;
@@ -81,111 +68,38 @@ class CardBattleMultiplayer extends World
   double xLastPositionCard = 600;
   double yLastPositionCard = 250;
 
+  int? selectedEquipmentCardIndex;
+  List<EquipmentEffect> equipmentsEffectSelected = [];
+  List<DigimonCardComponent> digimonCardCompomponents = [];
+
   CardBattleMultiplayer() {
     socket.on("UPDATE GAME DATA", (data) {
-      var jsonMap = json.decode(data);
-      Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
-
-      if (socket.id! == flutterMap["gameData"]["socketIdUsuarioA"]) {
-        List<Card> playerDeckCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"]);
-        List<Card> playerHandCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field1"]["hand"]["cartas"]);
-
-        List<Card> rivalDeckCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"]);
-        List<Card> rivalHandCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field2"]["hand"]["cartas"]);
-
-        EnergiesCounters energiesPlayer =
-            EnergiesAdapter.getEnergiesFromSocketInfo(
-                flutterMap["gameData"]["game"]["field1"]["cantidadesEnergias"]);
-        EnergiesCounters energiesRival =
-            EnergiesAdapter.getEnergiesFromSocketInfo(
-                flutterMap["gameData"]["game"]["field2"]["cantidadesEnergias"]);
-
-        String phaseGame = flutterMap["gameData"]["game"]["estadoDeLaRonda"];
-
-        bool player1SummonCards =
-            flutterMap["gameData"]["game"]["player1SummonCards"];
-
-        int apPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
-        int apRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
-
-        int hpPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
-        int hpRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
-
-        bloc.add(UpdateHandAndDeckAfterDrawedPhase(
-            playerDeckCards,
-            playerHandCards,
-            rivalDeckCards,
-            rivalHandCards,
-            energiesPlayer,
-            energiesRival,
-            phaseGame,
-            player1SummonCards,
-            apPlayer,
-            apRival,
-            hpPlayer,
-            hpRival));
-      }
-
-      if (socket.id! == flutterMap["gameData"]["socketIdUsuarioB"]) {
-        List<Card> playerDeckCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"]);
-        List<Card> playerHandCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field1"]["hand"]["cartas"]);
-
-        List<Card> rivalDeckCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field2"]["deck"]["cartas"]);
-        List<Card> rivalHandCards = ListCardAdapter.getListOfCardsInstantiated(
-            flutterMap["gameData"]["game"]["field2"]["hand"]["cartas"]);
-
-        EnergiesCounters energiesPlayer =
-            EnergiesAdapter.getEnergiesFromSocketInfo(
-                flutterMap["gameData"]["game"]["field1"]["cantidadesEnergias"]);
-        EnergiesCounters energiesRival =
-            EnergiesAdapter.getEnergiesFromSocketInfo(
-                flutterMap["gameData"]["game"]["field2"]["cantidadesEnergias"]);
-
-        String phaseGame = flutterMap["gameData"]["game"]["estadoDeLaRonda"];
-
-        bool player2SummonCards =
-            flutterMap["gameData"]["game"]["player2SummonCards"];
-
-        int apPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
-        int apRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
-
-        int hpPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
-        int hpRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
-
-        bloc.add(UpdateHandAndDeckAfterDrawedPhase(
-          rivalDeckCards,
-          rivalHandCards,
-          playerDeckCards,
-          playerHandCards,
-          energiesRival,
-          energiesPlayer,
-          phaseGame,
-          player2SummonCards,
-          apRival,
-          apPlayer,
-          hpRival,
-          hpPlayer,
-        ));
-      }
-
-      /*  Tamer playerTamer = Tamer(
-          ListCardAdapter.getListOfCardsInstantiated(playerCards), playerInfo);
-      Tamer rivalTamer = Tamer(
-          ListCardAdapter.getListOfCardsInstantiated(rivalCards), rivalInfo);
-
-      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
+      updateBattleCardGameBloc(data);
     });
 
-    socket.on("start summon phase", (data) {
-      add(summonDigimonButton);
+    socket.on("START_BATTLE", (data) {
+      fadingText.addText("Battle Phase");
+      updateBattleCardGameBloc(data);
     });
+
+    socket.on("PLAYER 1 ATTACKS", (data) {
+      //TODO ANIMACION ATAQUE
+      updateBattleCardGameBloc(data);
+    });
+
+    socket.on("PLAYER 2 ATTACKS", (data) {
+      //TODO ANIMACION ATAQUE
+      updateBattleCardGameBloc(data);
+    });
+
+    socket.on('finish battle phase', (data) {
+      //AGREGAR CARTEL O ALGO QUE INDIQUE GANADOR DE LA RONDA
+      updateBattleCardGameBloc(data);
+    });
+
+    socket.on("finished game", (data) {});
+
+    socket.on("START NEXT ROUND", (data) {});
 
     socket.on('start compile phase', (data) {
       /* if (bloc.state.battleCardGame.isDrawPhase() &&
@@ -198,11 +112,23 @@ class CardBattleMultiplayer extends World
         fadingText.addText("Compilation Phase");
       } */
     });
+
+    socket.on("start summon phase", (data) {
+      add(summonDigimonButton);
+    });
   }
 
-  int? selectedEquipmentCardIndex;
-  List<EquipmentEffect> equipmentsEffectSelected = [];
-  List<DigimonCardComponent> digimonCardCompomponents = [];
+  void updateBattleCardGameBloc(data) {
+    var jsonMap = json.decode(data);
+    Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
+
+    //socket.id! == flutterMap["gameData"]["socketIdUsuarioB"]
+    BattleCardGameFromJSON battleCardGameFromJSON =
+        battleCardGameAdapter.getBattleCardGameFromSocket(
+            data, socket.id! == flutterMap["gameData"]["socketIdUsuarioA"]);
+
+    bloc.add(UpdateHandAndDeckAfterDrawedPhase(battleCardGameFromJSON));
+  }
 
   @override
   Future<void> onLoad() async {
@@ -236,34 +162,6 @@ class CardBattleMultiplayer extends World
       position: Vector2(0, 0),
     );
 
-    apRival = TextComponent(
-      text: 'AP:${0}',
-      size: Vector2.all(10.0),
-      position: Vector2(640, 0),
-      scale: Vector2.all(0.8),
-    );
-
-    hpRival = TextComponent(
-      text: 'HP:${0}',
-      size: Vector2.all(10.0),
-      position: Vector2(700, 0),
-      scale: Vector2.all(0.8),
-    );
-
-    apPlayer = TextComponent(
-      text: 'AP:${0}',
-      size: Vector2.all(10.0),
-      position: Vector2(640, 370),
-      scale: Vector2.all(0.8),
-    );
-
-    hpPlayer = TextComponent(
-      text: 'HP:${0}',
-      size: Vector2.all(10.0),
-      position: Vector2(700, 370),
-      scale: Vector2.all(0.8),
-    );
-
     summonDigimonButton.position = Vector2(650, 50);
     summonDigimonButton.size = Vector2(100, 50);
     summonDigimonButton.tapUpCallback = summonToDigimonZone;
@@ -275,6 +173,10 @@ class CardBattleMultiplayer extends World
     confirmCompilationPhaseButton.position = Vector2(650, 50);
     confirmCompilationPhaseButton.size = Vector2(100, 50);
     confirmCompilationPhaseButton.tapUpCallback = confirmCompilationPhase;
+
+    confirmUpgradePhaseButton.position = Vector2(650, 50);
+    confirmUpgradePhaseButton.size = Vector2(100, 50);
+    confirmUpgradePhaseButton.tapUpCallback = confirmUpgradePhase;
 
     passPhaseButton.position = Vector2(650, 110);
     passPhaseButton.size = Vector2(100, 50);
@@ -294,10 +196,10 @@ class CardBattleMultiplayer extends World
     await add(colorCounterInstances.greenCounterRival);
     await add(roundsWinPlayer);
     await add(roundsWinRival);
-    await add(apRival);
-    await add(hpRival);
-    await add(apPlayer);
-    await add(hpPlayer);
+    await add(apHpInstances.apRival);
+    await add(apHpInstances.hpRival);
+    await add(apHpInstances.apPlayer);
+    await add(apHpInstances.hpPlayer);
     await add(texts.blackCounterText);
     await add(texts.blackCounterTextRival);
     await add(texts.blueCounterText);
@@ -342,8 +244,9 @@ class CardBattleMultiplayer extends World
 
       removedNotSummonedCards = true;
 
+      add(confirmUpgradePhaseButton);
       //remove(summonDigimonButton);
-      add(activateEquipmentButton);
+      //add(activateEquipmentButton);
     }
 
     if (state.battleCardGame.isFinishedRound() &&
@@ -465,42 +368,18 @@ class CardBattleMultiplayer extends World
       fadingText.addText("Compilation Phase");
     }
 
-    int? activatedEnergyCardId =
-        bloc.state.battleCardGame.activatedEnergyCardId;
-
-    texts.blackCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.black}';
-    texts.blueCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.blue}';
-    texts.brownCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.brown}';
-    texts.greenCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.green}';
-    texts.redCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.red}';
-    texts.whiteCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.white}';
-
-    texts.blackCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.black}';
-    texts.blueCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.blue}';
-    texts.brownCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.brown}';
-    texts.greenCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.green}';
-    texts.redCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.red}';
-    texts.whiteCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.white}';
-
-    apRival.text = 'AP:${bloc.state.battleCardGame.rival.attackPoints}';
-    hpRival.text = 'HP:${bloc.state.battleCardGame.rival.healthPoints}';
-    apPlayer.text = 'AP:${bloc.state.battleCardGame.player.attackPoints}';
-    hpPlayer.text = 'HP:${bloc.state.battleCardGame.player.healthPoints}';
+    texts.updateValues(bloc.state.battleCardGame);
+    apHpInstances.updateValues(bloc.state.battleCardGame);
 
     roundsWinPlayer.text = 'W:${bloc.state.battleCardGame.player.roundsWon}';
     roundsWinRival.text = 'W:${bloc.state.battleCardGame.rival.roundsWon}';
+
+    removeEnergyCardIfWasActivated();
+  }
+
+  void removeEnergyCardIfWasActivated() {
+    int? activatedEnergyCardId =
+        bloc.state.battleCardGame.activatedEnergyCardId;
 
     if (addedCardsToUi) {
       if (playerCards.card1.getUniqueCardId() == activatedEnergyCardId &&
@@ -540,6 +419,15 @@ class CardBattleMultiplayer extends World
     //bloc.add(ConfirmCompilationPhase());
   }
 
+  void confirmUpgradePhase() {
+    socket.emit(PlayerActions.FINISH_UPGRADE_PHASE, {
+      "socketId": socket.id,
+      "usuarioId": bloc.state.battleCardGame.player.username,
+    });
+
+    remove(confirmUpgradePhaseButton);
+  }
+
   void passPhase() {}
 
   void nextToBattlePhase() {
@@ -553,6 +441,8 @@ class CardBattleMultiplayer extends World
       "cardDigimonsToSummonIds":
           bloc.state.battleCardGame.player.hand.selectedCardsInternalIds,
     });
+    //AGREGAR BOTON CUANDO FINALIZA LA SUMMON PHASE
+    //add(confirmUpgradePhaseButton);
   }
 
   void removeCardAfterEquipmentActivation(BattleCardGame battleCardGame) {
@@ -691,38 +581,38 @@ class CardBattleMultiplayer extends World
   }
 
   void removeNotSummonedCardsByRival() {
-    if (!bloc.state.battleCardGame.rival
-            .wasSelectedCard(rivalCards.card1.getUniqueCardId()) &&
+    if (bloc.state.battleCardGame.rival
+            .wasDiscarded(rivalCards.card1.getUniqueCardId()) &&
         rivalCards.card1.isMounted) {
       rivalCards.card1.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.rival
-            .wasSelectedCard(rivalCards.card2.getUniqueCardId()) &&
+    if (bloc.state.battleCardGame.rival
+            .wasDiscarded(rivalCards.card2.getUniqueCardId()) &&
         rivalCards.card2.isMounted) {
       rivalCards.card2.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.rival
-            .wasSelectedCard(rivalCards.card3.getUniqueCardId()) &&
+    if (bloc.state.battleCardGame.rival
+            .wasDiscarded(rivalCards.card3.getUniqueCardId()) &&
         rivalCards.card3.isMounted) {
       rivalCards.card3.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.rival
-            .wasSelectedCard(rivalCards.card4.getUniqueCardId()) &&
+    if (bloc.state.battleCardGame.rival
+            .wasDiscarded(rivalCards.card4.getUniqueCardId()) &&
         rivalCards.card4.isMounted) {
       rivalCards.card4.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.rival
-            .wasSelectedCard(rivalCards.card5.getUniqueCardId()) &&
+    if (bloc.state.battleCardGame.rival
+            .wasDiscarded(rivalCards.card5.getUniqueCardId()) &&
         rivalCards.card5.isMounted) {
       rivalCards.card5.removeFromParent();
     }
 
-    if (!bloc.state.battleCardGame.rival
-            .wasSelectedCard(rivalCards.card6.getUniqueCardId()) &&
+    if (bloc.state.battleCardGame.rival
+            .wasDiscarded(rivalCards.card6.getUniqueCardId()) &&
         rivalCards.card6.isMounted) {
       rivalCards.card6.removeFromParent();
     }

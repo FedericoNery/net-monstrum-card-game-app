@@ -38,4 +38,20 @@ class ListCardAdapter {
         CardProgramming.getInstanceFromSocket(card);
     return programmingCard;
   }
+
+  //ONLY DIGIMON CARD
+  static List<CardDigimon> getListOfDigimonCardsInstantiated(
+      List<dynamic> cards) {
+    List<CardDigimon> listOfCardsInstantiated = [];
+    for (var i = 0; i < cards.length; i++) {
+      listOfCardsInstantiated
+          .add(ListCardAdapter.getInstanceCardDigimon(cards[i]));
+    }
+    return listOfCardsInstantiated;
+  }
+
+  static CardDigimon getInstanceCardDigimon(Map<String, dynamic> card) {
+    CardDigimon digimonCard = CardDigimon.getInstanceFromSocket(card);
+    return digimonCard;
+  }
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/adapters/list_card_adapter.dart';
+import 'package:net_monstrum_card_game/communication/socket_events_names.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 import 'package:net_monstrum_card_game/services/aggregation_service.dart';
@@ -10,12 +11,9 @@ import 'package:net_monstrum_card_game/views/card_battle_multiplayer_view.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:socket_io_common/src/util/event_emitter.dart';
 
-import '../game/deck-selector.dart';
-
 class MyButtonListWidget extends StatefulWidget {
-  List<String> roomsIds; // Parámetro que se pasará al widget
+  List<String> roomsIds;
 
-  // Constructor que acepta el parámetro
   MyButtonListWidget({required this.roomsIds});
 
   @override
@@ -26,16 +24,12 @@ class _MyButtonListWidgetState extends State<MyButtonListWidget> {
   IO.Socket socket = SocketManager().socket!;
 
   _MyButtonListWidgetState() {
-    print("CONSTRUCTOR");
     socket.on(
-        "start game",
+        ServerActions.START_GAME,
         (data) {
-          // Redirigir al widget de la batalla
-          //Map<String, dynamic> objetoDeserializado = json.decode(data);
-          print(data);
           var jsonMap = json.decode(data);
           Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
-
+          BattleCardGame battleCardGame;
           var playerCards =
               flutterMap["gameData"]["game"]["field1"]["deck"]["cartas"];
 
@@ -54,8 +48,12 @@ class _MyButtonListWidgetState extends State<MyButtonListWidget> {
               ListCardAdapter.getListOfCardsInstantiated(rivalCards),
               rivalInfo);
 
-          BattleCardGame battleCardGame =
-              BattleCardGame(playerTamer, rivalTamer);
+          battleCardGame = BattleCardGame(playerTamer, rivalTamer);
+
+          /* if (socket.id! == flutterMap["gameData"]["socketIdUsuarioA"]) {
+          } else {
+            battleCardGame = BattleCardGame(rivalTamer, playerTamer);
+          } */
 
           //Convertir a BattleCardGame o delegarlo en el otro componente
           Navigator.push(
@@ -68,14 +66,12 @@ class _MyButtonListWidgetState extends State<MyButtonListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.roomsIds.length > 0) {
+    if (widget.roomsIds.isNotEmpty) {
       return ListView.builder(
         itemCount: widget.roomsIds.length,
         itemBuilder: (BuildContext context, int index) {
-          // Para cada elemento en la lista, crea un botón con el texto correspondiente
           return ElevatedButton(
             onPressed: () {
-              print("APRETO EL BOTON");
               AggregationService service = AggregationService();
               Aggregation player = service.getAggregatioByUserId(2);
 
@@ -86,16 +82,16 @@ class _MyButtonListWidgetState extends State<MyButtonListWidget> {
                   "id": player.user.id,
                   "username": player.user.username
                 },
-                "gameIdToJoin": roomId
+                "gameIdToJoin": roomId,
+                "socketId": socket.id!
               });
-              print("EMITIO");
             },
-            child: Text(widget.roomsIds[index]), // Texto del botón
+            child: Text(widget.roomsIds[index]),
           );
         },
       );
     }
 
-    return Text('La lista está vacía');
+    return const Text('No hay salas creadas');
   }
 }

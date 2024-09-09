@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/domain/card/card_equipment.dart';
 import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
@@ -47,7 +46,6 @@ class SelectDigimonCardToBeEquipped extends CardBattleEvent {
   List<Object?> get props => [];
 }
 
-
 class SelectEquipmentCardFromHandTo extends CardBattleEvent {
   final CardEquipment cardEquipment;
   const SelectEquipmentCardFromHandTo(this.cardEquipment);
@@ -62,7 +60,6 @@ class ActivateEnergyCard extends CardBattleEvent {
 
   @override
   List<Object?> get props => [];
-
 }
 
 class SummonDigimonCardsToDigimonZone extends CardBattleEvent {
@@ -70,7 +67,6 @@ class SummonDigimonCardsToDigimonZone extends CardBattleEvent {
 
   @override
   List<Object?> get props => [];
-
 }
 
 class ShuffleDeck extends CardBattleEvent {
@@ -135,7 +131,6 @@ class ActivateSummonDigimonCard extends CardBattleEvent {
 
   @override
   List<Object?> get props => [];
-
 }
 
 class FinishedSpecialSummonDigimon extends CardBattleEvent {

@@ -10,15 +10,6 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 class ListRoomsPage extends StatefulWidget {
   const ListRoomsPage({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -26,7 +17,6 @@ class ListRoomsPage extends StatefulWidget {
 }
 
 class _ListRoomsPageState extends State<ListRoomsPage> {
-  int _counter = 0;
   List<String> _listRoomsIds = [];
 
   IO.Socket socket = SocketManager().socket!;
@@ -39,6 +29,10 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
       "deck": player.decksAggregations[0].cards,
       "user": {"id": player.user.id, "username": player.user.username}
     });
+  }
+
+  void _refreshRooms() {
+    socket.emit('obtener rooms', null);
   }
 
   @override
@@ -54,7 +48,6 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
 
     socket.on('new game created', (data) {
       Map<String, dynamic> objetoDeserializado = json.decode(data);
-      print(data);
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -84,13 +77,20 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh Rooms',
+            onPressed: _refreshRooms,
+          ),
+        ],
       ),
       body: Center(child: MyButtonListWidget(roomsIds: _listRoomsIds)),
       floatingActionButton: FloatingActionButton(
         onPressed: _createRoom,
-        tooltip: 'Increment',
+        tooltip: 'Create Room',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }

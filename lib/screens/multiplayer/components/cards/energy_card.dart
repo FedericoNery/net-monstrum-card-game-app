@@ -15,13 +15,12 @@ import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_bor
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class EnergyCardComponent extends BaseCardComponent
+class EnergyCardComponent extends BaseCardComponent<CardEnergy>
     with
         TapCallbacks,
         FlameBlocListenable<CardBattleMultiplayerBloc,
             CardBattleMultiplayerState> {
-  final CardEnergy card;
-  EnergyCardComponent(this.card, x, y, isHidden, isRival)
+  EnergyCardComponent(CardEnergy cardEnergy, x, y, isHidden, isRival)
       : super(
           size: isHidden ? Vector2(64, 85) : Vector2.all(64),
           position: Vector2(x, y),
@@ -30,6 +29,7 @@ class EnergyCardComponent extends BaseCardComponent
     this.isRival = isRival;
     this.x = x;
     this.y = y;
+    this.card = cardEnergy;
   }
 
   @override

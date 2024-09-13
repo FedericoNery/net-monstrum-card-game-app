@@ -15,14 +15,12 @@ import 'package:net_monstrum_card_game/widgets/card_battle/styles/ap_hp_texts.da
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_border.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
 
-class CardEquipmentWidget extends BaseCardComponent
+class CardEquipmentWidget extends BaseCardComponent<CardEquipment>
     with
         TapCallbacks,
         FlameBlocListenable<CardBattleMultiplayerBloc,
             CardBattleMultiplayerState> {
-  final CardEquipment card;
-
-  CardEquipmentWidget(this.card, x, y, isHidden, isRival)
+  CardEquipmentWidget(CardEquipment cardEquipment, x, y, isHidden, isRival)
       : super(
           size: isHidden ? Vector2(64, 85) : Vector2.all(64),
           position: Vector2(x, y),
@@ -31,6 +29,7 @@ class CardEquipmentWidget extends BaseCardComponent
     this.isRival = isRival;
     this.x = x;
     this.y = y;
+    this.card = cardEquipment;
   }
 
   @override

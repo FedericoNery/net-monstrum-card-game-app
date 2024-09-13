@@ -10,6 +10,8 @@ class CardDigimon extends Card implements IColor {
   String color;
   int attackPoints;
   int healthPoints;
+  int currentAttackPoints = 0;
+  int currentHealthPoints = 0;
   Evolution? evolution;
   int energyCount;
 
@@ -17,6 +19,8 @@ class CardDigimon extends Card implements IColor {
       this.healthPoints, this.evolution, this.energyCount)
       : super(id) {
     type = "Digimon";
+    currentAttackPoints = attackPoints;
+    currentHealthPoints = healthPoints;
   }
 
   CardDigimon copyWith(
@@ -27,7 +31,7 @@ class CardDigimon extends Card implements IColor {
       int? healthPoints,
       Evolution? evolution,
       int? energyCount}) {
-    return CardDigimon(
+    var cardDigimon = CardDigimon(
       id ?? this.id,
       digimonName ?? this.digimonName,
       color ?? this.color,
@@ -36,6 +40,10 @@ class CardDigimon extends Card implements IColor {
       evolution ?? this.evolution,
       energyCount ?? this.energyCount,
     );
+
+    cardDigimon.currentAttackPoints = cardDigimon.attackPoints;
+    cardDigimon.currentHealthPoints = cardDigimon.healthPoints;
+    return cardDigimon;
   }
 
   String getDigimonImageFilename() {
@@ -84,6 +92,8 @@ class CardDigimon extends Card implements IColor {
       'color': color,
       'attackPoints': attackPoints,
       'healthPoints': healthPoints,
+      'currentAttackPoints': currentAttackPoints,
+      'currentHealthPoints': currentHealthPoints,
       'energyCount': energyCount,
       'evolution': evolution?.toJson(),
       "type": type,
@@ -101,6 +111,17 @@ class CardDigimon extends Card implements IColor {
         Evolution.getInstanceFromSocket(card["evolution"]),
         card["energyCount"]);
     cardDigimon.uniqueIdInGame = card["uniqueIdInGame"];
+    cardDigimon.currentAttackPoints = card.containsKey('currentAttackPoints')
+        ? card["currentAttackPoints"]
+        : cardDigimon.attackPoints;
+    cardDigimon.currentHealthPoints = card.containsKey('currentHealthPoints')
+        ? card["currentHealthPoints"]
+        : cardDigimon.healthPoints;
     return cardDigimon;
+  }
+
+  void resetCurrentAtkAndHpPoints() {
+    currentAttackPoints = attackPoints;
+    currentHealthPoints = healthPoints;
   }
 }

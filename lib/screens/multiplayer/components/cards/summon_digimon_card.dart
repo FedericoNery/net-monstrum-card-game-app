@@ -16,13 +16,13 @@ import 'package:net_monstrum_card_game/widgets/card_battle/styles/card_color_bor
 import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class SummonDigimonCardComponent extends BaseCardComponent
+class SummonDigimonCardComponent extends BaseCardComponent<CardSummonDigimon>
     with
         TapCallbacks,
         FlameBlocListenable<CardBattleMultiplayerBloc,
             CardBattleMultiplayerState> {
-  final CardSummonDigimon card;
-  SummonDigimonCardComponent(this.card, x, y, isHidden, isRival)
+  SummonDigimonCardComponent(
+      CardSummonDigimon cardSummonDigimon, x, y, isHidden, isRival)
       : super(
           size: isHidden ? Vector2(64, 85) : Vector2.all(64),
           position: Vector2(x, y),
@@ -31,6 +31,7 @@ class SummonDigimonCardComponent extends BaseCardComponent
     this.isRival = isRival;
     this.x = x;
     this.y = y;
+    this.card = cardSummonDigimon;
   }
 
   @override

@@ -47,8 +47,8 @@ class BattleCardGameAdapter {
     int apPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
     int apRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
 
-    int hpPlayer = flutterMap["gameData"]["game"]["field1"]["attackPoints"];
-    int hpRival = flutterMap["gameData"]["game"]["field2"]["attackPoints"];
+    int hpPlayer = flutterMap["gameData"]["game"]["field1"]["healthPoints"];
+    int hpRival = flutterMap["gameData"]["game"]["field2"]["healthPoints"];
 
     int wonRoundsPlayer = flutterMap["gameData"]["game"]["roundsPlayer1"];
     int wonRoundsRival = flutterMap["gameData"]["game"]["roundsPlayer2"];

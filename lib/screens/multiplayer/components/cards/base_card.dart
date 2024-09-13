@@ -2,13 +2,13 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 
-abstract class BaseCardComponent extends SpriteComponent {
+abstract class BaseCardComponent<T extends Card> extends SpriteComponent {
   bool isHidden = false;
   double x = 0;
   double y = 0;
   bool isSelected = false;
   bool isRival = false;
-  Card? card;
+  late T card;
 
   BaseCardComponent({required Vector2 size, required Vector2 position})
       : super(size: size, position: position);

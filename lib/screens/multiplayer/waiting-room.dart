@@ -25,15 +25,6 @@ class _WaitingRoomState extends State<WaitingRoom> {
     super.initState();
     print("ENTROOOO");
     socket.on('start game', (data) {
-      print(data);
-
-/*       Tamer playerTamer =
-          Tamer(player.decksAggregations[0].cards, player.user.username);
-      Tamer rivalTamer =
-          Tamer(rival.decksAggregations[0].cards, rival.user.username);
-      BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer); */
-
-      print(data);
       var jsonMap = json.decode(data);
       Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
 

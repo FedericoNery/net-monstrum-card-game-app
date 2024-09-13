@@ -16,14 +16,13 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../../../../domain/card/card_digimon.dart';
 
-class DigimonCardComponent extends BaseCardComponent
+class DigimonCardComponent extends BaseCardComponent<CardDigimon>
     with
         TapCallbacks,
         FlameBlocListenable<CardBattleMultiplayerBloc,
             CardBattleMultiplayerState> {
-  final CardDigimon card;
   DigimonCardComponent(
-      this.card, double x, double y, bool isHidden, bool isRival)
+      CardDigimon cardDigimon, double x, double y, bool isHidden, bool isRival)
       : super(
           size: isHidden ? Vector2(64, 85) : Vector2.all(64),
           position: Vector2(x, y),
@@ -32,6 +31,7 @@ class DigimonCardComponent extends BaseCardComponent
     this.isRival = isRival;
     this.x = x;
     this.y = y;
+    this.card = cardDigimon;
   }
 
   @override
@@ -48,7 +48,7 @@ class DigimonCardComponent extends BaseCardComponent
       drawCardColor(canvas, card.color);
       drawBackgroundApHp(canvas);
 
-      drawApHpTexts(canvas, card.attackPoints, card.healthPoints);
+      drawApHpTexts(canvas, card.currentAttackPoints, card.currentHealthPoints);
     }
   }
 
@@ -75,7 +75,7 @@ class DigimonCardComponent extends BaseCardComponent
 
   bool isEnabledToEquip(int internalCardId) {
     return bloc.state.battleCardGame.isUpgradePhase() &&
-        bloc.state.battleCardGame.player.hand
+        bloc.state.battleCardGame.player.digimonZone
             .isDigimonCardByInternalId(internalCardId);
   }
 

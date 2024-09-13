@@ -11,6 +11,7 @@ import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart'
 import '../../../../domain/card/card_base.dart';
 import '../../../../domain/card/card_digimon.dart';
 import '../../../../domain/card/card_equipment.dart';
+import '../../../../domain/game/digimon_zone.dart';
 import '../../../../domain/game/tamer.dart';
 
 //TODO :: analizar de renombrar la clase
@@ -139,6 +140,51 @@ class CardWidgetFactory {
     }
     if (!card6.isRemoved && tamer.wasSummonedCard(card6.getUniqueCardId())) {
       card6.reveal();
+      card6.update(1);
+    }
+  }
+
+  void updateCurrentPoints(DigimonZone digimonZone) {
+    if (card1.isMounted &&
+        card1.card!.isDigimonCard() &&
+        digimonZone.hasCardById(card1.card!.uniqueIdInGame!)) {
+      var cardUpdated = digimonZone.getCardById(card1.card!.uniqueIdInGame!);
+      card1.card = cardUpdated;
+      card1.update(1);
+    }
+    if (card2.isMounted &&
+        card2.card!.isDigimonCard() &&
+        digimonZone.hasCardById(card2.card!.uniqueIdInGame!)) {
+      var cardUpdated = digimonZone.getCardById(card2.card!.uniqueIdInGame!);
+      card2.card = cardUpdated;
+      card2.update(1);
+    }
+    if (card3.isMounted &&
+        card3.card!.isDigimonCard() &&
+        digimonZone.hasCardById(card3.card!.uniqueIdInGame!)) {
+      var cardUpdated = digimonZone.getCardById(card3.card!.uniqueIdInGame!);
+      card3.card = cardUpdated;
+      card3.update(1);
+    }
+    if (card4.isMounted &&
+        card4.card!.isDigimonCard() &&
+        digimonZone.hasCardById(card4.card!.uniqueIdInGame!)) {
+      var cardUpdated = digimonZone.getCardById(card4.card!.uniqueIdInGame!);
+      card4.card = cardUpdated;
+      card4.update(1);
+    }
+    if (card5.isMounted &&
+        card5.card!.isDigimonCard() &&
+        digimonZone.hasCardById(card5.card!.uniqueIdInGame!)) {
+      var cardUpdated = digimonZone.getCardById(card5.card!.uniqueIdInGame!);
+      card5.card = cardUpdated;
+      card5.update(1);
+    }
+    if (card6.isMounted &&
+        card6.card!.isDigimonCard() &&
+        digimonZone.hasCardById(card6.card!.uniqueIdInGame!)) {
+      var cardUpdated = digimonZone.getCardById(card6.card!.uniqueIdInGame!);
+      card6.card = cardUpdated;
       card6.update(1);
     }
   }

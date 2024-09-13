@@ -17,10 +17,10 @@ class DigimonZone {
     cards.removeAt(index);
   }
 
-  int getAttackPoints(){
+  int getAttackPoints() {
     int attackPoints = 0;
-    for (CardDigimon card in cards){
-        attackPoints += card.attackPoints;
+    for (CardDigimon card in cards) {
+      attackPoints += card.attackPoints;
     }
 
     int evolutionAttackPoints = getEvolutionAttackPoints();
@@ -28,7 +28,7 @@ class DigimonZone {
     return attackPoints + evolutionAttackPoints;
   }
 
-  Map<String, int> getCardCounts(){
+  Map<String, int> getCardCounts() {
     Map<String, int> cardCounts = {};
     for (CardDigimon card in cards) {
       if (cardCounts.containsKey(card.digimonName)) {
@@ -48,16 +48,17 @@ class DigimonZone {
     for (String digimonName in cardCounts.keys) {
       int count = cardCounts[digimonName]!;
       if (count >= 3) {
-        CardDigimon card = cards.firstWhere((card) => card.digimonName == digimonName);
+        CardDigimon card =
+            cards.firstWhere((card) => card.digimonName == digimonName);
         totalAttackPoints += card.attackPoints * count;
       }
     }
     return totalAttackPoints;
   }
 
-  int getHealthPoints(){
+  int getHealthPoints() {
     int healthPoints = 0;
-    for (CardDigimon card in cards){
+    for (CardDigimon card in cards) {
       healthPoints += card.healthPoints;
     }
 
@@ -73,26 +74,44 @@ class DigimonZone {
     for (String digimonName in cardCounts.keys) {
       int count = cardCounts[digimonName]!;
       if (count >= 3) {
-        CardDigimon card = cards.firstWhere((card) => card.digimonName == digimonName);
+        CardDigimon card =
+            cards.firstWhere((card) => card.digimonName == digimonName);
         totalHealthPoints += card.healthPoints * count;
       }
     }
     return totalHealthPoints;
   }
 
-  void addEquipmentsEffect(List<EquipmentEffect> equipmentEffects){
-    for (EquipmentEffect equipmentEffect in equipmentEffects){
+  void addEquipmentsEffect(List<EquipmentEffect> equipmentEffects) {
+    for (EquipmentEffect equipmentEffect in equipmentEffects) {
       equipmentEffectsQueue.add(equipmentEffect);
     }
   }
 
-  void applyLastEquipmentEffectTo(CardDigimon cardDigimon){
+  void applyLastEquipmentEffectTo(CardDigimon cardDigimon) {
     EquipmentEffect equipmentEffect = equipmentEffectsQueue.removeLast();
     equipmentEffect.applyTo(cardDigimon);
   }
 
-  void applyEffectTo(int digimonCardUniqueId, EquipmentEffect equipmentEffect){
-    int indexCard = cards.indexWhere((card) => card.uniqueIdInGame == digimonCardUniqueId);
+  void applyEffectTo(int digimonCardUniqueId, EquipmentEffect equipmentEffect) {
+    int indexCard =
+        cards.indexWhere((card) => card.uniqueIdInGame == digimonCardUniqueId);
     cards[indexCard].applyEquipmentEffect(equipmentEffect);
+  }
+
+  bool isDigimonCardByInternalId(int internalCardId) {
+    var card =
+        cards.firstWhereOrNull((card) => card.uniqueIdInGame == internalCardId);
+    return card != null && card.isDigimonCard();
+  }
+
+  bool hasCardById(int internalCardId) {
+    var card =
+        cards.firstWhereOrNull((card) => card.uniqueIdInGame == internalCardId);
+    return card != null;
+  }
+
+  CardDigimon getCardById(int internalCardId) {
+    return cards.firstWhere((card) => card.uniqueIdInGame == internalCardId);
   }
 }

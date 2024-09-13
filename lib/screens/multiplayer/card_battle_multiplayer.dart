@@ -77,6 +77,13 @@ class CardBattleMultiplayer extends World
       updateBattleCardGameBloc(data);
     });
 
+    socket.on("AFTER ACTIVATED EQUIPMENT", (data) {
+      var jsonMap = json.decode(data);
+      Map<String, dynamic> flutterMap = Map<String, dynamic>.from(jsonMap);
+      var cardId = flutterMap["cardEquipmentId"];
+      removeCardAfterEquipmentActivation(cardId);
+    });
+
     socket.on("START_BATTLE", (data) {
       fadingText.addText("Battle Phase");
       updateBattleCardGameBloc(data);
@@ -235,6 +242,11 @@ class CardBattleMultiplayer extends World
 
   @override
   void onNewState(CardBattleMultiplayerState state) {
+    if (state.battleCardGame.isUpgradePhase()) {
+      updateDigimonCardsOnDigimonZone(state.battleCardGame.player.digimonZone,
+          state.battleCardGame.rival.digimonZone);
+    }
+
     if (state.battleCardGame.isDrawPhase() &&
         state.battleCardGame.decksShuffled &&
         state.battleCardGame.drawedCards &&
@@ -286,13 +298,6 @@ class CardBattleMultiplayer extends World
       }
       add(victoryMessage);
       remove(activateEquipmentButton);
-    }
-
-    if (state.battleCardGame.isUpgradePhase() &&
-        state.battleCardGame.selectedEquipmentCardId != null &&
-        state.battleCardGame.targetDigimonId != null) {
-      removeCardAfterEquipmentActivation(state.battleCardGame);
-      //bloc.add(ClearActivatedEquipmentCard());
     }
 
     if (state.battleCardGame.isUpgradePhase() &&
@@ -461,35 +466,29 @@ class CardBattleMultiplayer extends World
     //add(confirmUpgradePhaseButton);
   }
 
-  void removeCardAfterEquipmentActivation(BattleCardGame battleCardGame) {
+  void removeCardAfterEquipmentActivation(int cardId) {
     if (playerCards.card1.isMounted &&
-        playerCards.card1.card!.uniqueIdInGame ==
-            battleCardGame.selectedEquipmentCardId) {
+        playerCards.card1.card!.uniqueIdInGame == cardId) {
       remove(playerCards.card1);
     }
     if (playerCards.card2.isMounted &&
-        playerCards.card2.card!.uniqueIdInGame ==
-            battleCardGame.selectedEquipmentCardId) {
+        playerCards.card2.card!.uniqueIdInGame == cardId) {
       remove(playerCards.card2);
     }
     if (playerCards.card3.isMounted &&
-        playerCards.card3.card!.uniqueIdInGame ==
-            battleCardGame.selectedEquipmentCardId) {
+        playerCards.card3.card!.uniqueIdInGame == cardId) {
       remove(playerCards.card3);
     }
     if (playerCards.card4.isMounted &&
-        playerCards.card4.card!.uniqueIdInGame ==
-            battleCardGame.selectedEquipmentCardId) {
+        playerCards.card4.card!.uniqueIdInGame == cardId) {
       remove(playerCards.card4);
     }
     if (playerCards.card5.isMounted &&
-        playerCards.card5.card!.uniqueIdInGame ==
-            battleCardGame.selectedEquipmentCardId) {
+        playerCards.card5.card!.uniqueIdInGame == cardId) {
       remove(playerCards.card5);
     }
     if (playerCards.card6.isMounted &&
-        playerCards.card6.card!.uniqueIdInGame ==
-            battleCardGame.selectedEquipmentCardId) {
+        playerCards.card6.card!.uniqueIdInGame == cardId) {
       remove(playerCards.card6);
     }
   }
@@ -632,5 +631,11 @@ class CardBattleMultiplayer extends World
         rivalCards.card6.isMounted) {
       rivalCards.card6.removeFromParent();
     }
+  }
+
+  void updateDigimonCardsOnDigimonZone(
+      DigimonZone digimonZonePlayer, DigimonZone digimonZoneRival) {
+    playerCards.updateCurrentPoints(digimonZonePlayer);
+    rivalCards.updateCurrentPoints(digimonZoneRival);
   }
 }

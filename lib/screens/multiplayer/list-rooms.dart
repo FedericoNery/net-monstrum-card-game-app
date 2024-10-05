@@ -1,10 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:net_monstrum_card_game/adapters/list_card_adapter.dart';
+import 'package:net_monstrum_card_game/app_state.dart';
+import 'package:net_monstrum_card_game/main.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/list-rooms/button-widget-list.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/waiting-room.dart';
 import 'package:net_monstrum_card_game/services/aggregation_service.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
+import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ListRoomsPage extends StatefulWidget {
@@ -21,14 +26,24 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
 
   IO.Socket socket = SocketManager().socket!;
 
-  void _createRoom() {
-    AggregationService service = AggregationService();
-    Aggregation player = service.getAggregatioByUserId(1);
+  void _createRoom(BuildContext context) {
+    bool loadLocalDeckPlayer1 =
+        dotenv.env['LOAD_LOCAL_DECK_PLAYER1']?.toLowerCase() == 'true';
 
-    socket.emit('createNewGame', {
-      "deck": player.decksAggregations[0].cards,
-      "user": {"id": player.user.id, "username": player.user.username}
-    });
+    final appState = Provider.of<AppState>(context);
+
+    socket.emit(
+        'createNewGame',
+        loadLocalDeckPlayer1
+            ? {
+                "deck": appState.castedDeckToMultiplayer,
+                "user": {"id": appState.userId, "username": appState.username}
+              }
+            : {
+                "deck": ListCardAdapter.getListOfCardsInstantiated(
+                    appState.selectedDeckToMultiplayer!),
+                "user": {"id": appState.userId, "username": appState.username}
+              });
   }
 
   void _refreshRooms() {
@@ -87,7 +102,7 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
       ),
       body: Center(child: MyButtonListWidget(roomsIds: _listRoomsIds)),
       floatingActionButton: FloatingActionButton(
-        onPressed: _createRoom,
+        onPressed: () => _createRoom(context),
         tooltip: 'Create Room',
         child: const Icon(Icons.add),
       ),

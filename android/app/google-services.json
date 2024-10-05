@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "497315054543",
+    "project_id": "nmcg-firebase",
+    "storage_bucket": "nmcg-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497315054543:android:c038b1c2d8a6892fc448ba",
+        "android_client_info": {
+          "package_name": "com.federiconery.net_monstrum_card_game"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAg12857VJB3_YLlbQBYQ_QW4JLlDlDBMc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

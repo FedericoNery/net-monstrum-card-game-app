@@ -14,6 +14,7 @@ class AppState extends ChangeNotifier {
   late List<CardBase.Card> castedDeckToMultiplayer;
   late int userId;
   late String username;
+  Map<String, dynamic>? userInformation;
 
   AppState() {
     AggregationService service = AggregationService();
@@ -30,5 +31,9 @@ class AppState extends ChangeNotifier {
 
   void setSelectedDeck(List<Map<String, dynamic>> deck) {
     _selectedDeckToMultiplayer = deck;
+  }
+
+  void setUserInformation(Map<String, dynamic> user) {
+    userInformation = user;
   }
 }

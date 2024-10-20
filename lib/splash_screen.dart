@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:net_monstrum_card_game/views/deck_editor_view.dart';
 import 'package:net_monstrum_card_game/views/deck_selector_view.dart';
 import 'package:net_monstrum_card_game/views/login_screen.dart';
+import 'package:net_monstrum_card_game/views/store.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -38,11 +39,14 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     if (skipSplashScreen) {
-      CardDeckEditor cardDeckEditor = CardDeckEditor();
-      return cardDeckEditor;
+      CardShop cardShop = CardShop();
+      return cardShop;
 
-      DeckSelectionScreen deckSelectionScreen = DeckSelectionScreen();
-      return deckSelectionScreen;
+/*       CardDeckEditor cardDeckEditor = CardDeckEditor();
+      return cardDeckEditor;
+ */
+      /* DeckSelectionScreen deckSelectionScreen = DeckSelectionScreen();
+      return deckSelectionScreen; */
     }
 
     return Scaffold(

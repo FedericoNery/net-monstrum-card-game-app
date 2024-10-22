@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/graphql/mutations.dart';
 import 'package:net_monstrum_card_game/graphql/queries.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
+import 'package:provider/provider.dart';
 
 import '../domain/editor_deck/card_deck_editor.dart';
 import '../domain/editor_deck/list_card_adapter.dart';
@@ -11,12 +13,16 @@ import '../widgets/deck_editor/deck_area.dart';
 import '../widgets/deck_editor/drop_area.dart';
 
 class DeckEditorScreen extends StatefulWidget {
+  String folderId;
+  DeckEditorScreen({required this.folderId});
+
   @override
   _DeckEditorScreenState createState() => _DeckEditorScreenState();
 }
 
 class _DeckEditorScreenState extends State<DeckEditorScreen> {
   List<CardDeckEditor> deck = [];
+  String localUserId = "";
 
   void _removeCardFromDeck(String cardId) {
     setState(() {
@@ -37,11 +43,11 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
     });
   }
 
-  void _onSaveDeck(RunMutation runMutation) {
+  void _onSaveDeck(RunMutation runMutation, String folderId) {
     List<String> cardsInput = deck.map((card) => card.id).toList();
     runMutation({
-      'userId': "670b45598d56cdba07bd0876",
-      'folderId': "6670647552c07bc9e106083d",
+      'userId': localUserId, //"670b45598d56cdba07bd0876",
+      'folderId': folderId, //"6670647552c07bc9e106083d",
       'cardIds': cardsInput,
     });
   }
@@ -49,13 +55,15 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
   @override
   Widget build(BuildContext context) {
     GraphQlClientManager graphQlClientManager = GraphQlClientManager();
+    final appState = Provider.of<AppState>(context);
+    String userId = appState.userInformation?["id"];
+
     return GraphQLProvider(
         client: graphQlClientManager.client,
         child: Query(
-            options:
-                QueryOptions(document: gql(getFolderById), variables: const {
-              "userId": "670b45598d56cdba07bd0876",
-              "folderId": "6670647552c07bc9e106083d",
+            options: QueryOptions(document: gql(getFolderById), variables: {
+              "userId": userId, //"670b45598d56cdba07bd0876",
+              "folderId": widget.folderId //"6670647552c07bc9e106083d",
             }),
             builder: (QueryResult result,
                 {VoidCallback? refetch, FetchMore? fetchMore}) {
@@ -83,6 +91,7 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                         folderCardsJson);
 
                 deck = cardsOfDeck;
+                localUserId = userId;
               }
 
               return Scaffold(
@@ -102,7 +111,8 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                       builder: (RunMutation runMutation, QueryResult? result) {
                         return IconButton(
                           icon: Icon(Icons.save),
-                          onPressed: () => _onSaveDeck(runMutation),
+                          onPressed: () =>
+                              _onSaveDeck(runMutation, widget.folderId),
                         );
                       },
                     ),

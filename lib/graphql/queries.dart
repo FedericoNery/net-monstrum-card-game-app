@@ -4,6 +4,7 @@ String getUserByIdQuery = """
     email
     username
     folders{
+      id
       cards{
         ... on CardDigimon {
           __typename
@@ -255,6 +256,19 @@ query getAvailableCardsToPurchase(\$userId: String!){
           targetScope
         }
     }
+  }
+}
+
+""";
+
+String getUserByEmail = """
+query getUserByEmail(\$email: String!){
+  getUserByEmail(email: \$email){
+    id
+    email
+    username
+    coins
+    role
   }
 }
 

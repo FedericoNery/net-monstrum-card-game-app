@@ -26,23 +26,27 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
 
   IO.Socket socket = SocketManager().socket!;
 
-  void _createRoom(BuildContext context) {
+  void _createRoom(Map<String, dynamic> roomParameters) {
     bool loadLocalDeckPlayer1 =
         dotenv.env['LOAD_LOCAL_DECK_PLAYER1']?.toLowerCase() == 'true';
-
-    final appState = Provider.of<AppState>(context);
 
     socket.emit(
         'createNewGame',
         loadLocalDeckPlayer1
             ? {
-                "deck": appState.castedDeckToMultiplayer,
-                "user": {"id": appState.userId, "username": appState.username}
+                "deck": roomParameters["castedDeckToMultiplayer"],
+                "user": {
+                  "id": roomParameters["userId"],
+                  "username": roomParameters["username"]
+                }
               }
             : {
                 "deck": ListCardAdapter.getListOfCardsInstantiated(
-                    appState.selectedDeckToMultiplayer!),
-                "user": {"id": appState.userId, "username": appState.username}
+                    roomParameters["selectedDeckToMultiplayer"]),
+                "user": {
+                  "id": roomParameters["userId"],
+                  "username": roomParameters["username"]
+                }
               });
   }
 
@@ -88,6 +92,14 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+    var roomParameters = {
+      "castedDeckToMultiplayer": appState.castedDeckToMultiplayer,
+      "userId": appState.userId,
+      "username": appState.username,
+      "selectedDeckToMultiplayer": appState.selectedDeckToMultiplayer!
+    };
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -102,7 +114,8 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
       ),
       body: Center(child: MyButtonListWidget(roomsIds: _listRoomsIds)),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _createRoom(context),
+        heroTag: "fabCreateRoom",
+        onPressed: () => _createRoom(roomParameters),
         tooltip: 'Create Room',
         child: const Icon(Icons.add),
       ),

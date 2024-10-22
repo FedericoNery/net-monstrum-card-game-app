@@ -6,6 +6,7 @@ import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
 import 'package:net_monstrum_card_game/services/firebase_auth_service.dart';
 import 'package:net_monstrum_card_game/services/user_service.dart';
 import 'package:net_monstrum_card_game/views/deck_selector_view.dart';
+import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:provider/provider.dart';
 
 class GoogleSignInButtonState extends StatefulWidget {
@@ -18,6 +19,7 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
   Widget build(BuildContext context) {
     GraphQlClientManager graphQlClientManager = GraphQlClientManager();
     UsersService usersService = UsersService();
+    final appState = Provider.of<AppState>(context);
 
     return GraphQLProvider(
         client: graphQlClientManager.client,
@@ -40,21 +42,23 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
             ),
             onPressed: () async {
               try {
-                final user = await UserController.loginWithGoogle();
+                // final user = await UserController.loginWithGoogle();
+                final user = {"email": "email1@gmail.com"};
                 if (user != null && mounted) {
                   final userFromApp = await usersService
-                      .fetchUserWithGoogleToken("", user.email!);
+                      .fetchUserWithGoogleToken("", user["email"]!);
+                  //.fetchUserWithGoogleToken("", user.email!);
 
                   if (userFromApp == null) {
                     throw Exception("User not found in app");
                   } else {
-                    final appState = Provider.of<AppState>(context);
                     appState.setUserInformation(userFromApp);
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                         builder: (context) => Scaffold(
                               backgroundColor: Colors.white,
                               body: Center(
-                                child: DeckSelectionScreen(),
+                                //child: DeckSelectionScreen(),
+                                child: MenuPage(),
                               ),
                             )));
                   }

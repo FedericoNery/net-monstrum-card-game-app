@@ -40,18 +40,22 @@ class UsersService {
             );
 
     final QueryOptions options = QueryOptions(
-        document: gql(getUserByIdQuery),
-        variables: {"id": "670f2cd4798b3b58a3eb08e3"});
+        document: gql(getUserByEmail), variables: {"email": email});
     try {
       final QueryResult result = await client.query(options);
       if (result.hasException) {
         print(result.exception.toString());
         return null;
-      } else {
-        final userData = result.data?['getUserById'];
-        print('User data: $userData');
-        return userData;
       }
+
+      final userData = result.data?['getUserByEmail'];
+
+      if (userData == null) {
+        throw Exception("Error usuario no encontrado");
+      }
+
+      print('User data: $userData');
+      return userData;
     } catch (error) {
       return null;
     }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/domain/store/card_item.dart';
 import 'package:net_monstrum_card_game/domain/store/list_card_adapter.dart';
 import 'package:net_monstrum_card_game/graphql/mutations.dart';
 import 'package:net_monstrum_card_game/graphql/queries.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
 import 'package:net_monstrum_card_game/widgets/deck_editor/card_color.dart';
+import 'package:provider/provider.dart';
 
 class CardShop extends StatefulWidget {
   @override
@@ -13,7 +15,7 @@ class CardShop extends StatefulWidget {
 }
 
 class _CardShopState extends State<CardShop> {
-  int coins = 100;
+  int coins = 0;
   bool wasFetched = false;
   List<CardItem> cards = [];
   String lastCardIdPurchased = "";
@@ -26,9 +28,8 @@ class _CardShopState extends State<CardShop> {
         coins -= card.price;
       }); */
       lastCardIdPurchased = card.id;
-      userIdLocal = "670f2cd4798b3b58a3eb08e3";
-      runMutation(
-          {"cardIdToPurchase": card.id, "userId": "670f2cd4798b3b58a3eb08e3"});
+      //userIdLocal = "670f2cd4798b3b58a3eb08e3";
+      runMutation({"cardIdToPurchase": card.id, "userId": userIdLocal});
     }
   }
 
@@ -105,16 +106,17 @@ class _CardShopState extends State<CardShop> {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+    String userId = appState.userInformation?["id"];
     GraphQlClientManager graphQlClientManager = GraphQlClientManager();
 
     return GraphQLProvider(
         client: graphQlClientManager.client,
         child: Query(
-            options: QueryOptions(
-                document: gql(getStoreCardsByUserId),
-                variables: const {
-                  "userId": "670f2cd4798b3b58a3eb08e3",
-                }),
+            options:
+                QueryOptions(document: gql(getStoreCardsByUserId), variables: {
+              "userId": userId,
+            }),
             builder: (QueryResult result,
                 {VoidCallback? refetch, FetchMore? fetchMore}) {
               if (result.hasException) {
@@ -126,8 +128,6 @@ class _CardShopState extends State<CardShop> {
               }
 
               if (!wasFetched) {
-                print("wasFetched");
-                print(wasFetched);
                 List<dynamic> cardsJson = result
                     .data?['getAvailableCardsToPurchase'] as List<dynamic>;
 
@@ -144,8 +144,9 @@ class _CardShopState extends State<CardShop> {
                     ListCardAdapterFromApi.getListOfCardsInstantiated(
                         cardsMapped);
                 cards = cardsOfStore;
-                print(cardsOfStore[0].ownedCount);
                 wasFetched = true;
+                coins = appState.userInformation?["coins"];
+                userIdLocal = userId;
               }
               return Scaffold(
                 appBar: AppBar(title: Text('Comprar Cartas'), actions: [

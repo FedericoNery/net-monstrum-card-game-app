@@ -22,12 +22,12 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     if (!skipSplashScreen) {
-      Timer(Duration(seconds: 3), () {
+      /*  Timer(Duration(seconds: 3), () {
         DeckSelectionScreen deckSelectionScreen = DeckSelectionScreen();
 
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => deckSelectionScreen));
-      });
+      }); */
     }
   }
 

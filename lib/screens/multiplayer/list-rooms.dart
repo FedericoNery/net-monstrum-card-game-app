@@ -13,9 +13,10 @@ import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ListRoomsPage extends StatefulWidget {
-  const ListRoomsPage({super.key, required this.title});
-
   final String title;
+  Function onNavigation;
+
+  ListRoomsPage({super.key, required this.title, required this.onNavigation});
 
   @override
   State<ListRoomsPage> createState() => _ListRoomsPageState();
@@ -74,6 +75,7 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
             builder: (context) => WaitingRoom(
               gameId: objetoDeserializado['gameId'],
               socketId: objetoDeserializado["mySocketId"],
+              onNavigation: this.widget.onNavigation,
             ),
           ));
     });
@@ -112,7 +114,9 @@ class _ListRoomsPageState extends State<ListRoomsPage> {
           ),
         ],
       ),
-      body: Center(child: MyButtonListWidget(roomsIds: _listRoomsIds)),
+      body: Center(
+          child: MyButtonListWidget(
+              roomsIds: _listRoomsIds, onNavigation: widget.onNavigation)),
       floatingActionButton: FloatingActionButton(
         heroTag: "fabCreateRoom",
         onPressed: () => _createRoom(roomParameters),

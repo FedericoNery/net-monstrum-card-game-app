@@ -7,7 +7,7 @@ import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/splash_screen.dart';
 import 'package:provider/provider.dart';
 
-import 'firebase_options.dart';
+import 'infrastructure/firebase_options.dart';
 
 // ...
 
@@ -43,6 +43,8 @@ void main() async {
   bool redirectToComponentsViewer =
       dotenv.env['REDIRECT_TO_COMPONENTS_VIEWER']?.toLowerCase() == 'true';
 
+  final _mainNavigatorKey = GlobalKey<NavigatorState>();
+
   runApp(
     ChangeNotifierProvider(
         create: (_) => AppState(),
@@ -51,7 +53,8 @@ void main() async {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: SplashScreen(), // Asegúrate de que tu pantalla esté aquí
+          navigatorKey: _mainNavigatorKey,
+          home: SplashScreen(),
         )),
   );
 

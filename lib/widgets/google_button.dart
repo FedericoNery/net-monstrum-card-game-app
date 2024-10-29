@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
-import 'package:net_monstrum_card_game/services/firebase_auth_service.dart';
 import 'package:net_monstrum_card_game/services/user_service.dart';
-import 'package:net_monstrum_card_game/views/deck_selector_view.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:provider/provider.dart';
 

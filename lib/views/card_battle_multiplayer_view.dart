@@ -13,6 +13,6 @@ class CardBattleMultiplayerView extends StatelessWidget {
     CardBattleComponentMultiplayer game =
         CardBattleComponentMultiplayer(battleCardGame);
 
-    return GameWidget(game: game);
+    return Scaffold(body: GameWidget(game: game));
   }
 }

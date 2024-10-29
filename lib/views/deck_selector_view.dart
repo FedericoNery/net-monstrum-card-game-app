@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
+import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/graphql/queries.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:net_monstrum_card_game/widgets/deck_selector/deck_list.dart';
@@ -11,7 +12,10 @@ import 'multiplayer_game_view.dart';
 
 class DeckSelectionScreen extends StatelessWidget {
   int redirectionOption = 0;
-  DeckSelectionScreen({required this.redirectionOption});
+  Function onNavigation;
+
+  DeckSelectionScreen(
+      {super.key, required this.redirectionOption, required this.onNavigation});
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +27,9 @@ class DeckSelectionScreen extends StatelessWidget {
     bool skipSelectorDeckScreen =
         dotenv.env['SKIP_SELECTOR_DECK_SCREEN']?.toLowerCase() == 'true';
 
-    if (skipSelectorDeckScreen) {
+    /* if (skipSelectorDeckScreen) {
       return MultiplayerGameView();
-    }
+    } */
 
     final HttpLink httpLink = HttpLink('http://localhost:5000/graphql');
 
@@ -66,7 +70,7 @@ class DeckSelectionScreen extends StatelessWidget {
                         [];
 
                 return Center(
-                  child: DeckList(decks, redirectionOption),
+                  child: DeckList(decks, redirectionOption, onNavigation),
                 );
               },
             ),

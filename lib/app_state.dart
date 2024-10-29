@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart' as CardBase;
 import 'package:net_monstrum_card_game/services/aggregation_service.dart';
 

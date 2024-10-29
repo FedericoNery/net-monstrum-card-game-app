@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
-import 'package:net_monstrum_card_game/views/deck_editor_view.dart';
+import 'package:net_monstrum_card_game/views/deck_editor.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:net_monstrum_card_game/views/multiplayer_game_view.dart';
 import 'package:net_monstrum_card_game/widgets/deck_selector/colors.dart';
@@ -13,13 +13,16 @@ class DeckItem extends StatefulWidget {
   final Map<String, Map<String, dynamic>> cards;
   final List<Map<String, dynamic>> originalDeckCards;
   final int redirectOption;
+  Function onNavigation = () {};
+
   DeckItem(
       {required this.deckId,
       required this.redirectOption,
       required this.deckName,
       required this.deckColors,
       required this.cards,
-      required this.originalDeckCards});
+      required this.originalDeckCards,
+      required this.onNavigation});
 
   @override
   _DeckItemState createState() => _DeckItemState();
@@ -66,7 +69,7 @@ class _DeckItemState extends State<DeckItem> {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // Cantidad de columnas
-                childAspectRatio: 3, // Relación de aspecto para cada carta
+                childAspectRatio: 8, // Relación de aspecto para cada carta
               ),
               itemCount: widget.cards.length,
               itemBuilder: (context, index) {
@@ -100,8 +103,12 @@ class _DeckItemState extends State<DeckItem> {
                 onPressed: () {
                   appState.setSelectedDeck(widget.originalDeckCards);
 
-                  _onDeckSelected(context, widget.originalDeckCards,
-                      widget.redirectOption, widget.deckId);
+                  _onDeckSelected(
+                      context,
+                      widget.originalDeckCards,
+                      widget.redirectOption,
+                      widget.deckId,
+                      widget.onNavigation);
                 },
                 child: Text('Seleccionar ${widget.deckName}'),
               ),
@@ -112,12 +119,12 @@ class _DeckItemState extends State<DeckItem> {
   }
 
   void _onDeckSelected(BuildContext context, List<Map<String, dynamic>> cards,
-      int redirectOption, String folderId) {
+      int redirectOption, String folderId, Function onNavigation) {
     if (redirectOption == REDIRECT_OPTIONS.TO_MULTIPLAYER) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MultiplayerGameView(),
+          builder: (context) => MultiplayerGameView(onNavigation),
         ),
       );
     }
@@ -126,7 +133,7 @@ class _DeckItemState extends State<DeckItem> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => CardDeckEditor(folderId: folderId),
+          builder: (context) => DeckEditorScreen(folderId: folderId),
         ),
       );
     }

@@ -13,8 +13,9 @@ import 'package:socket_io_common/src/util/event_emitter.dart';
 
 class MyButtonListWidget extends StatefulWidget {
   List<String> roomsIds;
+  Function onNavigation;
 
-  MyButtonListWidget({required this.roomsIds});
+  MyButtonListWidget({required this.roomsIds, required this.onNavigation});
 
   @override
   _MyButtonListWidgetState createState() => _MyButtonListWidgetState();
@@ -54,13 +55,16 @@ class _MyButtonListWidgetState extends State<MyButtonListWidget> {
           } else {
             battleCardGame = BattleCardGame(rivalTamer, playerTamer);
           } */
-
+          widget.onNavigation(battleCardGame);
           //Convertir a BattleCardGame o delegarlo en el otro componente
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => CardBattleMultiplayerView(
-                      battleCardGame: battleCardGame)));
+          /*  Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CardBattleMultiplayerView(
+                      battleCardGame: battleCardGame,
+                    )),
+            (Route<dynamic> route) => true,
+          ); */
         } as EventHandler);
   }
 

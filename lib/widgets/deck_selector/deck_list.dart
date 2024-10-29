@@ -4,13 +4,15 @@ import 'package:net_monstrum_card_game/widgets/deck_selector/deck_item.dart';
 class DeckList extends StatelessWidget {
   late List<Map<String, dynamic>> decks;
   late int redirectOption;
-  DeckList(this.decks, this.redirectOption, {super.key});
+  Function onNavigation;
+  DeckList(this.decks, this.redirectOption, this.onNavigation, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: decks
           .map((deck) => DeckItem(
+              onNavigation: onNavigation,
               deckId: deck['id'],
               redirectOption: redirectOption,
               deckName: deck['name'],

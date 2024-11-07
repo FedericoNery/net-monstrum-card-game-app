@@ -21,12 +21,12 @@ class CardBattleComponent extends FlameGame {
   @override
   Future<void> onLoad() async {
     final backgroundImage = await images.load("backgrounds/fondo5.jpeg");
-    final _imagesNames = [ParallaxImageData("backgrounds/fondo5.jpeg")];
+    final _imagesNames = [ParallaxImageData("backgrounds/fondo5-min.jpeg")];
 
     final screenSize = WidgetsBinding.instance!.window.physicalSize;
 
     final scaleX = screenSize.width / 850; //backgroundImage.width;
-    final scaleY = screenSize.height / 400; //backgroundImage.height;
+    final scaleY = screenSize.height / 500; //backgroundImage.height;
 
     final parallax = await loadParallaxComponent(_imagesNames,
         baseVelocity: Vector2(30, -20),
@@ -35,7 +35,7 @@ class CardBattleComponent extends FlameGame {
         repeat: ImageRepeat.repeat,
         scale: Vector2(scaleX, scaleY));
     add(parallax);
-    world = CardBattle();
+    world = CardBattle(scaleX); //screenSizeWidth
     camera.world = world;
     camera.moveTo(Vector2(400, 200));
     await add(FlameBlocProvider<CardBattleBloc, CardBattleState>(

@@ -166,6 +166,8 @@ class CardBattleMultiplayer extends World
     }
 
     fadingText = FadingTextComponent(
+        screenWidth:
+            100, //TODO REEMPLAZAR POR EL VALOR QUE LE PASE AL CONSTRUCTOR
         scale: Vector2.all(0.6),
         size: Vector2.all(10.0),
         position: Vector2(0, 185));

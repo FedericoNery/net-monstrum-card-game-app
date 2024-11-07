@@ -3,7 +3,8 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/list-rooms.dart';
 
 class MultiplayerGameView extends StatelessWidget {
-  MultiplayerGameView({super.key});
+  late Function onNavigation;
+  MultiplayerGameView(this.onNavigation, {super.key});
 /* 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +24,15 @@ class MultiplayerGameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+/*     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const ListRoomsPage(title: 'List Rooms Page'),
-    );
+    ); */
+
+    return ListRoomsPage(title: 'List Rooms Page', onNavigation: onNavigation);
   }
 }

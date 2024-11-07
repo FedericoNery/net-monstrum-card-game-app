@@ -3,13 +3,16 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
-import 'package:net_monstrum_card_game/domain/card/card_base.dart';
+import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/domain/card/card_base.dart' as cardBase;
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/rounded_rectangle_component.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_state.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/ap_hp.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/cards/digimon_card.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
 import 'package:net_monstrum_card_game/widgets/shared/fading_text.dart';
@@ -19,6 +22,8 @@ import '../../widgets/card_battle/color_counter.dart';
 import '../../widgets/card_battle/texts_counters_player.dart';
 import '../../widgets/card_battle/victory_message.dart';
 import '../../widgets/shared/button.dart';
+import '../../widgets/shared/icon_with_counter.dart';
+import 'dart:ui' as ui;
 
 class CardBattle extends World
     with HasGameRef, FlameBlocListenable<CardBattleBloc, CardBattleState> {
@@ -31,23 +36,53 @@ class CardBattle extends World
   late CardWidgetFactory playerCards;
   late CardWidgetFactory rivalCards;
 
-  final summonDigimonButton = DefaultButton('Summon Digimon');
+/*   final summonDigimonButton = DefaultButton('Summon Digimon');
   final activateEquipmentButton = DefaultButton('Activate Equipment');
   final confirmCompilationPhaseButton =
-      DefaultButton('Confirm compilation phase');
-  final passPhaseButton = DefaultButton('Pass');
+      DefaultButton('Confirm compilation phase'); */
 
-  late TextComponent apRival;
-  late TextComponent hpRival;
-  late TextComponent apPlayer;
-  late TextComponent hpPlayer;
+  final summonDigimonButton = InGameButton('Summon Digimon');
+  final activateEquipmentButton = InGameButton('Activate Equipment');
+  final confirmCompilationPhaseButton =
+      InGameButton('Confirm compilation phase');
+
+  late ApHpText apRival;
+  late ApHpText hpRival;
+  late ApHpText apPlayer;
+  late ApHpText hpPlayer;
   final ColorCounterInstances colorCounterInstances = ColorCounterInstances();
   late TextComponent roundsWinPlayer;
   late TextComponent roundsWinRival;
-  late List<TextComponent> textsCounters;
-  late List<TextComponent> textsCountersRival;
-  late TextsCounters texts;
+/*   late List<TextComponent> textsCounters;
+  late List<TextComponent> textsCountersRival; */
+/*   late TextsCounters texts; */
   late FadingTextComponent fadingText;
+
+  RectangleComponent squareBackgroundNumber = RectangleComponent.square(
+      position: Vector2.all(10),
+      size: 20,
+      paint: Paint()..color = Colors.blueGrey.shade900);
+
+  RectangleComponent squareBackgroundColor = RectangleComponent.square(
+      position: Vector2.all(50),
+      size: 20,
+      paint: Paint()..color = Colors.blueGrey.shade900);
+
+  RectanguloRedondeadoComponent inferiorBar = RectanguloRedondeadoComponent(
+      color: Color.fromRGBO(141, 149, 158, 1),
+      top: 365,
+      left: 100,
+      width: 510,
+      height: 35,
+      borderRadius: 4);
+
+  RectanguloRedondeadoComponent inferiorBarApHp = RectanguloRedondeadoComponent(
+      color: Color.fromRGBO(141, 149, 158, 1),
+      top: 365,
+      left: 630,
+      width: 120,
+      height: 35,
+      borderRadius: 4);
 
   bool addedCardsToUi = false;
   bool removedNotSummonedCards = false;
@@ -57,8 +92,8 @@ class CardBattle extends World
 
   double xLastPositionCard = 600;
   double yLastPositionCard = 250;
-
-  CardBattle();
+  double screenSizeWidth;
+  CardBattle(this.screenSizeWidth);
 
   int? selectedEquipmentCardIndex;
   List<EquipmentEffect> equipmentsEffectSelected = [];
@@ -77,12 +112,12 @@ class CardBattle extends World
     }
 
     fadingText = FadingTextComponent(
+        screenWidth: screenSizeWidth / 850,
         scale: Vector2.all(0.6),
         size: Vector2.all(10.0),
         position: Vector2(0, 185));
 
     victoryMessage = VictoryMessage();
-    texts = TextsCounters();
 
     roundsWinPlayer = TextComponent(
       text: 'W:${0}',
@@ -96,7 +131,7 @@ class CardBattle extends World
       position: Vector2(0, 0),
     );
 
-    apRival = TextComponent(
+    /*   apRival = TextComponent(
       text: 'AP:${0}',
       size: Vector2.all(10.0),
       position: Vector2(640, 0),
@@ -122,7 +157,7 @@ class CardBattle extends World
       size: Vector2.all(10.0),
       position: Vector2(700, 370),
       scale: Vector2.all(0.8),
-    );
+    ); */
 
     summonDigimonButton.position = Vector2(650, 50);
     summonDigimonButton.size = Vector2(100, 50);
@@ -132,13 +167,82 @@ class CardBattle extends World
     activateEquipmentButton.size = Vector2(100, 50);
     activateEquipmentButton.tapUpCallback = nextToBattlePhase;
 
-    confirmCompilationPhaseButton.position = Vector2(650, 50);
+    confirmCompilationPhaseButton.position = Vector2(650, 175);
     confirmCompilationPhaseButton.size = Vector2(100, 50);
     confirmCompilationPhaseButton.tapUpCallback = confirmCompilationPhase;
 
-    passPhaseButton.position = Vector2(650, 110);
-    passPhaseButton.size = Vector2(100, 50);
-    passPhaseButton.tapUpCallback = passPhase;
+    await add(inferiorBar);
+    await add(inferiorBarApHp);
+
+    RectanguloRedondeadoComponent inferiorBar2 = RectanguloRedondeadoComponent(
+        color: Color.fromRGBO(141, 149, 158, 1),
+        top: 0,
+        left: 100,
+        width: 510,
+        height: 35,
+        borderRadius: 4);
+
+    RectanguloRedondeadoComponent inferiorBarApHp2 =
+        RectanguloRedondeadoComponent(
+            color: Color.fromRGBO(141, 149, 158, 1),
+            top: 0,
+            left: 630,
+            width: 120,
+            height: 35,
+            borderRadius: 4);
+    await add(inferiorBar2);
+    await add(inferiorBarApHp2);
+
+    RectanguloRedondeadoComponent rect2 = RectanguloRedondeadoComponent(
+        color: const Color.fromRGBO(123, 24, 42, 1),
+        top: 0,
+        left: 0,
+        width: 100,
+        height: 200,
+        borderRadius: 0);
+
+    await add(rect2);
+    RectanguloRedondeadoComponent rect5 = RectanguloRedondeadoComponent(
+        color: const Color.fromRGBO(132, 74, 82, 1),
+        top: 105,
+        left: 0,
+        width: 90,
+        height: 90,
+        borderRadius: 4);
+    await add(rect5);
+    RectanguloRedondeadoComponent rect6 = RectanguloRedondeadoComponent(
+        color: const Color.fromRGBO(189, 140, 148, 1),
+        top: 110,
+        left: 0,
+        width: 85,
+        height: 80,
+        borderRadius: 4);
+    await add(rect6);
+
+    RectanguloRedondeadoComponent rect1 = RectanguloRedondeadoComponent(
+        color: const Color.fromRGBO(24, 49, 123, 1),
+        top: 200,
+        left: 0,
+        width: 100,
+        height: 200,
+        borderRadius: 0);
+    await add(rect1);
+    RectanguloRedondeadoComponent rect4 = RectanguloRedondeadoComponent(
+        color: const Color.fromRGBO(74, 90, 132, 1),
+        top: 205,
+        left: 0,
+        width: 90,
+        height: 90,
+        borderRadius: 4);
+    await add(rect4);
+    RectanguloRedondeadoComponent rect3 = RectanguloRedondeadoComponent(
+        color: const Color.fromRGBO(142, 157, 190, 1),
+        top: 210,
+        left: 0,
+        width: 85,
+        height: 80,
+        borderRadius: 4);
+    await add(rect3);
 
     await add(colorCounterInstances.blueCounter);
     await add(colorCounterInstances.redCounter);
@@ -154,25 +258,116 @@ class CardBattle extends World
     await add(colorCounterInstances.greenCounterRival);
     await add(roundsWinPlayer);
     await add(roundsWinRival);
+    /* await add(apRival);
+    await add(hpRival);
+    await add(apPlayer);
+    await add(hpPlayer); */
+    await add(confirmCompilationPhaseButton);
+    await add(fadingText);
+    apRival = ApHpText(
+      x: 620,
+      y: 5,
+      cantidad: 0,
+      text: 'AP',
+    );
+    apPlayer = ApHpText(
+      x: 620,
+      y: 370,
+      cantidad: 0,
+      text: 'AP',
+    );
+    hpRival = ApHpText(
+      x: 670,
+      y: 5,
+      cantidad: 0,
+      text: 'HP',
+    );
+    hpPlayer = ApHpText(
+      x: 670,
+      y: 370,
+      cantidad: 0,
+      text: 'HP',
+    );
     await add(apRival);
     await add(hpRival);
     await add(apPlayer);
     await add(hpPlayer);
-    await add(texts.blackCounterText);
-    await add(texts.blackCounterTextRival);
-    await add(texts.blueCounterText);
-    await add(texts.blueCounterTextRival);
-    await add(texts.brownCounterText);
-    await add(texts.brownCounterTextRival);
-    await add(texts.greenCounterText);
-    await add(texts.greenCounterTextRival);
-    await add(texts.redCounterText);
-    await add(texts.redCounterTextRival);
-    await add(texts.whiteCounterText);
-    await add(texts.whiteCounterTextRival);
-    await add(confirmCompilationPhaseButton);
-    await add(passPhaseButton);
-    await add(fadingText);
+
+    IconWithCounter deckPlayer = IconWithCounter(
+        cantidad: 0,
+        x: 670,
+        y: 240,
+        imageUrl: "assets/images/playmat/deck_icon.png");
+    IconWithCounter discardPlayer = IconWithCounter(
+        cantidad: 0,
+        x: 670,
+        y: 280,
+        imageUrl: "assets/images/playmat/trash_icon.png");
+    IconWithCounter handPlayer = IconWithCounter(
+        cantidad: 0,
+        x: 670,
+        y: 320,
+        imageUrl: "assets/images/playmat/hand_icon.png");
+
+    RectanguloRedondeadoComponent rect8 = RectanguloRedondeadoComponent(
+        color: const Color.fromRGBO(24, 49, 123, 1),
+        top: 225,
+        left: 650,
+        width: 100,
+        height: 140,
+        borderRadius: 0);
+    await add(rect8);
+
+    RectanguloRedondeadoComponent rect9 = RectanguloRedondeadoComponent(
+        color: const Color.fromRGBO(74, 90, 132, 1),
+        top: 230,
+        left: 660,
+        width: 90,
+        height: 130,
+        borderRadius: 4);
+    await add(rect9);
+
+    await add(deckPlayer);
+    await add(discardPlayer);
+    await add(handPlayer);
+
+    IconWithCounter deckRival = IconWithCounter(
+        cantidad: 0,
+        x: 670,
+        y: 50,
+        imageUrl: "assets/images/playmat/deck_icon.png");
+    IconWithCounter discardRival = IconWithCounter(
+        cantidad: 0,
+        x: 670,
+        y: 90,
+        imageUrl: "assets/images/playmat/trash_icon.png");
+    IconWithCounter handRival = IconWithCounter(
+        cantidad: 0,
+        x: 670,
+        y: 130,
+        imageUrl: "assets/images/playmat/hand_icon.png");
+
+    RectanguloRedondeadoComponent rect10 = RectanguloRedondeadoComponent(
+        color: const Color.fromRGBO(123, 24, 42, 1),
+        top: 35,
+        left: 650,
+        width: 100,
+        height: 140,
+        borderRadius: 0);
+    await add(rect10);
+
+    RectanguloRedondeadoComponent rect12 = RectanguloRedondeadoComponent(
+        color: const Color.fromRGBO(132, 74, 82, 1),
+        top: 40,
+        left: 660,
+        width: 90,
+        height: 130,
+        borderRadius: 4);
+    await add(rect12);
+
+    await add(deckRival);
+    await add(discardRival);
+    await add(handRival);
   }
 
   @override
@@ -239,12 +434,12 @@ class CardBattle extends World
   void updateDigimonZoneOnSummonDigimon(DigimonZone digimonZone) {
     List<CardDigimon> cards = digimonZone.cards;
 
-    Card? card1 = playerCards.card1.card;
-    Card? card2 = playerCards.card2.card;
-    Card? card3 = playerCards.card3.card;
-    Card? card4 = playerCards.card4.card;
-    Card? card5 = playerCards.card5.card;
-    Card? card6 = playerCards.card6.card;
+    cardBase.Card? card1 = playerCards.card1.card;
+    cardBase.Card? card2 = playerCards.card2.card;
+    cardBase.Card? card3 = playerCards.card3.card;
+    cardBase.Card? card4 = playerCards.card4.card;
+    cardBase.Card? card5 = playerCards.card5.card;
+    cardBase.Card? card6 = playerCards.card6.card;
     List<int?> cardsIdsList = [
       card1?.uniqueIdInGame,
       card2?.uniqueIdInGame,
@@ -322,36 +517,36 @@ class CardBattle extends World
     int? activatedEnergyCardId =
         bloc.state.battleCardGame.activatedEnergyCardId;
 
-    texts.blackCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.black}';
-    texts.blueCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.blue}';
-    texts.brownCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.brown}';
-    texts.greenCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.green}';
-    texts.redCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.red}';
-    texts.whiteCounterText.text =
-        '${bloc.state.battleCardGame.player.energiesCounters.white}';
+    colorCounterInstances.blackCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.black;
+    colorCounterInstances.blueCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.blue;
+    colorCounterInstances.brownCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.brown;
+    colorCounterInstances.greenCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.green;
+    colorCounterInstances.redCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.red;
+    colorCounterInstances.whiteCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.white;
 
-    texts.blackCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.black}';
-    texts.blueCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.blue}';
-    texts.brownCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.brown}';
-    texts.greenCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.green}';
-    texts.redCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.red}';
-    texts.whiteCounterTextRival.text =
-        '${bloc.state.battleCardGame.rival.energiesCounters.white}';
+    colorCounterInstances.blackCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.black;
+    colorCounterInstances.blueCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.blue;
+    colorCounterInstances.brownCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.brown;
+    colorCounterInstances.greenCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.green;
+    colorCounterInstances.redCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.red;
+    colorCounterInstances.whiteCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.white;
 
-    apRival.text = 'AP:${bloc.state.battleCardGame.rival.attackPoints}';
-    hpRival.text = 'HP:${bloc.state.battleCardGame.rival.healthPoints}';
-    apPlayer.text = 'AP:${bloc.state.battleCardGame.player.attackPoints}';
-    hpPlayer.text = 'HP:${bloc.state.battleCardGame.player.healthPoints}';
+    apRival.cantidad = bloc.state.battleCardGame.rival.attackPoints;
+    hpRival.cantidad = bloc.state.battleCardGame.rival.healthPoints;
+    apPlayer.cantidad = bloc.state.battleCardGame.player.attackPoints;
+    hpPlayer.cantidad = bloc.state.battleCardGame.player.healthPoints;
 
     roundsWinPlayer.text = 'W:${bloc.state.battleCardGame.player.roundsWon}';
     roundsWinRival.text = 'W:${bloc.state.battleCardGame.rival.roundsWon}';

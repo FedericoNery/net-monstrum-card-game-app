@@ -10,8 +10,14 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class WaitingRoom extends StatefulWidget {
   final String gameId;
+  final _mainNavigatorKey = GlobalKey<NavigatorState>();
   final String socketId;
-  WaitingRoom({required this.gameId, required this.socketId});
+  Function onNavigation;
+
+  WaitingRoom(
+      {required this.gameId,
+      required this.socketId,
+      required this.onNavigation});
 
   @override
   _WaitingRoomState createState() => _WaitingRoomState();
@@ -45,12 +51,18 @@ class _WaitingRoomState extends State<WaitingRoom> {
 
       BattleCardGame battleCardGame = BattleCardGame(playerTamer, rivalTamer);
 
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => CardBattleMultiplayerView(
-                    battleCardGame: battleCardGame,
-                  )));
+      //Navigator.push(
+
+      widget.onNavigation(battleCardGame);
+
+      /* Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => CardBattleMultiplayerView(
+                  battleCardGame: battleCardGame,
+                )),
+        (Route<dynamic> route) => true,
+      ); */
     });
   }
 

@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
             snapshot.data!.user != null) {
           // Token is valid, navigate to home screen
           appState.setUserInformation(snapshot.data!.user!);
+          //TODO: BUG???
           Future.microtask(
               () => Navigator.pushReplacementNamed(context, '/home'));
         } else if (snapshot.data!.isTokenExpiredOrNotExists) {

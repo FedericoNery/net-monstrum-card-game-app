@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/splash_screen.dart';
+import 'package:net_monstrum_card_game/views/single_player_game_view.dart';
 import 'package:provider/provider.dart';
 
 import 'infrastructure/firebase_options.dart';
@@ -29,7 +30,7 @@ void main() async {
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
 
-/*   SinglePlayerGameView singlePlayerGameView = SinglePlayerGameView();
+  /* SinglePlayerGameView singlePlayerGameView = SinglePlayerGameView();
   runApp(singlePlayerGameView); */
 
   /* SocketView socketView = SocketView();

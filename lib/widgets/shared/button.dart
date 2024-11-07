@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
 class ConfirmPhaseButton extends FlameGame {
@@ -79,8 +80,10 @@ class DefaultButton extends AdvancedButtonComponent with TapCallbacks {
   Future<void> onLoad() async {
     super.onLoad();
 
-    defaultLabel = TextComponent(text: defaultText, size: Vector2.all(5), scale: Vector2.all(0.5));
-    disabledLabel = TextComponent(text: 'Disabled button', size: Vector2.all(5));
+    defaultLabel = TextComponent(
+        text: defaultText, size: Vector2.all(5), scale: Vector2.all(0.5));
+    disabledLabel =
+        TextComponent(text: 'Disabled button', size: Vector2.all(5));
 
     defaultSkin = RoundedRectComponent()
       ..setColor(const Color.fromRGBO(0, 200, 0, 1));
@@ -137,5 +140,69 @@ class RoundedRectComponent extends PositionComponent with HasPaint {
       ),
       paint,
     );
+  }
+}
+
+class InGameButton extends PositionComponent with TapCallbacks {
+  final String defaultText;
+  VoidCallback? tapUpCallback;
+
+  late final TextComponent defaultLabel;
+  late final RectangleComponent defaultSkin;
+  late final RectangleComponent hoverSkin;
+  late final RectangleComponent downSkin;
+  late final RectangleComponent disabledSkin;
+
+  InGameButton(this.defaultText, {this.tapUpCallback}) {
+    size = Vector2(100, 30); // Tamaño del botón
+  }
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+
+    defaultSkin = RectangleComponent(
+      size: size,
+      paint: Paint()
+        ..color = const Color(0xFF001F5A)
+        ..style = PaintingStyle.fill,
+    );
+
+    final border = RectangleComponent(
+      size: size,
+      paint: Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+
+    defaultLabel = TextBoxComponent(
+      text: defaultText,
+      anchor: Anchor.center,
+      position: size / 2,
+      boxConfig: TextBoxConfig(
+        maxWidth: size.x - 20,
+        timePerChar: 0.08,
+        growingBox: true,
+      ),
+      textRenderer: TextPaint(
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+
+    add(defaultSkin);
+    add(border);
+    add(defaultLabel);
+  }
+
+  @override
+  void onTapDown(_) {
+    if (tapUpCallback != null) {
+      tapUpCallback!();
+    }
   }
 }

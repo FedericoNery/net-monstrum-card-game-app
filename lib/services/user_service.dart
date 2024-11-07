@@ -1,3 +1,4 @@
+import 'package:net_monstrum_card_game/graphql/mutations.dart';
 import 'package:net_monstrum_card_game/graphql/queries.dart';
 
 import '../domain/data/user.dart';
@@ -23,8 +24,36 @@ class UsersService {
     return _usersList.firstWhere((usuario) => usuario.id == id);
   }
 
-  Future<Map<String, dynamic>?> fetchUserWithGoogleToken(
-      String token, String email) async {
+  Future<User?> createUserWithEmail(String email) async {
+    final HttpLink httpLink = HttpLink('http://localhost:5000/graphql');
+    final GraphQLClient client =
+        GraphQLClient(cache: GraphQLCache(), link: httpLink
+            /* link: link, */
+            );
+
+    final MutationOptions options = MutationOptions(
+        document: gql(signInWithEmail), variables: {"email": email});
+    try {
+      final QueryResult result = await client.mutate(options);
+      if (result.hasException) {
+        print(result.exception.toString());
+        return null;
+      }
+
+      final userData = result.data?['signInWithEmail'];
+
+      if (userData == null) {
+        throw Exception("Error usuario no encontrado");
+      }
+
+      print('User data: $userData');
+      return userData['access_token'];
+    } catch (error) {
+      return null;
+    }
+  }
+
+  Future<String?> fetchUserWithGoogleToken(String token, String email) async {
     final HttpLink httpLink = HttpLink('http://localhost:5000/graphql');
 
     // Agregar el token a los headers
@@ -39,23 +68,23 @@ class UsersService {
             /* link: link, */
             );
 
-    final QueryOptions options = QueryOptions(
-        document: gql(getUserByEmail), variables: {"email": email});
+    final MutationOptions options = MutationOptions(
+        document: gql(signInWithEmail), variables: {"email": email});
     try {
-      final QueryResult result = await client.query(options);
+      final QueryResult result = await client.mutate(options);
       if (result.hasException) {
         print(result.exception.toString());
         return null;
       }
 
-      final userData = result.data?['getUserByEmail'];
+      final userData = result.data?['signInWithEmail'];
 
       if (userData == null) {
         throw Exception("Error usuario no encontrado");
       }
 
       print('User data: $userData');
-      return userData;
+      return userData['access_token'];
     } catch (error) {
       return null;
     }

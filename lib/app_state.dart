@@ -13,6 +13,7 @@ class AppState extends ChangeNotifier {
   late List<CardBase.Card> castedDeckToMultiplayer;
   late int userId;
   late String username;
+  late String access_token;
   Map<String, dynamic>? userInformation;
 
   AppState() {
@@ -32,7 +33,8 @@ class AppState extends ChangeNotifier {
     _selectedDeckToMultiplayer = deck;
   }
 
-  void setUserInformation(Map<String, dynamic> user) {
+  void setUserInformation(Map<String, dynamic> user, String access_token) {
     userInformation = user;
+    access_token = access_token;
   }
 }

@@ -50,6 +50,7 @@ dependencies:
   firebase_auth: ^5.2.0
   google_sign_in: ^6.2.1
   shared_preferences: ^2.0.15
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:

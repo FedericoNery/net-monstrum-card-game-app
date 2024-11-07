@@ -24,3 +24,21 @@ mutation purchaseCard(\$cardIdToPurchase: String!, \$userId: String!) {
   }
 }
 """;
+
+String signInWithEmail = """
+mutation signInWithEmail(\$email: String!) {
+  signInWithEmail(email: \$email) {
+    access_token
+  }
+}
+""";
+
+String createUserWithEmail = """
+mutation createUserWithEmail(\$email: String!) {
+  createUserWithEmail(email: \$email) {
+    successfull
+    userAlreadyExist
+    hasError
+  }
+}
+""";

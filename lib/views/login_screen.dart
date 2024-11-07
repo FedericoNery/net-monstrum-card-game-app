@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/services/local_session.dart';
+import 'package:net_monstrum_card_game/views/create_user.dart';
+import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/google_button.dart';
@@ -28,12 +30,13 @@ class _LoginScreenState extends State<LoginScreen> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error checking login status'));
         } else if (!(snapshot.data!.isTokenExpiredOrNotExists) &&
-            snapshot.data!.user != null) {
+            snapshot.data!.user != null &&
+            snapshot.data!.token != "") {
           // Token is valid, navigate to home screen
-          appState.setUserInformation(snapshot.data!.user!);
-          //TODO: BUG???
-          Future.microtask(
-              () => Navigator.pushReplacementNamed(context, '/home'));
+          appState.setUserInformation(
+              snapshot.data!.user!, snapshot.data!.token);
+
+          return MenuPage();
         } else if (snapshot.data!.isTokenExpiredOrNotExists) {
           // Token is expired, navigate to login screen
           return Scaffold(
@@ -44,11 +47,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: GoogleSignInButtonState(),
               ));
         } else {
-          return Container(
-            child: const Text('Deberá crear una cuenta'),
-          );
+          return Scaffold(
+              appBar: AppBar(
+                title: const Text('Crear usuario'),
+              ),
+              body: Center(
+                child: CreateUserWidget(),
+              ));
         }
-        return Container();
       },
     );
   }

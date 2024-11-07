@@ -1,5 +1,4 @@
-import 'package:net_monstrum_card_game/domain/data/user.dart';
-import 'package:net_monstrum_card_game/services/user_service.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveUserSession(String token, DateTime expiryDate) async {
@@ -40,12 +39,10 @@ Future<UserFromLocalSession> getUserFromLocalSession() async {
     return UserFromLocalSession("", null, isTokenExpiredOrNotExists);
   }
 
-  UsersService usersService = UsersService();
-  // Desencriptar token
-  final user = {"email": "email1@gmail.com"};
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
 
-  final userFromApp =
-      await usersService.fetchUserWithGoogleToken("", user["email"]!);
+  Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
 
-  return UserFromLocalSession("", userFromApp, isTokenExpiredOrNotExists);
+  return UserFromLocalSession(token, decodedToken, isTokenExpiredOrNotExists);
 }

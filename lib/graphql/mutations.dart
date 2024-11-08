@@ -33,9 +33,13 @@ mutation signInWithEmail(\$email: String!) {
 }
 """;
 
-String createUserWithEmail = """
-mutation createUserWithEmail(\$email: String!) {
-  createUserWithEmail(email: \$email) {
+String createUserWithEmailAndUsername = """
+mutation createUserWithEmail(\$email: String!, \$username: String!) {
+  createUserByEmail(createUserInput: { email: \$email, username: \$username} ) {
+    result{
+      id
+      username
+    }
     successfull
     userAlreadyExist
     hasError

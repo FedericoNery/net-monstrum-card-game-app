@@ -16,39 +16,29 @@ class StyledButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.blue.shade900,
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        backgroundColor: Colors.blue.shade900,
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(8),
             bottomLeft: Radius.circular(8),
             topRight: Radius.circular(2),
             bottomRight: Radius.circular(2),
           ),
-          border: Border.all(color: Colors.white, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black,
-              offset: Offset(2, 2),
-              blurRadius: 4,
-            ),
-          ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              text,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontFamily: 'monospace', // Para un estilo retro
-              ),
-            ),
-          ],
+        side: const BorderSide(color: Colors.white, width: 1.5),
+        shadowColor: Colors.black,
+        elevation: 4,
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontFamily: 'monospace', // Estilo retro
         ),
       ),
     );
@@ -71,16 +61,26 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
     if (username.isEmpty) {
       // Mostrar un mensaje de error si el campo está vacío
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor ingresa un nombre de usuario')),
+        const SnackBar(content: Text('Por favor ingresa un nombre de usuario')),
       );
     } else {
       try {
         final user = {"email": "email7@gmail.com"};
         // final user = await UserController.loginWithGoogle();
-        await usersService.createUserWithEmail(user["email"]!);
+        final resultMutation =
+            await usersService.createUserWithEmail(user["email"]!, username);
+
         //await usersService.createUserWithEmail(user.email!);
 
-        if (user != null && mounted) {
+        if (resultMutation != null && user != null && mounted) {
+          // Limpiar el campo de entrada después de enviar
+          //_usernameController.clear();
+
+          // Mostrar un mensaje de éxito
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Usuario creado exitosamente')),
+          );
+
           final accessTokenFromApi =
               await usersService.fetchUserWithGoogleToken("", user["email"]!);
           //.fetchUserWithGoogleToken("", user.email!);
@@ -118,14 +118,6 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
           error.toString(),
         )));
       }
-
-      // Limpiar el campo de entrada después de enviar
-      _usernameController.clear();
-
-      // Mostrar un mensaje de éxito
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Usuario creado exitosamente')),
-      );
     }
   }
 
@@ -133,25 +125,31 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextField(
-            controller: _usernameController,
-            decoration: InputDecoration(
-              labelText: 'Nombre de usuario',
-              border: OutlineInputBorder(),
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Crear usuario'),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre de usuario',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                StyledButton(
+                  text: "Crear usuario",
+                  onPressed: () => _createUser(appState),
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 16),
-          StyledButton(
-            text: "Crear usuario",
-            onPressed: () => _createUser(appState),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

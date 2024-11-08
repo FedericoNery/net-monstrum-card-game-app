@@ -18,6 +18,17 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
+  void _toCreateUserPage(BuildContext context) {
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => Scaffold(
+              backgroundColor: Colors.white,
+              body: Center(
+                //child: DeckSelectionScreen(),
+                child: CreateUserWidget(),
+              ),
+            )));
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -44,16 +55,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 title: const Text('Pantalla de Login'),
               ),
               body: Center(
-                child: GoogleSignInButtonState(),
-              ));
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                    GoogleSignInButtonState(),
+                    StyledButton(
+                      text: "Registrarse",
+                      onPressed: () => _toCreateUserPage(context),
+                    )
+                  ])));
         } else {
-          return Scaffold(
-              appBar: AppBar(
-                title: const Text('Crear usuario'),
-              ),
-              body: Center(
-                child: CreateUserWidget(),
-              ));
+          return Container();
         }
       },
     );

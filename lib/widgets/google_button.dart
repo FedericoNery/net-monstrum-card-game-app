@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
+import 'package:net_monstrum_card_game/services/local_session.dart';
 import 'package:net_monstrum_card_game/services/user_service.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:provider/provider.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class GoogleSignInButtonState extends StatefulWidget {
   @override
@@ -43,14 +45,27 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
                 // final user = await UserController.loginWithGoogle();
                 final user = {"email": "email1@gmail.com"};
                 if (user != null && mounted) {
-                  final userFromApp = await usersService
+                  final accessTokenFromApi = await usersService
                       .fetchUserWithGoogleToken("", user["email"]!);
                   //.fetchUserWithGoogleToken("", user.email!);
+                  bool isExpired = JwtDecoder.isExpired(accessTokenFromApi!);
 
-                  if (userFromApp == null) {
+                  if (isExpired) {
+                    throw Exception("Expired session");
+                  }
+
+                  if (accessTokenFromApi == null) {
                     throw Exception("User not found in app");
                   } else {
-                    appState.setUserInformation(userFromApp);
+                    Map<String, dynamic> decodedToken =
+                        JwtDecoder.decode(accessTokenFromApi);
+
+                    DateTime expirationDate =
+                        JwtDecoder.getExpirationDate(accessTokenFromApi);
+
+                    await saveUserSession(accessTokenFromApi, expirationDate);
+                    appState.setUserInformation(
+                        decodedToken, accessTokenFromApi);
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                         builder: (context) => Scaffold(
                               backgroundColor: Colors.white,

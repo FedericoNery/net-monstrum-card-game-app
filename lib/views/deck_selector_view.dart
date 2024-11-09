@@ -41,41 +41,39 @@ class DeckSelectionScreen extends StatelessWidget {
     );
 
     return GraphQLProvider(
-        client: client,
-        child: MaterialApp(
-          title: 'Seleccionar Mazo',
-          home: Scaffold(
-            appBar: AppBar(
-              title: Text(title),
-            ),
-            body: Query(
-              options: QueryOptions(
-                  document: gql(getUserByIdQuery),
-                  variables: {"id": appState.userInformation?["id"]}),
-              builder: (QueryResult result,
-                  {VoidCallback? refetch, FetchMore? fetchMore}) {
-                if (result.hasException) {
-                  return Text(result.exception.toString());
-                }
+      client: client,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: Query(
+          options: QueryOptions(
+              document: gql(getUserByIdQuery),
+              variables: {"id": appState.userInformation?["id"]}),
+          builder: (QueryResult result,
+              {VoidCallback? refetch, FetchMore? fetchMore}) {
+            if (result.hasException) {
+              return Text(result.exception.toString());
+            }
 
-                if (result.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            if (result.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-                List<Map<String, dynamic>> decks =
-                    (result.data?['getUserById']['folders'] as List?)
-                            ?.map((folder) {
-                          return folder as Map<String, dynamic>;
-                        }).toList() ??
-                        [];
+            List<Map<String, dynamic>> decks =
+                (result.data?['getUserById']['folders'] as List?)
+                        ?.map((folder) {
+                      return folder as Map<String, dynamic>;
+                    }).toList() ??
+                    [];
 
-                return Center(
-                  child: DeckList(decks, redirectionOption, onNavigation),
-                );
-              },
-            ),
-          ),
-        ));
+            return Center(
+              child: DeckList(decks, redirectionOption, onNavigation),
+            );
+          },
+        ),
+      ),
+    );
   }
 }
 

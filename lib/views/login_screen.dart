@@ -52,13 +52,16 @@ class _LoginScreenState extends State<LoginScreen> {
           // Token is expired, navigate to login screen
           return Scaffold(
               appBar: AppBar(
-                title: const Text('Pantalla de Login'),
+                title: const Text('Inicio de Sesión'),
               ),
               body: Center(
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                     GoogleSignInButtonState(),
+                    SizedBox(
+                      height: 20,
+                    ),
                     StyledButton(
                       text: "Registrarse",
                       onPressed: () => _toCreateUserPage(context),

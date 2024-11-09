@@ -71,23 +71,19 @@ class UsersService {
 
     final MutationOptions options = MutationOptions(
         document: gql(signInWithEmail), variables: {"email": email});
-    try {
-      final QueryResult result = await client.mutate(options);
-      if (result.hasException) {
-        print(result.exception.toString());
-        return null;
-      }
+    final QueryResult result = await client.mutate(options);
 
-      final userData = result.data?['signInWithEmail'];
-
-      if (userData == null) {
-        throw Exception("Error usuario no encontrado");
-      }
-
-      print('User data: $userData');
-      return userData['access_token'];
-    } catch (error) {
-      return null;
+    if (result.hasException) {
+      throw Exception(result.exception.toString());
     }
+
+    final userData = result.data?['signInWithEmail'];
+
+    if (userData == null) {
+      throw Exception("Error usuario no encontrado");
+    }
+
+    print('User data: $userData');
+    return userData['access_token'];
   }
 }

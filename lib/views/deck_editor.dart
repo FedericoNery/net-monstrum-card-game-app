@@ -145,6 +145,7 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                                     onTap: () => removeCard(card),
                                     child: CardWidget(
                                         card: card,
+                                        widthContainer: 70,
                                         heightImage: 45,
                                         fontSize: 8));
                               },
@@ -182,20 +183,16 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
 
                     return Expanded(
                       child: GridView.builder(
-                        padding: EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(4.0),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          childAspectRatio: 3 / 3,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                        ),
+                            crossAxisCount: 5),
                         itemCount: availableCardsTransformed.length,
                         itemBuilder: (context, index) {
                           final card = availableCardsTransformed[index];
                           return GestureDetector(
                               onTap: () => addCard(card),
                               child: CardWidget(
-                                  card: card, heightImage: 100, fontSize: 10));
+                                  card: card, heightImage: 100, fontSize: 16));
                         },
                       ),
                     );

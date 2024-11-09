@@ -40,6 +40,12 @@ class _CardShopState extends State<CardShop> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          surfaceTintColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+                color: CardColor.toFlutterColor(card.color), width: 2),
+            borderRadius: BorderRadius.circular(10),
+          ),
           title: Text(card.name),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -47,7 +53,7 @@ class _CardShopState extends State<CardShop> {
               Image.asset(card.imageUrl,
                   errorBuilder: (context, error, stackTrace) => Image.asset(
                       "assets/images/cards/card_back4.webp",
-                      height: 100)), // Imagen de la carta
+                      height: 100)),
               SizedBox(height: 10),
               Text('Precio: ${card.price} monedas'),
               Text('Propias: ${card.ownedCount}/${card.maxCopies}'),
@@ -85,6 +91,16 @@ class _CardShopState extends State<CardShop> {
                     ),
                     builder: (RunMutation runMutation, QueryResult? result) {
                       return TextButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                              color: Theme.of(context).primaryColor,
+                              width: 2, // Grosor del borde
+                            ),
+                          ),
+                        )),
                         onPressed: () {
                           buyCard(runMutation, card);
                         },
@@ -93,11 +109,20 @@ class _CardShopState extends State<CardShop> {
                     },
                   )),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cerrar'),
-            ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Cerrar'),
+                style: ButtonStyle(
+                    shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(
+                      color: Theme.of(context).primaryColor,
+                      width: 2, // Grosor del borde
+                    ),
+                  ),
+                ))),
           ],
         );
       },
@@ -157,7 +182,7 @@ class _CardShopState extends State<CardShop> {
                 ]),
                 body: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3), // Cambiado a 3 cartas por fila
+                      crossAxisCount: 4),
                   itemCount: cards.length,
                   itemBuilder: (context, index) {
                     final card = cards[index];
@@ -166,56 +191,69 @@ class _CardShopState extends State<CardShop> {
 
                     return GestureDetector(
                       onTap: () => showCardModal(card, refetch),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                              color: CardColor.toFlutterColor(card.color),
-                              width: 2), // Borde de la carta
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Stack(
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(card.imageUrl,
-                                    height: 100,
-                                    width: 100,
-                                    errorBuilder: (context, error,
-                                            stackTrace) =>
-                                        Image.asset(
-                                            "assets/images/cards/card_back4.webp",
-                                            height: 100)), // Imagen de la carta
-                                Text(card.name, style: TextStyle(fontSize: 16)),
-                              ],
-                            ),
-                            if (card.isNew)
+                      child: Center(
+                        child: SizedBox(
+                          width: 120, // Limita el ancho del Card
+                          child: Stack(
+                            clipBehavior: Clip
+                                .none, // Permite que el contador se superponga al borde
+                            children: [
+                              Card(
+                                surfaceTintColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color: CardColor.toFlutterColor(card.color),
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Imagen de la carta ocupando todo el ancho
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 100,
+                                      child: Image.asset(
+                                        card.imageUrl,
+                                        fit: BoxFit
+                                            .contain, // Ajuste de la imagen al ancho
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                Image.asset(
+                                          "assets/images/cards/card_back4.webp",
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                    // Nombre de la carta
+                                    Text(
+                                      card.name,
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          overflow: TextOverflow.ellipsis),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Contador de copias en la esquina superior derecha
                               Positioned(
-                                top: 5,
-                                right: 5,
+                                top: -10,
+                                right: -10,
                                 child: Container(
                                   padding: EdgeInsets.all(5),
-                                  color: Colors.green,
-                                  child: Text('Nueva',
-                                      style: TextStyle(color: Colors.white)),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    '${card.ownedCount}/${card.maxCopies}',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                               ),
-                            Positioned(
-                              bottom: 5,
-                              right: 5,
-                              child: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  '${card.ownedCount}/${card.maxCopies}',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );

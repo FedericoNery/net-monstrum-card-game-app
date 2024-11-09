@@ -116,7 +116,14 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  fonts:
+   - family: PixelDigivolve
+     fonts:
+       - asset: custom_fonts/fonts/PixelDigivolve.ttf
+       - asset: custom_fonts/fonts/PixelDigivolveItalic.ttf
+         style: italic
 
+  
 flutter_native_splash:
   color: "#ffffff"  # Color de fondo del splash screen
   image: assets/images/splash_image.png  # Ruta a la imagen

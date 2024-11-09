@@ -53,6 +53,7 @@ void main() async {
           title: 'Flutter Demo',
           theme: ThemeData(
             primarySwatch: Colors.blue,
+            fontFamily: 'PixelDigivolve',
           ),
           navigatorKey: _mainNavigatorKey,
           home: SplashScreen(),

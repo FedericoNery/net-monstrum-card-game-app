@@ -31,12 +31,18 @@ class _MenuPageState extends State<MenuPage> {
   final List<Widget> _screens = [];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index != _selectedIndex) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
 
+  @override
+  void initState() {
+    super.initState();
     _screens.addAll([
-      HomePage(),
+      const HomePage(),
       CardShop(),
       DeckSelectionScreen(
           redirectionOption: REDIRECT_OPTIONS.TO_EDIT_DECK,
@@ -52,7 +58,7 @@ class _MenuPageState extends State<MenuPage> {
     return Scaffold(
       appBar: _selectedIndex != 1 && _selectedIndex != 2 && _selectedIndex != 3
           ? AppBar(
-              title: Text('Card Game Menu'),
+              title: const Text('Net Monstrum Card Game'),
               centerTitle: true,
             )
           : null,
@@ -88,44 +94,6 @@ class _MenuPageState extends State<MenuPage> {
             Colors.grey, // Color de los íconos y textos no seleccionados
         onTap: _onItemTapped,
       ),
-      // Floating button for drawer
-      floatingActionButton: (_selectedIndex != 3 && _selectedIndex != 2)
-          ? FloatingActionButton(
-              heroTag: 'fabUserInformation',
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Container(
-                      height: 200,
-                      child: const Column(
-                        children: [
-                          ListTile(
-                            leading: CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                  'https://via.placeholder.com/50'),
-                            ),
-                            title: Text('Nivel 11'),
-                            subtitle: Text('Progreso 75%'),
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.email),
-                            title: Text('Mensajes'),
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.card_giftcard),
-                            title: Text('Regalos'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-              child: Icon(Icons.account_circle),
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

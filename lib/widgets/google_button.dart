@@ -37,7 +37,7 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
               width: 24,
             ),
             label: const Text(
-              'Sign in with Google',
+              'Iniciar sesión con Google',
               style: TextStyle(fontSize: 16),
             ),
             onPressed: () async {

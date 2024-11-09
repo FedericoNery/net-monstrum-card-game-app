@@ -8,37 +8,43 @@ import 'package:provider/provider.dart';
 
 import '../services/user_service.dart';
 
-class StyledButton extends StatelessWidget {
+class StyledButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
 
-  StyledButton({required this.text, required this.onPressed});
+  const StyledButton({Key? key, required this.text, required this.onPressed})
+      : super(key: key);
+
+  @override
+  _StyledButtonState createState() => _StyledButtonState();
+}
+
+class _StyledButtonState extends State<StyledButton> {
+  Color _backgroundColor = Colors.blue.shade900;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onPressed,
+      onHover: (isHovered) {
+        setState(() {
+          _backgroundColor =
+              isHovered ? Color.fromARGB(255, 0, 42, 91) : Colors.blue.shade900;
+        });
+      },
+      onPressed: widget.onPressed,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        backgroundColor: Colors.blue.shade900,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(8),
-            bottomLeft: Radius.circular(8),
-            topRight: Radius.circular(2),
-            bottomRight: Radius.circular(2),
-          ),
+        minimumSize: Size(240, 50),
+        backgroundColor: _backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
-        side: const BorderSide(color: Colors.white, width: 1.5),
-        shadowColor: Colors.black,
-        elevation: 4,
+        side: BorderSide(color: Colors.grey),
       ),
       child: Text(
-        text,
+        widget.text,
         style: const TextStyle(
           color: Colors.white,
           fontSize: 18,
-          fontFamily: 'monospace', // Estilo retro
         ),
       ),
     );

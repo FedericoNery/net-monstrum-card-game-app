@@ -9,7 +9,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     //TODO COINS
-    //String coins = appState.userInformation?["coins"]!.toString() ?? "-";
+    String coins = appState.userInformation?["coins"]!.toString() ?? "-";
     String username = appState.userInformation?["username"]!.toString() ?? "-";
     String email = appState.userInformation?["email"]!.toString() ?? "-";
 
@@ -47,12 +47,12 @@ class HomePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            const Row(
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.monetization_on),
-                SizedBox(width: 10),
-                Text('Coins -'),
+                const Icon(Icons.monetization_on),
+                const SizedBox(width: 10),
+                Text('Coins $coins'),
               ],
             ),
           ],

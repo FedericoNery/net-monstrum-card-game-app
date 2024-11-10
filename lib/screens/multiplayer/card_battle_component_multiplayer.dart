@@ -12,8 +12,9 @@ import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_sta
 
 class CardBattleComponentMultiplayer extends FlameGame {
   final BattleCardGame battleCardGame;
+  Function redirectToHomePage;
 
-  CardBattleComponentMultiplayer(this.battleCardGame)
+  CardBattleComponentMultiplayer(this.battleCardGame, this.redirectToHomePage)
       : super(
           camera: CameraComponent.withFixedResolution(width: 850, height: 400),
         );
@@ -35,7 +36,7 @@ class CardBattleComponentMultiplayer extends FlameGame {
         repeat: ImageRepeat.repeat,
         scale: Vector2(scaleX, scaleY));
     add(parallax);
-    world = CardBattleMultiplayer();
+    world = CardBattleMultiplayer(scaleX, redirectToHomePage);
     camera.world = world;
     camera.moveTo(Vector2(400, 200));
     await add(FlameBlocProvider<CardBattleMultiplayerBloc,

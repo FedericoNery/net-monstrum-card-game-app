@@ -9,6 +9,8 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     //TODO COINS
+    String avatarUrl =
+        appState.userInformation?["avatarUrl"]!.toString() ?? "-";
     String coins = appState.userInformation?["coins"]!.toString() ?? "-";
     String username = appState.userInformation?["username"]!.toString() ?? "-";
     String email = appState.userInformation?["email"]!.toString() ?? "-";
@@ -25,11 +27,11 @@ class HomePage extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   minRadius: 40,
                   maxRadius: 80,
                   backgroundImage:
-                      NetworkImage('https://via.placeholder.com/50'),
+                      AssetImage('assets/images/avatars/$avatarUrl'),
                 ),
                 const SizedBox(width: 10),
                 Column(

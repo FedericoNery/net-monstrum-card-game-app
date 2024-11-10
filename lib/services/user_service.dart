@@ -24,7 +24,8 @@ class UsersService {
     return _usersList.firstWhere((usuario) => usuario.id == id);
   }
 
-  Future<Object?> createUserWithEmail(String email, String username) async {
+  Future<Object?> createUserWithEmail(
+      String email, String username, String avatarUrlSelected) async {
     final HttpLink httpLink = HttpLink('http://localhost:5000/graphql');
     final GraphQLClient client =
         GraphQLClient(cache: GraphQLCache(), link: httpLink
@@ -33,7 +34,11 @@ class UsersService {
 
     final MutationOptions options = MutationOptions(
         document: gql(createUserWithEmailAndUsername),
-        variables: {"email": email, "username": username});
+        variables: {
+          "email": email,
+          "username": username,
+          "avatarUrl": avatarUrlSelected
+        });
     final QueryResult result = await client.mutate(options);
     if (result.hasException) {
       print(result.exception.toString());

@@ -73,7 +73,47 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                 options: MutationOptions(
                   document: gql(updateFolder),
                   onCompleted: (dynamic resultData) {
-                    print(resultData);
+                    bool cardNotExist =
+                        resultData['purchaseCard']['cardNotExist'];
+                    bool folderNotFound =
+                        resultData['purchaseCard']['folderNotFound'];
+                    bool reachedMaxCopiesOfCard =
+                        resultData['purchaseCard']['reachedMaxCopiesOfCard'];
+                    bool successful = resultData['purchaseCard']['successful'];
+
+                    if (cardNotExist) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(
+                                'Error: Una o más cartas no se encontraron')),
+                      );
+                      return;
+                    }
+
+                    if (folderNotFound) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(
+                                'Error: No se encontró el mazo a actualizar')),
+                      );
+                      return;
+                    }
+
+                    if (reachedMaxCopiesOfCard) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(
+                                'Alcanzó la cantidad máxima de copias en una o más cartas')),
+                      );
+                      return;
+                    }
+
+                    if (successful) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('La edición del mazo fué exitosa')),
+                      );
+                    }
                   },
                   onError: (error) => print(error),
                 ),

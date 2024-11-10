@@ -18,35 +18,35 @@ import '../../../../domain/game/tamer.dart';
 
 class CardsMeasures {
   static const offsetX = 100.0;
-  static const offsetYPlayer = 250.0;
-  static const card1x = offsetX + 10;
+  static const offsetYPlayer = 278.5;
+  static const card1x = offsetX + 1;
   static const card1y = offsetYPlayer;
-  static const card2x = offsetX + 100;
+  static const card2x = offsetX + 94;
   static const card2y = offsetYPlayer;
-  static const card3x = offsetX + 190;
+  static const card3x = offsetX + 184;
   static const card3y = offsetYPlayer;
-  static const card4x = offsetX + 280;
+  static const card4x = offsetX + 274;
   static const card4y = offsetYPlayer;
-  static const card5x = offsetX + 370;
+  static const card5x = offsetX + 364;
   static const card5y = offsetYPlayer;
-  static const card6x = offsetX + 450;
+  static const card6x = offsetX + 445;
   static const card6y = offsetYPlayer;
 
   static const OFFSET_Y_INITIAL = 250.0;
   static const OFFSET_X_INITIAL = -100.0;
 
-  static const offsetYCards = 25.0;
-  static const card1Rivalx = offsetX + 10;
+  static const offsetYCards = 35.0;
+  static const card1Rivalx = offsetX + 1;
   static const card1Rivaly = offsetYCards;
-  static const card2Rivalx = offsetX + 100;
+  static const card2Rivalx = offsetX + 94;
   static const card2Rivaly = offsetYCards;
-  static const card3Rivalx = offsetX + 190;
+  static const card3Rivalx = offsetX + 184;
   static const card3Rivaly = offsetYCards;
-  static const card4Rivalx = offsetX + 280;
+  static const card4Rivalx = offsetX + 274;
   static const card4Rivaly = offsetYCards;
-  static const card5Rivalx = offsetX + 370;
+  static const card5Rivalx = offsetX + 364;
   static const card5Rivaly = offsetYCards;
-  static const card6Rivalx = offsetX + 450;
+  static const card6Rivalx = offsetX + 445;
   static const card6Rivaly = offsetYCards;
 }
 

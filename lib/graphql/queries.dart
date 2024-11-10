@@ -269,6 +269,7 @@ query getUserByEmail(\$email: String!){
     username
     coins
     role
+    avatarUrl
   }
 }
 

@@ -86,6 +86,7 @@ flutter:
     - assets/images/energies/
     - assets/images/summon_digimon/
     - assets/images/backgrounds/
+    - assets/images/avatars/
     - assets/audio/sounds/
     - assets/images/splash_image.png 
     - assets/images/google-logo.png

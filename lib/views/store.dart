@@ -70,6 +70,39 @@ class _CardShopState extends State<CardShop> {
                         // Controlar los mensajes que están en la mutation
                         bool successful =
                             resultData['purchaseCard']['successful'];
+
+                        bool cardNotFound =
+                            resultData['purchaseCard']['cardNotFound'];
+                        bool insuficientCoins =
+                            resultData['purchaseCard']['insuficientCoins'];
+                        bool reachedMaxCopiesOfCard = resultData['purchaseCard']
+                            ['reachedMaxCopiesOfCard'];
+
+                        if (cardNotFound) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Carta no encontrada')),
+                          );
+                          return;
+                        }
+
+                        if (insuficientCoins) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('No posee suficientes monedas')),
+                          );
+                          return;
+                        }
+
+                        if (reachedMaxCopiesOfCard) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Alcanzó la cantidad máxima de cartas')),
+                          );
+                          return;
+                        }
+
                         if (successful) {
                           final index = cards.indexWhere(
                               (card) => card.id == lastCardIdPurchased);
@@ -83,6 +116,11 @@ class _CardShopState extends State<CardShop> {
                               cards.removeAt(index);
                             }
                           }
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('La compra fué exitosa')),
+                          );
                           refetch?.call();
                           Navigator.of(context).pop();
                         }

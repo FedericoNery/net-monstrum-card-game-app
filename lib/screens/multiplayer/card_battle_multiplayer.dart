@@ -4,11 +4,11 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flutter/material.dart' as material;
 import 'package:net_monstrum_card_game/adapters/battle_card_game_adapter.dart';
 import 'package:net_monstrum_card_game/communication/socket_events_names.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
-import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/digimon_card.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/factories/card_widget_factory.dart';
@@ -17,14 +17,17 @@ import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_eve
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/ap_hp.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/left_side_section.dart';
 import 'package:net_monstrum_card_game/widgets/shared/fading_text.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../../domain/card/equipment_effect.dart';
 import '../../widgets/card_battle/color_counter.dart';
+import '../../widgets/card_battle/counters_cards_section.dart';
 import '../../widgets/card_battle/texts_counters_player.dart';
 import '../../widgets/card_battle/victory_message.dart';
 import '../../widgets/shared/button.dart';
+import '../singleplayer/rounded_rectangle_component.dart';
 
 class CardBattleMultiplayer extends World
     with
@@ -43,21 +46,63 @@ class CardBattleMultiplayer extends World
   late CardWidgetFactory playerCards;
   late CardWidgetFactory rivalCards;
 
-  final summonDigimonButton = DefaultButton('Summon Digimon');
-  final activateEquipmentButton = DefaultButton('Activate Equipment');
+  final summonDigimonButton = InGameButton('Invocar Digimon');
+  final activateEquipmentButton = InGameButton('Activar Equipamiento');
   final confirmCompilationPhaseButton =
-      DefaultButton('Confirm compilation phase');
-  final confirmUpgradePhaseButton = DefaultButton('Confirm upgrade phase');
-  final passPhaseButton = DefaultButton('Pass');
+      InGameButton('Confirmar fase de compilación');
+  final confirmUpgradePhaseButton = InGameButton('Confirmar fase de mejora');
 
   final ColorCounterInstances colorCounterInstances = ColorCounterInstances();
   final ApHPInstances apHpInstances = ApHPInstances();
+
+  final CountersCardsSectionPlayer countersCardsSectionPlayer =
+      CountersCardsSectionPlayer();
+  final CountersCardsSectionRival countersCardsSectionRival =
+      CountersCardsSectionRival();
+
+  final LeftSideSectionRival leftSideSectionRival = LeftSideSectionRival();
+  final LeftSideSectionPlayer leftSideSectionPlayer = LeftSideSectionPlayer();
+
   late TextComponent roundsWinPlayer;
   late TextComponent roundsWinRival;
-  late List<TextComponent> textsCounters;
-  late List<TextComponent> textsCountersRival;
-  late TextsCounters texts;
   late FadingTextComponent fadingText;
+
+  Function redirectToHomePage;
+
+  late RectanguloRedondeadoComponent inferiorBar =
+      RectanguloRedondeadoComponent(
+          color: const material.Color.fromRGBO(141, 149, 158, 1),
+          top: 365,
+          left: 100,
+          width: 510,
+          height: 35,
+          borderRadius: 4);
+
+  late RectanguloRedondeadoComponent inferiorBarApHp =
+      RectanguloRedondeadoComponent(
+          color: const material.Color.fromRGBO(141, 149, 158, 1),
+          top: 365,
+          left: 630,
+          width: 120,
+          height: 35,
+          borderRadius: 4);
+  late RectanguloRedondeadoComponent inferiorBar2 =
+      RectanguloRedondeadoComponent(
+          color: const material.Color.fromRGBO(141, 149, 158, 1),
+          top: 0,
+          left: 100,
+          width: 510,
+          height: 35,
+          borderRadius: 4);
+
+  late RectanguloRedondeadoComponent inferiorBarApHp2 =
+      RectanguloRedondeadoComponent(
+          color: const material.Color.fromRGBO(141, 149, 158, 1),
+          top: 0,
+          left: 630,
+          width: 120,
+          height: 35,
+          borderRadius: 4);
 
   bool addedCardsToUi = false;
   bool removedNotSummonedCards = false;
@@ -71,8 +116,9 @@ class CardBattleMultiplayer extends World
   int? selectedEquipmentCardIndex;
   List<EquipmentEffect> equipmentsEffectSelected = [];
   List<DigimonCardComponent> digimonCardCompomponents = [];
+  double screenSizeWidth;
 
-  CardBattleMultiplayer() {
+  CardBattleMultiplayer(this.screenSizeWidth, this.redirectToHomePage) {
     socket.on("UPDATE GAME DATA", (data) {
       updateBattleCardGameBloc(data);
     });
@@ -85,7 +131,7 @@ class CardBattleMultiplayer extends World
     });
 
     socket.on("START_BATTLE", (data) {
-      fadingText.addText("Battle Phase");
+      fadingText.addText("Fase de batalla");
       updateBattleCardGameBloc(data);
     });
 
@@ -107,7 +153,7 @@ class CardBattleMultiplayer extends World
     socket.on("finished game", (data) {});
 
     socket.on("START NEXT ROUND", (data) {
-      fadingText.addText("Start next round");
+      fadingText.addText("Próxima ronda");
       //removeAllCards();
       resetLocalStateBloc(data);
     });
@@ -166,14 +212,13 @@ class CardBattleMultiplayer extends World
     }
 
     fadingText = FadingTextComponent(
-        screenWidth:
-            100, //TODO REEMPLAZAR POR EL VALOR QUE LE PASE AL CONSTRUCTOR
+        screenWidth: screenSizeWidth /
+            850, //TODO REEMPLAZAR POR EL VALOR QUE LE PASE AL CONSTRUCTOR
         scale: Vector2.all(0.6),
         size: Vector2.all(10.0),
         position: Vector2(0, 185));
 
     victoryMessage = VictoryMessage();
-    texts = TextsCounters();
 
     roundsWinPlayer = TextComponent(
       text: 'W:${0}',
@@ -187,25 +232,26 @@ class CardBattleMultiplayer extends World
       position: Vector2(0, 0),
     );
 
-    summonDigimonButton.position = Vector2(650, 50);
+    summonDigimonButton.position = Vector2(650, 175);
     summonDigimonButton.size = Vector2(100, 50);
     summonDigimonButton.tapUpCallback = summonToDigimonZone;
 
-    activateEquipmentButton.position = Vector2(650, 50);
+    activateEquipmentButton.position = Vector2(650, 175);
     activateEquipmentButton.size = Vector2(100, 50);
     activateEquipmentButton.tapUpCallback = nextToBattlePhase;
 
-    confirmCompilationPhaseButton.position = Vector2(650, 50);
+    confirmCompilationPhaseButton.position = Vector2(650, 175);
     confirmCompilationPhaseButton.size = Vector2(100, 50);
     confirmCompilationPhaseButton.tapUpCallback = confirmCompilationPhase;
 
-    confirmUpgradePhaseButton.position = Vector2(650, 50);
+    confirmUpgradePhaseButton.position = Vector2(650, 175);
     confirmUpgradePhaseButton.size = Vector2(100, 50);
     confirmUpgradePhaseButton.tapUpCallback = confirmUpgradePhase;
 
-    passPhaseButton.position = Vector2(650, 110);
-    passPhaseButton.size = Vector2(100, 50);
-    passPhaseButton.tapUpCallback = passPhase;
+    await add(inferiorBar);
+    await add(inferiorBarApHp);
+    await add(inferiorBar2);
+    await add(inferiorBarApHp2);
 
     await add(colorCounterInstances.blueCounter);
     await add(colorCounterInstances.redCounter);
@@ -219,31 +265,39 @@ class CardBattleMultiplayer extends World
     await add(colorCounterInstances.whiteCounterRival);
     await add(colorCounterInstances.blackCounterRival);
     await add(colorCounterInstances.greenCounterRival);
-    await add(roundsWinPlayer);
-    await add(roundsWinRival);
     await add(apHpInstances.apRival);
     await add(apHpInstances.hpRival);
     await add(apHpInstances.apPlayer);
     await add(apHpInstances.hpPlayer);
-    await add(texts.blackCounterText);
-    await add(texts.blackCounterTextRival);
-    await add(texts.blueCounterText);
-    await add(texts.blueCounterTextRival);
-    await add(texts.brownCounterText);
-    await add(texts.brownCounterTextRival);
-    await add(texts.greenCounterText);
-    await add(texts.greenCounterTextRival);
-    await add(texts.redCounterText);
-    await add(texts.redCounterTextRival);
-    await add(texts.whiteCounterText);
-    await add(texts.whiteCounterTextRival);
+
+    await add(leftSideSectionRival.firstLayer);
+    await add(leftSideSectionRival.secondLayer);
+    await add(leftSideSectionRival.thirdLayer);
+
+    await add(leftSideSectionPlayer.firstLayer);
+    await add(leftSideSectionPlayer.secondLayer);
+    await add(leftSideSectionPlayer.thirdLayer);
+
+    await add(countersCardsSectionPlayer.secondaryLayer);
+    await add(countersCardsSectionPlayer.firstLayer);
+    await add(countersCardsSectionPlayer.deckPlayer);
+    await add(countersCardsSectionPlayer.discardPlayer);
+    await add(countersCardsSectionPlayer.handPlayer);
+
+    await add(countersCardsSectionRival.secondaryLayer);
+    await add(countersCardsSectionRival.firstLayer);
+    await add(countersCardsSectionRival.deckRival);
+    await add(countersCardsSectionRival.discardRival);
+    await add(countersCardsSectionRival.handRival);
+
     await add(confirmCompilationPhaseButton);
-    await add(passPhaseButton);
     await add(fadingText);
+    await add(roundsWinPlayer);
+    await add(roundsWinRival);
   }
 
   @override
-  void onNewState(CardBattleMultiplayerState state) {
+  void onNewState(CardBattleMultiplayerState state) async {
     if (state.battleCardGame.isUpgradePhase()) {
       updateDigimonCardsOnDigimonZone(state.battleCardGame.player.digimonZone,
           state.battleCardGame.rival.digimonZone);
@@ -266,7 +320,7 @@ class CardBattleMultiplayer extends World
     }
 
     if (state.battleCardGame.isUpgradePhase() && !removedNotSummonedCards) {
-      fadingText.addText("Upgrade Phase");
+      fadingText.addText("Fase de mejora");
       removeNotSummonedCardsByPlayer();
       playerCards.deselectCards();
       removeNotSummonedCardsByRival();
@@ -294,12 +348,14 @@ class CardBattleMultiplayer extends World
       //TODO Remover todos los elementos visuales
       removeAllCards();
       if (state.battleCardGame.isPlayerWinner()) {
-        victoryMessage.text = "Ganaste";
+        fadingText.addText("Ganaste");
       } else {
-        victoryMessage.text = "Perdiste";
+        fadingText.addText("Perdiste");
       }
-      add(victoryMessage);
-      remove(activateEquipmentButton);
+      //remove(activateEquipmentButton);
+      await Future.delayed(const Duration(seconds: 3));
+
+      redirectToHomePage();
     }
 
     if (state.battleCardGame.isUpgradePhase() &&
@@ -371,8 +427,8 @@ class CardBattleMultiplayer extends World
     if (bloc.state.battleCardGame.isDrawPhase() &&
         bloc.state.battleCardGame.decksShuffled &&
         !bloc.state.battleCardGame.drawedCards) {
-      bloc.add(DrawCards());
-      fadingText.addText("Draw Phase");
+      bloc.add(const DrawCards());
+      fadingText.addText("Fase de reparto");
     }
 
 /*     if (bloc.state.battleCardGame.isDrawPhase() &&
@@ -387,15 +443,40 @@ class CardBattleMultiplayer extends World
         !drawCardsEffectWasApplied) {
       playerCards.applyDrawEffect();
       drawCardsEffectWasApplied = true;
-      bloc.add(ToCompilationPhase());
-      fadingText.addText("Compilation Phase");
+      bloc.add(const ToCompilationPhase());
+      fadingText.addText("Fase de compilación");
     }
 
-    texts.updateValues(bloc.state.battleCardGame);
     apHpInstances.updateValues(bloc.state.battleCardGame);
 
     roundsWinPlayer.text = 'W:${bloc.state.battleCardGame.player.roundsWon}';
     roundsWinRival.text = 'W:${bloc.state.battleCardGame.rival.roundsWon}';
+
+    colorCounterInstances.blackCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.black;
+    colorCounterInstances.blueCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.blue;
+    colorCounterInstances.brownCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.brown;
+    colorCounterInstances.greenCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.green;
+    colorCounterInstances.redCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.red;
+    colorCounterInstances.whiteCounter.cantidad =
+        bloc.state.battleCardGame.player.energiesCounters.white;
+
+    colorCounterInstances.blackCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.black;
+    colorCounterInstances.blueCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.blue;
+    colorCounterInstances.brownCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.brown;
+    colorCounterInstances.greenCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.green;
+    colorCounterInstances.redCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.red;
+    colorCounterInstances.whiteCounterRival.cantidad =
+        bloc.state.battleCardGame.rival.energiesCounters.white;
 
     removeEnergyCardIfWasActivated();
   }
@@ -451,8 +532,6 @@ class CardBattleMultiplayer extends World
     remove(confirmUpgradePhaseButton);
   }
 
-  void passPhase() {}
-
   void nextToBattlePhase() {
     battlePhase();
   }
@@ -497,13 +576,13 @@ class CardBattleMultiplayer extends World
 
   void battlePhase() async {
     //bloc.add(BattlePhaseInit());
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 3));
 
     //bloc.add(BattlePhasePlayerAttacksRival());
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 3));
 
     //bloc.add(BattlePhaseRivalAttacksPlayer());
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 3));
 
     //bloc.add(BattlePhaseFinishRound());
   }

@@ -49,7 +49,7 @@ import 'package:flame/flame.dart';
 import 'package:flutter/material.dart'; */
 
 class IconWithCounter extends flameComponents.PositionComponent {
-  int cantidad;
+  int cantidad = 0;
   final double x;
   final double y;
   final Color backgroundColor;

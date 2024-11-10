@@ -48,45 +48,45 @@ class ApHpText extends PositionComponent {
 }
 
 class ApHPInstances {
-  late TextComponent apRival;
-  late TextComponent hpRival;
-  late TextComponent apPlayer;
-  late TextComponent hpPlayer;
+  late ApHpText apRival;
+  late ApHpText hpRival;
+  late ApHpText apPlayer;
+  late ApHpText hpPlayer;
 
   ApHPInstances() {
-    apRival = TextComponent(
-      text: 'AP:${0}',
-      size: Vector2.all(10.0),
-      position: Vector2(640, 0),
-      scale: Vector2.all(0.8),
+    apRival = ApHpText(
+      x: 620,
+      y: 5,
+      cantidad: 0,
+      text: 'AP',
     );
 
-    hpRival = TextComponent(
-      text: 'HP:${0}',
-      size: Vector2.all(10.0),
-      position: Vector2(700, 0),
-      scale: Vector2.all(0.8),
+    hpRival = ApHpText(
+      x: 670,
+      y: 5,
+      cantidad: 0,
+      text: 'HP',
     );
 
-    apPlayer = TextComponent(
-      text: 'AP:${0}',
-      size: Vector2.all(10.0),
-      position: Vector2(640, 370),
-      scale: Vector2.all(0.8),
+    apPlayer = ApHpText(
+      x: 620,
+      y: 370,
+      cantidad: 0,
+      text: 'AP',
     );
 
-    hpPlayer = TextComponent(
-      text: 'HP:${0}',
-      size: Vector2.all(10.0),
-      position: Vector2(700, 370),
-      scale: Vector2.all(0.8),
+    hpPlayer = ApHpText(
+      x: 670,
+      y: 370,
+      cantidad: 0,
+      text: 'HP',
     );
   }
 
   updateValues(BattleCardGame battleCardGame) {
-    apRival.text = 'AP:${battleCardGame.rival.attackPoints}';
-    hpRival.text = 'HP:${battleCardGame.rival.healthPoints}';
-    apPlayer.text = 'AP:${battleCardGame.player.attackPoints}';
-    hpPlayer.text = 'HP:${battleCardGame.player.healthPoints}';
+    apRival.cantidad = battleCardGame.rival.attackPoints;
+    hpRival.cantidad = battleCardGame.rival.healthPoints;
+    apPlayer.cantidad = battleCardGame.player.attackPoints;
+    hpPlayer.cantidad = battleCardGame.player.healthPoints;
   }
 }

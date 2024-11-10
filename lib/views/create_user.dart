@@ -7,6 +7,7 @@ import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:provider/provider.dart';
 
 import '../services/user_service.dart';
+import '../widgets/create_user/avatar_carrousel.dart';
 
 class StyledButton extends StatefulWidget {
   final String text;
@@ -57,6 +58,7 @@ class CreateUserWidget extends StatefulWidget {
 }
 
 class _CreateUserWidgetState extends State<CreateUserWidget> {
+  String _avatarUrlSelected = "assets/images/avatars/hikari.png";
   final TextEditingController _usernameController = TextEditingController();
 
   void _createUser(AppState appState) async {
@@ -73,8 +75,8 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
       try {
         final user = {"email": "email7@gmail.com"};
         // final user = await UserController.loginWithGoogle();
-        final resultMutation =
-            await usersService.createUserWithEmail(user["email"]!, username);
+        final resultMutation = await usersService.createUserWithEmail(
+            user["email"]!, username, _avatarUrlSelected);
 
         //await usersService.createUserWithEmail(user.email!);
 
@@ -127,6 +129,12 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
     }
   }
 
+  void onAvatarSelected(String avatarUrl) {
+    setState(() {
+      _avatarUrlSelected = avatarUrl;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -137,10 +145,12 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
         ),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.fromLTRB(48, 24, 48, 24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                AvatarCarousel(onAvatarSelected: onAvatarSelected),
+                const SizedBox(height: 16),
                 TextField(
                   controller: _usernameController,
                   decoration: const InputDecoration(

@@ -34,8 +34,8 @@ mutation signInWithEmail(\$email: String!) {
 """;
 
 String createUserWithEmailAndUsername = """
-mutation createUserWithEmail(\$email: String!, \$username: String!) {
-  createUserByEmail(createUserInput: { email: \$email, username: \$username} ) {
+mutation createUserWithEmail(\$email: String!, \$username: String!, \$avatarUrl: String!) {
+  createUserByEmail(createUserInput: { email: \$email, username: \$username, avatarUrl: \$avatarUrl} ) {
     result{
       id
       username

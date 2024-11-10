@@ -71,29 +71,23 @@ class FadingTextComponent extends TextComponent with HasOpacityProvider {
 
   @override
   void render(Canvas canvas) {
-    // Dibujar el fondo del texto, estirado a lo ancho de la pantalla
-    final Paint backgroundPaint = Paint()..color = backgroundColor;
-    final RRect backgroundRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(-500, 0, 1500, 60.0), // Fondo que ocupa todo el ancho
-      Radius.circular(8.0),
-    );
-    canvas.drawRRect(backgroundRect, backgroundPaint);
-
-    // Dibujar el borde del fondo
-    final Paint borderPaint = Paint()
-      ..color = borderColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-    canvas.drawRRect(backgroundRect, borderPaint);
-
-    super.render(canvas);
-
-    // Centrando el texto dentro del fondo
     if (text.isNotEmpty) {
-      final double textWidth = textRenderer!.getLineMetrics(text).width;
-      final double textX = (screenWidth - textWidth) / 2; // Centrado en X
-      /* textRenderer!.render(canvas, text,
-          Vector2(textX, 10)); */ // Ajusta la posición en Y si es necesario
+      // Dibujar el fondo del texto, estirado a lo ancho de la pantalla
+      final Paint backgroundPaint = Paint()..color = backgroundColor;
+      final RRect backgroundRect = RRect.fromRectAndRadius(
+        Rect.fromLTWH(-500, 0, 1500, 60.0), // Fondo que ocupa todo el ancho
+        Radius.circular(8.0),
+      );
+      canvas.drawRRect(backgroundRect, backgroundPaint);
+
+      // Dibujar el borde del fondo
+      final Paint borderPaint = Paint()
+        ..color = borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0;
+      canvas.drawRRect(backgroundRect, borderPaint);
+
+      super.render(canvas);
     }
   }
 

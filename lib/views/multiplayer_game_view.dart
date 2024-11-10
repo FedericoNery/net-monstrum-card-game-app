@@ -33,6 +33,6 @@ class MultiplayerGameView extends StatelessWidget {
       home: const ListRoomsPage(title: 'List Rooms Page'),
     ); */
 
-    return ListRoomsPage(title: 'List Rooms Page', onNavigation: onNavigation);
+    return ListRoomsPage(title: 'Salas de juego', onNavigation: onNavigation);
   }
 }

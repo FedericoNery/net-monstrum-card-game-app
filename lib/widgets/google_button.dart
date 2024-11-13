@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
@@ -8,6 +9,8 @@ import 'package:net_monstrum_card_game/services/user_service.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:provider/provider.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+
+import '../services/firebase_auth_service.dart';
 
 class GoogleSignInButtonState extends StatefulWidget {
   @override
@@ -42,12 +45,18 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
             ),
             onPressed: () async {
               try {
-                // final user = await UserController.loginWithGoogle();
-                final user = {"email": "email1@gmail.com"};
+                bool loginWithoutGoogle =
+                    dotenv.env['LOGIN_WITHOUT_GOOGLE']?.toLowerCase() == 'true';
+                final user = loginWithoutGoogle
+                    ? {"email": "email1@gmail.com"} as Map<String, String>
+                    : await UserController.loginWithGoogle() as User?;
+
                 if (user != null && mounted) {
-                  final accessTokenFromApi = await usersService
-                      .fetchUserWithGoogleToken("", user["email"]!);
-                  //.fetchUserWithGoogleToken("", user.email!);
+                  final accessTokenFromApi =
+                      await usersService.fetchUserWithEmail(loginWithoutGoogle
+                          ? (user as Map<String, String>)["email"]!
+                          : (user as User?)!.email!);
+
                   bool isExpired = JwtDecoder.isExpired(accessTokenFromApi!);
 
                   if (isExpired) {
@@ -66,11 +75,11 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
                     await saveUserSession(accessTokenFromApi, expirationDate);
                     appState.setUserInformation(
                         decodedToken, accessTokenFromApi);
+
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                         builder: (context) => Scaffold(
                               backgroundColor: Colors.white,
                               body: Center(
-                                //child: DeckSelectionScreen(),
                                 child: MenuPage(),
                               ),
                             )));

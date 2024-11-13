@@ -36,8 +36,9 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
 
   @override
   Future<void> onLoad() async {
-    final uri =
-        isHidden ? 'cards/card_back4.webp' : 'digimon/${card.digimonName}.jpg';
+    final uri = isHidden
+        ? 'cards/card_back4.webp'
+        : 'digimon/${card.digimonName.replaceAll(' ', '-')}.jpg';
     sprite = await Sprite.load(uri);
   }
 

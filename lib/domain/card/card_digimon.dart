@@ -24,7 +24,7 @@ class CardDigimon extends Card implements IColor {
   }
 
   CardDigimon copyWith(
-      {int? id,
+      {String? id,
       String? digimonName,
       String? color,
       int? attackPoints,
@@ -104,7 +104,7 @@ class CardDigimon extends Card implements IColor {
   static CardDigimon getInstanceFromSocket(Map<String, dynamic> card) {
     CardDigimon cardDigimon = CardDigimon(
         card["id"],
-        card["digimonName"],
+        card.containsKey("digimonName") ? card["digimonName"] : card["name"],
         card["color"],
         card["attackPoints"],
         card["healthPoints"],

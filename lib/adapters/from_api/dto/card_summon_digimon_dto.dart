@@ -21,9 +21,13 @@ class CardSummonDigimonDTO {
   final String id;
   final String name;
   late final List<InternalCardDigimonDTO> digimonsCards;
+  final int? quantityLimit;
 
   CardSummonDigimonDTO(
-      {required this.id, required this.name, required this.digimonsCards});
+      {required this.id,
+      required this.name,
+      required this.digimonsCards,
+      this.quantityLimit});
 
   factory CardSummonDigimonDTO.fromJson(Map<String, dynamic> json) {
     var listDigimonsCardsJsonList = json['digimonsCards'] as List;
@@ -39,9 +43,9 @@ class CardSummonDigimonDTO {
       );
     }).toList();
     return CardSummonDigimonDTO(
-      id: json['id'],
-      name: json['name'],
-      digimonsCards: listDigimonsCardsTransformed,
-    );
+        id: json['id'],
+        name: json['name'],
+        digimonsCards: listDigimonsCardsTransformed,
+        quantityLimit: json.containsKey("quantity") ? json["quantity"] : null);
   }
 }

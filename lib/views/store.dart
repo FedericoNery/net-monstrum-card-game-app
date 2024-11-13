@@ -50,7 +50,7 @@ class _CardShopState extends State<CardShop> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(card.imageUrl,
+              Image.asset(card.imageUrl.replaceAll(" ", "-"),
                   errorBuilder: (context, error, stackTrace) => Image.asset(
                       "assets/images/cards/card_back4.webp",
                       height: 100)),
@@ -253,7 +253,7 @@ class _CardShopState extends State<CardShop> {
                                       width: double.infinity,
                                       height: 100,
                                       child: Image.asset(
-                                        card.imageUrl,
+                                        card.imageUrl.replaceAll(" ", "-"),
                                         fit: BoxFit
                                             .contain, // Ajuste de la imagen al ancho
                                         errorBuilder:

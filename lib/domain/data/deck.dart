@@ -1,6 +1,6 @@
 class Deck {
   int id;
-  List<int> cardsIds;
+  List<String> cardsIds;
 
   Deck(this.id, this.cardsIds);
 }

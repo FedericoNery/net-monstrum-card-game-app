@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/services/local_session.dart';
 import 'package:net_monstrum_card_game/views/create_user.dart';
@@ -32,6 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
+    final TextEditingController _usernameController = TextEditingController();
+    bool loginWithoutGoogle =
+        dotenv.env['LOGIN_WITHOUT_GOOGLE']?.toLowerCase() == 'true';
 
     return FutureBuilder<UserFromLocalSession>(
       future: getUserFromLocalSession(),
@@ -59,13 +63,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                     GoogleSignInButtonState(),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     StyledButton(
                       text: "Registrarse",
                       onPressed: () => _toCreateUserPage(context),
-                    )
+                    ),
+                    if (loginWithoutGoogle)
+                      const SizedBox(
+                        height: 20,
+                      ),
+                    if (loginWithoutGoogle)
+                      TextField(
+                        controller: _usernameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Nombre de usuario',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
                   ])));
         } else {
           return Container();

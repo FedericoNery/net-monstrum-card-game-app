@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/services/local_session.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:provider/provider.dart';
 
+import '../services/firebase_auth_service.dart';
 import '../services/user_service.dart';
 import '../widgets/create_user/avatar_carrousel.dart';
 
@@ -73,25 +75,30 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
       );
     } else {
       try {
-        final user = {"email": "email7@gmail.com"};
-        // final user = await UserController.loginWithGoogle();
-        final resultMutation = await usersService.createUserWithEmail(
-            user["email"]!, username, _avatarUrlSelected);
+        bool registerWithoutGoogle =
+            dotenv.env['REGISTER_WITHOUT_GOOGLE']?.toLowerCase() == 'true';
 
-        //await usersService.createUserWithEmail(user.email!);
+        final user = registerWithoutGoogle
+            ? {"email": "$username@email.com"}
+            : await UserController.loginWithGoogle();
+
+        final resultMutation = await usersService.createUserWithEmail(
+            registerWithoutGoogle
+                ? (user as Map<String, String>)["email"]!
+                : (user as User?)!.email!,
+            username,
+            _avatarUrlSelected);
 
         if (resultMutation != null && user != null && mounted) {
-          // Limpiar el campo de entrada después de enviar
-          //_usernameController.clear();
-
-          // Mostrar un mensaje de éxito
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Usuario creado exitosamente')),
           );
 
-          final accessTokenFromApi =
-              await usersService.fetchUserWithGoogleToken("", user["email"]!);
-          //.fetchUserWithGoogleToken("", user.email!);
+          final accessTokenFromApi = await usersService.fetchUserWithEmail(
+              registerWithoutGoogle
+                  ? (user as Map<String, String>)["email"]!
+                  : (user as User?)!.email!);
+
           if (accessTokenFromApi == null) {
             throw Exception("User not found in app");
           } else {
@@ -107,7 +114,6 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
                 builder: (context) => Scaffold(
                       backgroundColor: Colors.white,
                       body: Center(
-                        //child: DeckSelectionScreen(),
                         child: MenuPage(),
                       ),
                     )));

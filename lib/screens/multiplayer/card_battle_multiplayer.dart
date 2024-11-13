@@ -354,7 +354,7 @@ class CardBattleMultiplayer extends World
       }
       //remove(activateEquipmentButton);
       await Future.delayed(const Duration(seconds: 3));
-
+      socket.disconnect(); // VER SI SIRVE ESTO
       redirectToHomePage();
     }
 

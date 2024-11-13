@@ -8,6 +8,8 @@ String getUserByIdQuery = """
       cards{
         ... on CardDigimon {
           __typename
+          id
+          type
           name
           color
           attackPoints
@@ -20,12 +22,16 @@ String getUserByIdQuery = """
         }
         ... on CardEnergy {
           __typename
+          id
+          type
           name
           color
           energyCount
         }
         ... on CardSummonDigimon {
           __typename
+          id
+          type
           name
           digimonsCards{
             name
@@ -41,6 +47,8 @@ String getUserByIdQuery = """
         }
         ... on CardEquipment {
           __typename
+          id
+          type
           name
           attackPointsCardEquipment : attackPoints
           healthPointsCardEquipment : healthPoints
@@ -192,6 +200,40 @@ query getFolderById(\$userId: String!, \$folderId: String!){
           targetScope
         }
   }
+  }
+}
+""";
+
+String getAvailableCardsToPutInDeck = """
+query getAvailableCardsToPutInDeck(\$userId: String!){
+  getAvailableCardsToPutInDeck(userId: \$userId){
+    quantity
+    card{
+      	... on CardDigimon {
+          name
+          id
+          color
+          type
+        }
+				... on CardEnergy {
+          id
+          name
+          color
+          type
+        }
+        ... on CardSummonDigimon {
+          id
+          name
+          type
+        }
+        ... on CardEquipment {
+          __typename
+          id
+          type
+          name
+        }
+
+    }
   }
 }
 """;

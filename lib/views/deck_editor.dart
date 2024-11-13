@@ -12,8 +12,8 @@ import '../widgets/deck_editor/avalaible_cards_area.dart';
 
 class DeckEditorScreen extends StatefulWidget {
   late String folderId;
-
-  DeckEditorScreen({required this.folderId});
+  VoidCallback? refetchPreviewDecks;
+  DeckEditorScreen({required this.folderId, required this.refetchPreviewDecks});
   @override
   _DeckEditorScreenState createState() => _DeckEditorScreenState();
 }
@@ -22,19 +22,28 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
   List<CardDeckEditor> deck = [];
   String localUserId = "";
 
-  void addCard(CardDeckEditor card) {
+  void addCard(CardDeckEditor card, BuildContext context) {
     setState(() {
       var listOfCardRepetitions =
           deck.where((element) => element.id == card.id);
-      if (listOfCardRepetitions.length < 4) {
+      if (listOfCardRepetitions.length < 4 &&
+          listOfCardRepetitions.length < card.quantityLimit!) {
         deck.add(card);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content:
+                  Text('Alcanzó el límite de copias de la carta seleccionada')),
+        );
       }
     });
   }
 
   void removeCard(CardDeckEditor card) {
+    print(card.name);
+    print(card.id);
     setState(() {
-      var index = deck.indexWhere((card) => card.id == card.id);
+      var index = deck.indexWhere((cardFromDeck) => cardFromDeck.id == card.id);
       if (index != -1) {
         deck.removeAt(index);
       }
@@ -58,10 +67,10 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
     GraphQlClientManager graphQlClientManager = GraphQlClientManager();
     final appState = Provider.of<AppState>(context);
     String userId = appState.userInformation?["id"] ?? "";
-    print("localUserId");
+/*     print("localUserId");
     print(localUserId);
     print("widget.folderId");
-    print(widget.folderId);
+    print(widget.folderId); */
 
     return Scaffold(
       appBar: AppBar(
@@ -74,12 +83,12 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                   document: gql(updateFolder),
                   onCompleted: (dynamic resultData) {
                     bool cardNotExist =
-                        resultData['purchaseCard']['cardNotExist'];
+                        resultData['updateFolder']['cardNotExist'];
                     bool folderNotFound =
-                        resultData['purchaseCard']['folderNotFound'];
+                        resultData['updateFolder']['folderNotFound'];
                     bool reachedMaxCopiesOfCard =
-                        resultData['purchaseCard']['reachedMaxCopiesOfCard'];
-                    bool successful = resultData['purchaseCard']['successful'];
+                        resultData['updateFolder']['reachedMaxCopiesOfCard'];
+                    bool successful = resultData['updateFolder']['successful'];
 
                     if (cardNotExist) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -113,9 +122,13 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                         const SnackBar(
                             content: Text('La edición del mazo fué exitosa')),
                       );
+                      widget.refetchPreviewDecks?.call();
                     }
                   },
-                  onError: (error) => print(error),
+                  onError: (OperationException? error) =>
+                      ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(error.toString())),
+                  ),
                 ),
                 builder: (RunMutation runMutation, QueryResult? result) {
                   return IconButton(
@@ -199,8 +212,9 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
           GraphQLProvider(
               client: graphQlClientManager.client,
               child: Query(
-                  options:
-                      QueryOptions(document: gql(getAllCards), variables: {}),
+                  options: QueryOptions(
+                      document: gql(getAvailableCardsToPutInDeck),
+                      variables: {"userId": userId}),
                   builder: (QueryResult result,
                       {VoidCallback? refetch, FetchMore? fetchMore}) {
                     if (result.hasException) {
@@ -212,14 +226,16 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                     }
 
                     List<Map<String, dynamic>> availableCardsJson =
-                        (result.data?['cards'] as List?)?.map((card) {
+                        (result.data?['getAvailableCardsToPutInDeck'] as List?)
+                                ?.map((card) {
                               return card as Map<String, dynamic>;
                             }).toList() ??
                             [];
 
                     List<CardDeckEditor> availableCardsTransformed =
-                        ListCardAdapterFromApi.getListOfCardsInstantiated(
-                            availableCardsJson);
+                        ListCardAdapterFromApi
+                            .getListAvailableCardsInstantiated(
+                                availableCardsJson);
 
                     return Expanded(
                       child: GridView.builder(
@@ -230,9 +246,9 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                         itemBuilder: (context, index) {
                           final card = availableCardsTransformed[index];
                           return GestureDetector(
-                              onTap: () => addCard(card),
+                              onTap: () => addCard(card, context),
                               child: CardWidget(
-                                  card: card, heightImage: 100, fontSize: 16));
+                                  card: card, heightImage: 80, fontSize: 16));
                         },
                       ),
                     );

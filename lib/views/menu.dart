@@ -89,7 +89,8 @@ class _MenuPageState extends State<MenuPage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue, // Color del ícono y texto seleccionados
+        selectedItemColor: Theme.of(context)
+            .primaryColor, // Color del ícono y texto seleccionados
         unselectedItemColor:
             Colors.grey, // Color de los íconos y textos no seleccionados
         onTap: _onItemTapped,

@@ -15,7 +15,8 @@ class HomePage extends StatelessWidget {
     String username = appState.userInformation?["username"]!.toString() ?? "-";
     String email = appState.userInformation?["email"]!.toString() ?? "-";
 
-    return Container(
+    return Center(
+        child: Container(
       height: 400,
       width: double.infinity,
       child: Center(
@@ -52,14 +53,15 @@ class HomePage extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.monetization_on),
+                Icon(Icons.monetization_on,
+                    color: Theme.of(context).primaryColor),
                 const SizedBox(width: 10),
-                Text('Coins $coins'),
+                Text('Monedas $coins'),
               ],
             ),
           ],
         ),
       ),
-    );
+    ));
   }
 }

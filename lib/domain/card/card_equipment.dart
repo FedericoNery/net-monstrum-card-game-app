@@ -25,7 +25,7 @@ class CardEquipment extends Card {
   }
 
   CardEquipment copyWith(
-      {int? id,
+      {String? id,
       String? name,
       int? attackPoints,
       int? healthPoints,

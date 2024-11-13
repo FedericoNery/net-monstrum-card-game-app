@@ -14,7 +14,7 @@ class DeckItem extends StatefulWidget {
   final List<Map<String, dynamic>> originalDeckCards;
   final int redirectOption;
   Function onNavigation = () {};
-
+  VoidCallback? refetchPreviewDecks;
   DeckItem(
       {required this.deckId,
       required this.redirectOption,
@@ -22,7 +22,8 @@ class DeckItem extends StatefulWidget {
       required this.deckColors,
       required this.cards,
       required this.originalDeckCards,
-      required this.onNavigation});
+      required this.onNavigation,
+      required this.refetchPreviewDecks});
 
   @override
   _DeckItemState createState() => _DeckItemState();
@@ -50,9 +51,10 @@ class _DeckItemState extends State<DeckItem> {
                       height: 20,
                       color: getColor(entry.key),
                     ),
-                    SizedBox(width: 5),
-                    Text('${entry.value}', style: TextStyle(fontSize: 12)),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 5),
+                    Text('${entry.value}',
+                        style: const TextStyle(fontSize: 12)),
+                    const SizedBox(width: 10),
                   ],
                 );
               }).toList(),
@@ -83,9 +85,9 @@ class _DeckItemState extends State<DeckItem> {
                       Text(
                         '$cardCount x $cardName',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 12),
                       ),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       Container(
                         width: 20,
                         height: 20,
@@ -101,14 +103,17 @@ class _DeckItemState extends State<DeckItem> {
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onPressed: () {
-                  appState.setSelectedDeck(widget.originalDeckCards);
+                  var transformedDeck =
+                      withUniqueIdCards(widget.originalDeckCards);
+                  appState.setSelectedDeck(transformedDeck);
 
                   _onDeckSelected(
                       context,
                       widget.originalDeckCards,
                       widget.redirectOption,
                       widget.deckId,
-                      widget.onNavigation);
+                      widget.onNavigation,
+                      widget.refetchPreviewDecks);
                 },
                 child: Text('Seleccionar ${widget.deckName}'),
               ),
@@ -118,8 +123,26 @@ class _DeckItemState extends State<DeckItem> {
     );
   }
 
-  void _onDeckSelected(BuildContext context, List<Map<String, dynamic>> cards,
-      int redirectOption, String folderId, Function onNavigation) {
+  List<Map<String, dynamic>> withUniqueIdCards(
+      List<Map<String, dynamic>> originalDeck) {
+    List<Map<String, dynamic>> transformedDeck = [];
+    int counter = 1;
+    for (var i = 0; i < originalDeck.length; i++) {
+      var card = originalDeck[i];
+      card["uniqueIdInGame"] = counter;
+      transformedDeck.add(card);
+      counter++;
+    }
+    return transformedDeck;
+  }
+
+  void _onDeckSelected(
+      BuildContext context,
+      List<Map<String, dynamic>> cards,
+      int redirectOption,
+      String folderId,
+      Function onNavigation,
+      VoidCallback? refetchPreviewDecks) {
     if (redirectOption == REDIRECT_OPTIONS.TO_MULTIPLAYER) {
       Navigator.push(
         context,
@@ -133,7 +156,8 @@ class _DeckItemState extends State<DeckItem> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => DeckEditorScreen(folderId: folderId),
+          builder: (context) => DeckEditorScreen(
+              folderId: folderId, refetchPreviewDecks: refetchPreviewDecks),
         ),
       );
     }

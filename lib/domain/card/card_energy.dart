@@ -13,7 +13,7 @@ class CardEnergy extends Card implements IColor {
   }
 
   CardEnergy copyWith(
-      {int? id, String? name, String? color, int? energyCount}) {
+      {String? id, String? name, String? color, int? energyCount}) {
     return CardEnergy(id ?? this.id, name ?? this.name, color ?? this.color,
         energyCount ?? this.energyCount);
   }

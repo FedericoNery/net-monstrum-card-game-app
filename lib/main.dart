@@ -2,10 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
-import 'package:net_monstrum_card_game/splash_screen.dart';
-import 'package:net_monstrum_card_game/views/single_player_game_view.dart';
+import 'package:net_monstrum_card_game/views/login_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'infrastructure/firebase_options.dart';
@@ -19,7 +19,10 @@ void main() async {
   );
   await initHiveForFlutter();
 
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   bool skipGoogleSession =
       dotenv.env['SKIP_GOOGLE_SESSION']?.toLowerCase() == 'true';
   if (!skipGoogleSession) {
@@ -46,17 +49,19 @@ void main() async {
 
   final _mainNavigatorKey = GlobalKey<NavigatorState>();
 
+  FlutterNativeSplash.remove();
+
   runApp(
     ChangeNotifierProvider(
         create: (_) => AppState(),
         child: MaterialApp(
           title: 'Flutter Demo',
           theme: ThemeData(
-            primarySwatch: Colors.blue,
+            primarySwatch: Colors.deepPurple,
             fontFamily: 'PixelDigivolve',
           ),
           navigatorKey: _mainNavigatorKey,
-          home: SplashScreen(),
+          home: LoginScreen(),
         )),
   );
 

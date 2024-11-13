@@ -10,7 +10,7 @@ class CardSummonDigimon extends Card {
   }
 
   CardSummonDigimon copyWith({
-    int? id,
+    String? id,
     String? name,
     List<CardDigimon>? digimonsCards,
   }) {

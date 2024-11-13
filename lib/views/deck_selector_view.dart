@@ -48,6 +48,7 @@ class DeckSelectionScreen extends StatelessWidget {
         ),
         body: Query(
           options: QueryOptions(
+              fetchPolicy: FetchPolicy.networkOnly,
               document: gql(getUserByIdQuery),
               variables: {"id": appState.userInformation?["id"]}),
           builder: (QueryResult result,
@@ -68,7 +69,7 @@ class DeckSelectionScreen extends StatelessWidget {
                     [];
 
             return Center(
-              child: DeckList(decks, redirectionOption, onNavigation),
+              child: DeckList(decks, redirectionOption, onNavigation, refetch),
             );
           },
         ),
@@ -76,21 +77,3 @@ class DeckSelectionScreen extends StatelessWidget {
     );
   }
 }
-
-/* class DeckDetailsScreen extends StatelessWidget {
-  final String deckName;
-
-  DeckDetailsScreen({required this.deckName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Detalles de $deckName'),
-      ),
-      body: Center(
-        child: Text('Has seleccionado $deckName'),
-      ),
-    );
-  }
-} */

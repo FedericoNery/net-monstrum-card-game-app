@@ -1,23 +1,23 @@
-class CardEnergyDTO {
+class CardEnergyDeckEditorDTO {
   final String id;
   final String name;
+  final String type;
   final String color;
-  final int energyCount;
   final int? quantityLimit;
 
-  CardEnergyDTO(
+  CardEnergyDeckEditorDTO(
       {required this.id,
       required this.name,
       required this.color,
-      required this.energyCount,
+      required this.type,
       this.quantityLimit});
 
-  factory CardEnergyDTO.fromJson(Map<String, dynamic> json) {
-    return CardEnergyDTO(
+  factory CardEnergyDeckEditorDTO.fromJson(Map<String, dynamic> json) {
+    return CardEnergyDeckEditorDTO(
       id: json['id'],
       name: json['name'],
       color: json['color'],
-      energyCount: json['energyCount'],
+      type: json['type'],
       quantityLimit: json.containsKey("quantity") ? json["quantity"] : null,
     );
   }

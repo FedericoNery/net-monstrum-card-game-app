@@ -5,13 +5,17 @@ class DeckList extends StatelessWidget {
   late List<Map<String, dynamic>> decks;
   late int redirectOption;
   Function onNavigation;
-  DeckList(this.decks, this.redirectOption, this.onNavigation, {super.key});
+  VoidCallback? refetchPreviewDecks;
+  DeckList(this.decks, this.redirectOption, this.onNavigation,
+      this.refetchPreviewDecks,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: decks
           .map((deck) => DeckItem(
+              refetchPreviewDecks: refetchPreviewDecks,
               onNavigation: onNavigation,
               deckId: deck['id'],
               redirectOption: redirectOption,

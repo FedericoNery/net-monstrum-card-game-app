@@ -6,6 +6,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 
 class UsersService {
   List<User> _usersList = [];
+  late GraphQLClient client;
 
   UsersService() {
     _usersList.add(User(1, 'Usuario1', 'Apellido1', 'user1',
@@ -14,6 +15,9 @@ class UsersService {
         'usuario2@email.com', 200, 'password2', [1, 2]));
     _usersList.add(User(3, 'Usuario3', 'Apellido3', 'user3',
         'usuario3@email.com', 300, 'password3', [1, 2]));
+
+    final HttpLink httpLink = HttpLink('http://localhost:5000/graphql');
+    client = GraphQLClient(cache: GraphQLCache(), link: httpLink);
   }
 
   List<User> getUsers() {
@@ -26,12 +30,6 @@ class UsersService {
 
   Future<Object?> createUserWithEmail(
       String email, String username, String avatarUrlSelected) async {
-    final HttpLink httpLink = HttpLink('http://localhost:5000/graphql');
-    final GraphQLClient client =
-        GraphQLClient(cache: GraphQLCache(), link: httpLink
-            /* link: link, */
-            );
-
     final MutationOptions options = MutationOptions(
         document: gql(createUserWithEmailAndUsername),
         variables: {
@@ -59,20 +57,13 @@ class UsersService {
     return data["result"];
   }
 
-  Future<String?> fetchUserWithGoogleToken(String token, String email) async {
-    final HttpLink httpLink = HttpLink('http://localhost:5000/graphql');
-
+  Future<String?> fetchUserWithEmail(String email) async {
     // Agregar el token a los headers
     /* final AuthLink authLink = AuthLink(
       getToken: () async => 'Bearer $token',
     );
 
     final Link link = authLink.concat(httpLink); */
-
-    final GraphQLClient client =
-        GraphQLClient(cache: GraphQLCache(), link: httpLink
-            /* link: link, */
-            );
 
     final MutationOptions options = MutationOptions(
         document: gql(signInWithEmail), variables: {"email": email});

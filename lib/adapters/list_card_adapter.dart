@@ -16,6 +16,7 @@ class ListCardAdapter {
 
   static Card getInstanceCard(Map<String, dynamic> card) {
     if (card["type"] == 'Digimon') {
+      //EL OR ES PARA FIXEAR LAS CARTAS QUE PROVIENEN DE LA API
       CardDigimon digimonCard = CardDigimon.getInstanceFromSocket(card);
       return digimonCard;
     }

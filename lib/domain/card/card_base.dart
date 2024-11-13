@@ -14,7 +14,7 @@ abstract class ICard {
 }
 
 class Card implements ICard {
-  int id;
+  String id;
   int? uniqueIdInGame;
   late String type;
 

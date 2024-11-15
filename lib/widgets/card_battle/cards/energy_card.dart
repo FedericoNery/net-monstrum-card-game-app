@@ -30,8 +30,9 @@ class EnergyCardComponent extends BaseCardComponent
 
   @override
   Future<void> onLoad() async {
-    final uri =
-        isHidden ? 'cards/card_back4.webp' : 'energies/${card.name}.png';
+    final uri = isHidden
+        ? 'cards/card_back4.webp'
+        : 'energies/${card.name.replaceAll(" ", "-")}.png';
     sprite = await Sprite.load(uri);
   }
 
@@ -59,7 +60,7 @@ class EnergyCardComponent extends BaseCardComponent
     sizeEffect.onComplete = () async {
       size = Vector2.all(64);
       isHidden = false;
-      final uri = 'energies/${card.name}.png';
+      final uri = 'energies/${card.name.replaceAll(" ", "-")}.png';
       sprite = await Sprite.load(uri);
       update(1);
     };

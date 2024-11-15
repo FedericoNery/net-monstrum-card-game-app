@@ -6,6 +6,7 @@ import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
 import 'package:net_monstrum_card_game/services/local_session.dart';
 import 'package:net_monstrum_card_game/services/user_service.dart';
+import 'package:net_monstrum_card_game/state/coin_state.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:provider/provider.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -13,6 +14,10 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import '../services/firebase_auth_service.dart';
 
 class GoogleSignInButtonState extends StatefulWidget {
+  TextEditingController usernameController;
+
+  GoogleSignInButtonState(this.usernameController);
+
   @override
   _GoogleSignInButton createState() => _GoogleSignInButton();
 }
@@ -23,6 +28,7 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
     GraphQlClientManager graphQlClientManager = GraphQlClientManager();
     UsersService usersService = UsersService();
     final appState = Provider.of<AppState>(context);
+    final coinState = Provider.of<CoinState>(context);
 
     return GraphQLProvider(
         client: graphQlClientManager.client,
@@ -48,7 +54,8 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
                 bool loginWithoutGoogle =
                     dotenv.env['LOGIN_WITHOUT_GOOGLE']?.toLowerCase() == 'true';
                 final user = loginWithoutGoogle
-                    ? {"email": "email1@gmail.com"} as Map<String, String>
+                    ? {"email": widget.usernameController.text}
+                        as Map<String, String>
                     : await UserController.loginWithGoogle() as User?;
 
                 if (user != null && mounted) {
@@ -75,6 +82,8 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
                     await saveUserSession(accessTokenFromApi, expirationDate);
                     appState.setUserInformation(
                         decodedToken, accessTokenFromApi);
+
+                    coinState.setCoins(decodedToken["coins"]);
 
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
                         builder: (context) => Scaffold(

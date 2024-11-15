@@ -10,7 +10,7 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class WaitingRoom extends StatefulWidget {
   final String gameId;
-  final _mainNavigatorKey = GlobalKey<NavigatorState>();
+  //final _mainNavigatorKey = GlobalKey<NavigatorState>();
   final String socketId;
   Function onNavigation;
 

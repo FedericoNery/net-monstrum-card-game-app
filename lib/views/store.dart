@@ -6,6 +6,7 @@ import 'package:net_monstrum_card_game/domain/store/list_card_adapter.dart';
 import 'package:net_monstrum_card_game/graphql/mutations.dart';
 import 'package:net_monstrum_card_game/graphql/queries.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
+import 'package:net_monstrum_card_game/state/coin_state.dart';
 import 'package:net_monstrum_card_game/widgets/deck_editor/card_color.dart';
 import 'package:provider/provider.dart';
 
@@ -22,18 +23,33 @@ class _CardShopState extends State<CardShop> {
   String userIdLocal = "";
 
   void buyCard(RunMutation runMutation, CardItem card) {
-    if (coins >= card.price && card.ownedCount < card.maxCopies) {
-      /* setState(() {
-        card.ownedCount++;
-        coins -= card.price;
-      }); */
-      lastCardIdPurchased = card.id;
-      //userIdLocal = "670f2cd4798b3b58a3eb08e3";
-      runMutation({"cardIdToPurchase": card.id, "userId": userIdLocal});
+    if (coins < card.price) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No posee suficientes monedas'),
+          backgroundColor: Colors.amber.shade600,
+        ),
+      );
+      return;
     }
+
+    if (card.ownedCount >= card.maxCopies) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Alcanzó la máxima cantidad de copias de la carta'),
+          backgroundColor: Colors.amber.shade600,
+        ),
+      );
+      return;
+    }
+
+    lastCardIdPurchased = card.id;
+    //userIdLocal = "670f2cd4798b3b58a3eb08e3";
+    runMutation({"cardIdToPurchase": card.id, "userId": userIdLocal});
   }
 
-  void showCardModal(CardItem card, VoidCallback? refetch) {
+  void showCardModal(CardItem card, VoidCallback? refetch, AppState appState,
+      CoinState coinState) {
     GraphQlClientManager graphQlClientManager = GraphQlClientManager();
 
     showDialog(
@@ -50,10 +66,14 @@ class _CardShopState extends State<CardShop> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(card.imageUrl.replaceAll(" ", "-"),
-                  errorBuilder: (context, error, stackTrace) => Image.asset(
-                      "assets/images/cards/card_back4.webp",
-                      height: 100)),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.45,
+                width: MediaQuery.of(context).size.width * 0.45,
+                child: Image.asset(card.imageUrl.replaceAll(" ", "-"),
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                        "assets/images/cards/card_back4.webp",
+                        height: 100)),
+              ),
               SizedBox(height: 10),
               Text('Precio: ${card.price} monedas'),
               Text('Propias: ${card.ownedCount}/${card.maxCopies}'),
@@ -112,14 +132,21 @@ class _CardShopState extends State<CardShop> {
                             cards[index] = cards[index]
                                 .copyWith(ownedCount: ownedCountCalculated);
                             coins = coins - cards[index].price;
+                            print("COINS");
+                            print(coins);
+                            coinState.setCoins(coins);
+                            //appState.setCoins(coins);
+
                             if (ownedCountCalculated == 4) {
                               cards.removeAt(index);
                             }
                           }
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('La compra fué exitosa')),
+                            SnackBar(
+                              content: Text('La compra fué exitosa'),
+                              backgroundColor: Colors.green.shade900,
+                            ),
                           );
                           refetch?.call();
                           Navigator.of(context).pop();
@@ -170,6 +197,7 @@ class _CardShopState extends State<CardShop> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
+    final coinState = Provider.of<CoinState>(context);
     String userId = appState.userInformation?["id"];
     GraphQlClientManager graphQlClientManager = GraphQlClientManager();
 
@@ -220,7 +248,8 @@ class _CardShopState extends State<CardShop> {
                 ]),
                 body: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4),
+                      crossAxisCount:
+                          MediaQuery.of(context).size.width > 700 ? 4 : 3),
                   itemCount: cards.length,
                   itemBuilder: (context, index) {
                     final card = cards[index];
@@ -228,7 +257,8 @@ class _CardShopState extends State<CardShop> {
                       return Container(); // No mostrar si ya tiene 4
 
                     return GestureDetector(
-                      onTap: () => showCardModal(card, refetch),
+                      onTap: () =>
+                          showCardModal(card, refetch, appState, coinState),
                       child: Center(
                         child: SizedBox(
                           width: 120, // Limita el ancho del Card

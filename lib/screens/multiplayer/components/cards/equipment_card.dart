@@ -63,7 +63,7 @@ class CardEquipmentWidget extends BaseCardComponent<CardEquipment>
     sizeEffect.onComplete = () async {
       size = Vector2.all(64);
       isHidden = false;
-      final uri = 'equipments/${card.name}.png';
+      final uri = 'equipments/${card.name.replaceAll(" ", "-")}.png';
       sprite = await Sprite.load(uri);
       update(1);
     };

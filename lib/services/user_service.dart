@@ -82,4 +82,22 @@ class UsersService {
     print('User data: $userData');
     return userData['access_token'];
   }
+
+  Future<int> getCoinsByEmail(String email) async {
+    final MutationOptions options = MutationOptions(
+        document: gql(getCoinsByEmailQuery), variables: {"email": email});
+    final QueryResult result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw Exception(result.exception.toString());
+    }
+
+    final coinsData = result.data?['getCoinsByEmail'];
+
+    if (coinsData == null) {
+      throw Exception("Error usuario no encontrado");
+    }
+
+    return coinsData['coins'];
+  }
 }

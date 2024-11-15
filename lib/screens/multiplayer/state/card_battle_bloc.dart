@@ -49,6 +49,8 @@ class CardBattleMultiplayerBloc
       battleCardGame.player.roundsWon = bcgFromJson.wonRoundsPlayer;
       battleCardGame.rival.roundsWon = bcgFromJson.wonRoundsRival;
 
+      battleCardGame.logText = "";
+
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
@@ -56,6 +58,7 @@ class CardBattleMultiplayerBloc
     on<ToCompilationPhase>((event, emit) {
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.toCompilationPhase();
+      battleCardGame.logText = "";
 
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
@@ -65,7 +68,7 @@ class CardBattleMultiplayerBloc
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.drawedCards = true;
       //battleCardGame.toCompilationPhase();
-
+      battleCardGame.logText = "";
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
@@ -80,6 +83,8 @@ class CardBattleMultiplayerBloc
         battleCardGame.player.hand.selectCardByInternalId(internalCardId);
       }
 
+      battleCardGame.logText = "";
+
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
@@ -88,6 +93,8 @@ class CardBattleMultiplayerBloc
       BattleCardGame battleCardGame = state.battleCardGame;
       //AGREGAR QUE SELECCIONÉ LA CARTA DE EQUIPAMIENTO
       battleCardGame.player.selectedEquipmentCardId = event.cardId;
+      battleCardGame.logText = "";
+
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
@@ -96,6 +103,7 @@ class CardBattleMultiplayerBloc
       BattleCardGame battleCardGame = state.battleCardGame;
       battleCardGame.player.selectedEquipmentCardId = null;
       //QUITAR QUE SELECCIONÉ LA CARTA DE EQUIPAMIENTO
+      battleCardGame.logText = "";
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));
     });
@@ -138,6 +146,15 @@ class CardBattleMultiplayerBloc
 
       battleCardGame.player.roundsWon = bcgFromJson.wonRoundsPlayer;
       battleCardGame.rival.roundsWon = bcgFromJson.wonRoundsRival;
+      battleCardGame.logText = "";
+
+      BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
+      emit(state.copyWith(instance));
+    });
+
+    on<LogAction>((event, emit) {
+      BattleCardGame battleCardGame = state.battleCardGame;
+      //COMO PARAMETRO RECIBE EL ID DE LA CARTA DIGIMON TARGET
 
       BattleCardGame instance = BattleCardGame.fromInstance(battleCardGame);
       emit(state.copyWith(instance));

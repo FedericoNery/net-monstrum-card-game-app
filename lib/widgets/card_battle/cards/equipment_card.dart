@@ -32,8 +32,9 @@ class CardEquipmentWidget extends BaseCardComponent
 
   @override
   Future<void> onLoad() async {
-    final uri =
-        isHidden ? 'cards/card_back4.webp' : 'equipments/${card.name}.png';
+    final uri = isHidden
+        ? 'cards/card_back4.webp'
+        : 'equipments/${card.name.replaceAll(" ", "-")}.png';
     sprite = await Sprite.load(uri);
   }
 
@@ -61,7 +62,7 @@ class CardEquipmentWidget extends BaseCardComponent
     sizeEffect.onComplete = () async {
       size = Vector2.all(64);
       isHidden = false;
-      final uri = 'equipments/${card.name}.png';
+      final uri = 'equipments/${card.name.replaceAll(" ", "-")}.png';
       sprite = await Sprite.load(uri);
       update(1);
     };

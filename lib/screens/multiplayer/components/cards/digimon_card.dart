@@ -68,7 +68,7 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
     sizeEffect.onComplete = () async {
       isHidden = false;
       size = Vector2.all(64);
-      final uri = 'digimon/${card.digimonName}.jpg';
+      final uri = 'digimon/${card.digimonName.replaceAll(" ", "-")}.jpg';
       sprite = await Sprite.load(uri);
       update(1);
     };
@@ -108,7 +108,16 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
         children.first.add(RemoveEffect(delay: 0.1));
       }
 
-      bloc.add(SelectDigimonCardFromHandToSummon(card.uniqueIdInGame!));
+      if (bloc.state.battleCardGame.player
+          .hasSufficientEnergiesToSummonCard(card)) {
+        bloc.add(SelectDigimonCardFromHandToSummon(card.uniqueIdInGame!));
+      }
+
+      if (isSelected &&
+          !bloc.state.battleCardGame.player
+              .hasSufficientEnergiesToSummonCard(card)) {
+        bloc.add(LogAction("No hay suficientes energias"));
+      }
 
       update(1);
     }
@@ -123,6 +132,7 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
         "userId": bloc.state.battleCardGame.player.username,
         "socketId": socket.id
       });
+      bloc.add(LogAction("${card.digimonName} fue equipado"));
     }
   }
 

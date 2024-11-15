@@ -1,13 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:net_monstrum_card_game/adapters/list_card_adapter.dart';
+import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/communication/socket_events_names.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/tamer.dart';
 import 'package:net_monstrum_card_game/services/aggregation_service.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:net_monstrum_card_game/views/card_battle_multiplayer_view.dart';
+import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:socket_io_common/src/util/event_emitter.dart';
 
@@ -70,25 +73,50 @@ class _MyButtonListWidgetState extends State<MyButtonListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+
     if (widget.roomsIds.isNotEmpty) {
       return ListView.builder(
         itemCount: widget.roomsIds.length,
         itemBuilder: (BuildContext context, int index) {
           return ElevatedButton(
             onPressed: () {
+              bool loadLocalDeckPlayer2 =
+                  dotenv.env['LOAD_LOCAL_DECK_PLAYER2']?.toLowerCase() ==
+                      'true';
+
               AggregationService service = AggregationService();
               Aggregation player = service.getAggregatioByUserId(2);
 
+              Map<String, dynamic> roomParameters = {
+                "userId": appState.userId,
+                "username": appState.username,
+                "selectedDeckToMultiplayer": appState.selectedDeckToMultiplayer!
+              };
+
               String roomId = widget.roomsIds[index];
-              socket.emit('playerJoinGame', {
-                "deck": player.decksAggregations[0].cards,
-                "user": {
-                  "id": player.user.id,
-                  "username": player.user.username
-                },
-                "gameIdToJoin": roomId,
-                "socketId": socket.id!
-              });
+              socket.emit(
+                  'playerJoinGame',
+                  loadLocalDeckPlayer2
+                      ? {
+                          "deck": player.decksAggregations[0].cards,
+                          "user": {
+                            "id": player.user.id,
+                            "username": player.user.username
+                          },
+                          "gameIdToJoin": roomId,
+                          "socketId": socket.id!
+                        }
+                      : {
+                          "deck": ListCardAdapter.getListOfCardsInstantiated(
+                              roomParameters["selectedDeckToMultiplayer"]),
+                          "user": {
+                            "id": roomParameters["userId"],
+                            "username": roomParameters["username"]
+                          },
+                          "gameIdToJoin": roomId,
+                          "socketId": socket.id!
+                        });
             },
             child: Text(widget.roomsIds[index]),
           );

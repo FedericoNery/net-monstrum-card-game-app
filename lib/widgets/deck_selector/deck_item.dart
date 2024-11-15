@@ -80,12 +80,13 @@ class _DeckItemState extends State<DeckItem> {
                 String cardColor = widget.cards[cardName]!['color'];
                 return Padding(
                   padding: const EdgeInsets.all(4.0),
-                  child: Row(
+                  child: Wrap(
                     children: [
                       Text(
                         '$cardCount x $cardName',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 12),
+                        style: const TextStyle(
+                            fontSize: 12, overflow: TextOverflow.ellipsis),
                       ),
                       const SizedBox(width: 5),
                       Container(

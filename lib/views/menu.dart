@@ -42,7 +42,7 @@ class _MenuPageState extends State<MenuPage> {
   void initState() {
     super.initState();
     _screens.addAll([
-      const HomePage(),
+      HomePage(),
       CardShop(),
       DeckSelectionScreen(
           redirectionOption: REDIRECT_OPTIONS.TO_EDIT_DECK,

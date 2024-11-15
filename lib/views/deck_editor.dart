@@ -40,8 +40,6 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
   }
 
   void removeCard(CardDeckEditor card) {
-    print(card.name);
-    print(card.id);
     setState(() {
       var index = deck.indexWhere((cardFromDeck) => cardFromDeck.id == card.id);
       if (index != -1) {
@@ -184,11 +182,8 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                           ? GridView.builder(
                               padding: EdgeInsets.all(4.0),
                               gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
-                                /* childAspectRatio: 2 / 3,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8, */
                               ),
                               scrollDirection: Axis.horizontal,
                               itemCount: deck.length,
@@ -199,11 +194,11 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                                     child: CardWidget(
                                         card: card,
                                         widthContainer: 70,
-                                        heightImage: 45,
+                                        heightImage: 60,
                                         fontSize: 8));
                               },
                             )
-                          : Center(child: Text('No cards selected')),
+                          : const Center(child: Text('No hay cartas')),
                     );
                   })),
           Divider(),
@@ -239,16 +234,22 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
 
                     return Expanded(
                       child: GridView.builder(
-                        padding: EdgeInsets.all(4.0),
+                        padding: null,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5),
+                            crossAxisCount:
+                                MediaQuery.of(context).size.width > 700 ? 5 : 4,
+                            childAspectRatio: 1),
                         itemCount: availableCardsTransformed.length,
                         itemBuilder: (context, index) {
                           final card = availableCardsTransformed[index];
                           return GestureDetector(
                               onTap: () => addCard(card, context),
                               child: CardWidget(
-                                  card: card, heightImage: 80, fontSize: 16));
+                                card: card,
+                                heightImage: 80,
+                                fontSize: 16,
+                                widthContainer: 100,
+                              ));
                         },
                       ),
                     );

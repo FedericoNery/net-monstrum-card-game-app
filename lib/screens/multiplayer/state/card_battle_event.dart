@@ -64,6 +64,14 @@ class ResetLocalState extends CardBattleMultiplayerEvent {
   List<Object?> get props => [];
 }
 
+class LogAction extends CardBattleMultiplayerEvent {
+  final String text;
+
+  const LogAction(this.text);
+
+  @override
+  List<Object?> get props => [];
+}
 
 /* class SelectDigimonCardToBeEquipped extends CardBattleMultiplayerEvent {
   final int cardDigimonId;

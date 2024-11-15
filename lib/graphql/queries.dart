@@ -316,3 +316,11 @@ query getUserByEmail(\$email: String!){
 }
 
 """;
+
+String getCoinsByEmailQuery = """
+query getCoinsByEmailQuery(\$email: String!){
+  getCoinsByEmail(email: \$email){
+    coins
+  }
+}
+""";

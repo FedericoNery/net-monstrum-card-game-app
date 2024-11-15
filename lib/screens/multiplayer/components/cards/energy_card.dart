@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/domain/card/card_energy.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/base_card.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
@@ -34,8 +35,9 @@ class EnergyCardComponent extends BaseCardComponent<CardEnergy>
 
   @override
   Future<void> onLoad() async {
-    final uri =
-        isHidden ? 'cards/card_back4.webp' : 'energies/${card.name}.png';
+    final uri = isHidden
+        ? 'cards/card_back4.webp'
+        : 'energies/${card.name.replaceAll(" ", "-")}.png';
     sprite = await Sprite.load(uri);
   }
 
@@ -63,7 +65,7 @@ class EnergyCardComponent extends BaseCardComponent<CardEnergy>
     sizeEffect.onComplete = () async {
       size = Vector2.all(64);
       isHidden = false;
-      final uri = 'energies/${card.name}.png';
+      final uri = 'energies/${card.name.replaceAll(" ", "-")}.png';
       sprite = await Sprite.load(uri);
       update(1);
     };
@@ -89,6 +91,7 @@ class EnergyCardComponent extends BaseCardComponent<CardEnergy>
           "userId": bloc.state.battleCardGame.player.username,
           "socketId": socket.id
         });
+        bloc.add(LogAction("${card.name} fue activada"));
         removeFromParent();
       } else {
         children.first.add(RemoveEffect(delay: 0.1));

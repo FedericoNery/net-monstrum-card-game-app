@@ -129,4 +129,9 @@ class Tamer {
       calculatePoints();
     }
   }
+
+  bool hasSufficientEnergiesToSummonCard(CardDigimon cardDigimon) {
+    return this.energiesCounters.canBeDiscountedByColorAndQuantity(
+        cardDigimon.color, cardDigimon.energyCount);
+  }
 }

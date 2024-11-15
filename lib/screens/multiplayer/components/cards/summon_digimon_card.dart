@@ -8,6 +8,7 @@ import 'package:net_monstrum_card_game/domain/card/card_summon_digimon.dart';
 import 'package:net_monstrum_card_game/domain/card/color.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/base_card.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
 import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
@@ -65,7 +66,7 @@ class SummonDigimonCardComponent extends BaseCardComponent<CardSummonDigimon>
     sizeEffect.onComplete = () async {
       size = Vector2.all(64);
       isHidden = false;
-      final uri = 'summon_digimon/${card.name}.png';
+      final uri = 'summon_digimon/${card.name.replaceAll(" ", "-")}.png';
       sprite = await Sprite.load(uri);
       update(1);
     };
@@ -91,6 +92,7 @@ class SummonDigimonCardComponent extends BaseCardComponent<CardSummonDigimon>
           "userId": bloc.state.battleCardGame.player.username,
           "socketId": socket.id
         });
+        bloc.add(LogAction("${card.name} fue activada"));
         removeFromParent();
       } else {
         children.first.add(RemoveEffect(delay: 0.1));

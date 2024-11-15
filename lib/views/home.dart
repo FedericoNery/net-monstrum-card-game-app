@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
+import 'package:net_monstrum_card_game/state/coin_state.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class HomePage extends StatefulWidget {
+  HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePage();
+}
+
+class _HomePage extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
-    //TODO COINS
+    final coinState = Provider.of<CoinState>(context);
+
     String avatarUrl =
         appState.userInformation?["avatarUrl"]!.toString() ?? "-";
-    String coins = appState.userInformation?["coins"]!.toString() ?? "-";
+    int coins = coinState.coins;
     String username = appState.userInformation?["username"]!.toString() ?? "-";
     String email = appState.userInformation?["email"]!.toString() ?? "-";
-
+    print(coins);
     return Center(
         child: Container(
       height: 400,

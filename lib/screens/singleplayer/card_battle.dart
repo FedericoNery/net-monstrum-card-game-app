@@ -16,6 +16,7 @@ import 'package:net_monstrum_card_game/widgets/card_battle/ap_hp.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/cards/digimon_card.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/factories/card_widget_factory.dart';
 import 'package:net_monstrum_card_game/widgets/shared/fading_text.dart';
+import 'package:net_monstrum_card_game/widgets/shared/fading_text_queue.dart';
 
 import '../../domain/card/equipment_effect.dart';
 import '../../widgets/card_battle/color_counter.dart';
@@ -57,6 +58,7 @@ class CardBattle extends World
   late List<TextComponent> textsCountersRival; */
 /*   late TextsCounters texts; */
   late FadingTextComponent fadingText;
+  late FadingTextQueueComponent fadingTextQueueComponent;
 
   RectangleComponent squareBackgroundNumber = RectangleComponent.square(
       position: Vector2.all(10),
@@ -116,6 +118,9 @@ class CardBattle extends World
         scale: Vector2.all(0.6),
         size: Vector2.all(10.0),
         position: Vector2(0, 185));
+
+    fadingTextQueueComponent =
+        FadingTextQueueComponent(screenWidth: screenSizeWidth / 850);
 
     victoryMessage = VictoryMessage();
 
@@ -264,6 +269,7 @@ class CardBattle extends World
     await add(hpPlayer); */
     await add(confirmCompilationPhaseButton);
     await add(fadingText);
+    await add(fadingTextQueueComponent);
     apRival = ApHpText(
       x: 620,
       y: 5,
@@ -380,6 +386,7 @@ class CardBattle extends World
       rivalCards = CardWidgetFactory(state.battleCardGame.rival, true);
       addCards();
       addedCardsToUi = true;
+      fadingTextQueueComponent.addText("Repartiendo Cartas");
     }
 
     if (state.battleCardGame.isUpgradePhase() && !removedNotSummonedCards) {
@@ -589,10 +596,12 @@ class CardBattle extends World
 
   void nextToBattlePhase() {
     battlePhase();
+    fadingTextQueueComponent.addText("Luchar...");
   }
 
   void nextPhase() {
     bloc.add(SummonDigimonCardsToDigimonZone());
+    fadingTextQueueComponent.addText("Proxima fase...");
   }
 
   void removeCardAfterEquipmentActivation(BattleCardGame battleCardGame) {
@@ -639,6 +648,7 @@ class CardBattle extends World
     await Future.delayed(Duration(seconds: 3));
 
     bloc.add(BattlePhaseFinishRound());
+    fadingTextQueueComponent.addText("Batalla finalizada...");
   }
 
   void removeAllCards() {

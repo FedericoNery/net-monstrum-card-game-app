@@ -37,4 +37,9 @@ class AppState extends ChangeNotifier {
     userInformation = user;
     access_token = access_token;
   }
+
+  void setCoins(int coins) {
+    userInformation!["coins"] = coins;
+    //notifyListeners();
+  }
 }

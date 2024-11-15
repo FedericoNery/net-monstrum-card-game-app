@@ -32,8 +32,9 @@ class DigimonCardComponent extends BaseCardComponent
 
   @override
   Future<void> onLoad() async {
-    final uri =
-        isHidden ? 'cards/card_back4.webp' : 'digimon/${card.digimonName}.jpg';
+    final uri = isHidden
+        ? 'cards/card_back4.webp'
+        : 'digimon/${card.digimonName.replaceAll(" ", "-")}.jpg';
     sprite = await Sprite.load(uri);
   }
 
@@ -63,7 +64,7 @@ class DigimonCardComponent extends BaseCardComponent
     sizeEffect.onComplete = () async {
       isHidden = false;
       size = Vector2.all(64);
-      final uri = 'digimon/${card.digimonName}.jpg';
+      final uri = 'digimon/${card.digimonName.replaceAll(" ", "-")}.jpg';
       sprite = await Sprite.load(uri);
       update(1);
     };
@@ -99,7 +100,10 @@ class DigimonCardComponent extends BaseCardComponent
         children.first.add(RemoveEffect(delay: 0.1));
       }
 
-      bloc.add(SelectDigimonCardFromHandToSummon(card.uniqueIdInGame!));
+      if (bloc.state.battleCardGame.player
+          .hasSufficientEnergiesToSummonCard(card)) {
+        bloc.add(SelectDigimonCardFromHandToSummon(card.uniqueIdInGame!));
+      }
 
       update(1);
     }

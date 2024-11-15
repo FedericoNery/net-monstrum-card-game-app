@@ -31,8 +31,9 @@ class SummonDigimonCardComponent extends BaseCardComponent
 
   @override
   Future<void> onLoad() async {
-    final uri =
-        isHidden ? 'cards/card_back4.webp' : 'summon_digimon/${card.name}.png';
+    final uri = isHidden
+        ? 'cards/card_back4.webp'
+        : 'summon_digimon/${card.name.replaceAll(" ", "-")}.png';
     sprite = await Sprite.load(uri);
   }
 
@@ -60,7 +61,7 @@ class SummonDigimonCardComponent extends BaseCardComponent
     sizeEffect.onComplete = () async {
       size = Vector2.all(64);
       isHidden = false;
-      final uri = 'summon_digimon/${card.name}.png';
+      final uri = 'summon_digimon/${card.name.replaceAll(" ", "-")}.png';
       sprite = await Sprite.load(uri);
       update(1);
     };

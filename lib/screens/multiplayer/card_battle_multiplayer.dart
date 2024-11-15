@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:net_monstrum_card_game/adapters/battle_card_game_adapter.dart';
 import 'package:net_monstrum_card_game/communication/socket_events_names.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
@@ -19,6 +20,7 @@ import 'package:net_monstrum_card_game/services/socket_client.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/ap_hp.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/left_side_section.dart';
 import 'package:net_monstrum_card_game/widgets/shared/fading_text.dart';
+import 'package:net_monstrum_card_game/widgets/shared/fading_text_queue.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../../domain/card/equipment_effect.dart';
@@ -39,7 +41,8 @@ class CardBattleMultiplayer extends World
 
   late ParallaxComponent backgroundParallax;
 
-  final enabledMusic = false;
+  final bool enabledMusic =
+      dotenv.env['ENABLE_MUSIC_BATTLE']?.toLowerCase() == 'true';
   late AudioPool pool;
   late VictoryMessage victoryMessage;
 
@@ -66,6 +69,7 @@ class CardBattleMultiplayer extends World
   late TextComponent roundsWinPlayer;
   late TextComponent roundsWinRival;
   late FadingTextComponent fadingText;
+  late FadingTextQueueComponent fadingTextQueueComponent;
 
   Function redirectToHomePage;
 
@@ -218,6 +222,11 @@ class CardBattleMultiplayer extends World
         size: Vector2.all(10.0),
         position: Vector2(0, 185));
 
+    fadingTextQueueComponent = FadingTextQueueComponent(
+      screenWidth: screenSizeWidth /
+          850, //TODO REEMPLAZAR POR EL VALOR QUE LE PASE AL CONSTRUCTOR
+    );
+
     victoryMessage = VictoryMessage();
 
     roundsWinPlayer = TextComponent(
@@ -292,12 +301,18 @@ class CardBattleMultiplayer extends World
 
     await add(confirmCompilationPhaseButton);
     await add(fadingText);
+    await add(fadingTextQueueComponent);
     await add(roundsWinPlayer);
     await add(roundsWinRival);
   }
 
   @override
   void onNewState(CardBattleMultiplayerState state) async {
+    if (state.battleCardGame.logText.length > 0) {
+      fadingTextQueueComponent.addText(state.battleCardGame.logText);
+      return;
+    }
+
     if (state.battleCardGame.isUpgradePhase()) {
       updateDigimonCardsOnDigimonZone(state.battleCardGame.player.digimonZone,
           state.battleCardGame.rival.digimonZone);
@@ -309,6 +324,7 @@ class CardBattleMultiplayer extends World
         !addedCardsToUi) {
       playerCards = CardWidgetFactory(state.battleCardGame.player, false);
       rivalCards = CardWidgetFactory(state.battleCardGame.rival, true);
+      fadingTextQueueComponent.addText("Reparto");
       addCards();
       addedCardsToUi = true;
     }
@@ -354,6 +370,7 @@ class CardBattleMultiplayer extends World
       }
       //remove(activateEquipmentButton);
       await Future.delayed(const Duration(seconds: 3));
+
       socket.disconnect(); // VER SI SIRVE ESTO
       redirectToHomePage();
     }
@@ -477,6 +494,20 @@ class CardBattleMultiplayer extends World
         bloc.state.battleCardGame.rival.energiesCounters.red;
     colorCounterInstances.whiteCounterRival.cantidad =
         bloc.state.battleCardGame.rival.energiesCounters.white;
+
+    countersCardsSectionPlayer.deckPlayer.cantidad =
+        bloc.state.battleCardGame.player.deck.cards.length;
+    countersCardsSectionPlayer.discardPlayer.cantidad =
+        bloc.state.battleCardGame.player.trash.cards.length;
+    countersCardsSectionPlayer.handPlayer.cantidad =
+        bloc.state.battleCardGame.player.hand.cards.length;
+
+    countersCardsSectionRival.deckRival.cantidad =
+        bloc.state.battleCardGame.rival.deck.cards.length;
+    countersCardsSectionRival.discardRival.cantidad =
+        bloc.state.battleCardGame.rival.trash.cards.length;
+    countersCardsSectionRival.handRival.cantidad =
+        bloc.state.battleCardGame.rival.hand.cards.length;
 
     removeEnergyCardIfWasActivated();
   }

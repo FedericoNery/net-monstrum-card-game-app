@@ -26,6 +26,7 @@ class BattleCardGame {
   bool drawedCards = false;
   bool decksShuffled = false;
   bool playerSummonedDigimons = false;
+  String logText = "";
 
   BattleCardGame(this.player, this.rival) : phaseGame = Phases.DRAW_PHASE;
 

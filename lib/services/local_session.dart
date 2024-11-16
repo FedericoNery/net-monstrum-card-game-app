@@ -46,8 +46,12 @@ Future<UserFromLocalSession> getUserFromLocalSession() async {
   Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
 
   UsersService usersService = UsersService();
-  int coins = await usersService.getCoinsByEmail(decodedToken["email"]);
-  decodedToken["coins"] = coins;
+  try {
+    int coins = await usersService.getCoinsByEmail(decodedToken["email"]);
+    decodedToken["coins"] = coins;
+  } catch (error) {
+    throw Exception(error.toString());
+  }
 
   return UserFromLocalSession(token, decodedToken, isTokenExpiredOrNotExists);
 }

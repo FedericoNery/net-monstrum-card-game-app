@@ -30,10 +30,9 @@ class CardBattleComponentMultiplayer extends FlameGame {
     final scaleY = screenSize.height / 400; //backgroundImage.height;
 
     final parallax = await loadParallaxComponent(_imagesNames,
-        baseVelocity: Vector2(30, -20),
-        velocityMultiplierDelta: Vector2(1.8, 1.0),
-        filterQuality: FilterQuality.none,
+        position: Vector2(0, 0),
         repeat: ImageRepeat.repeat,
+        filterQuality: FilterQuality.none,
         scale: Vector2(scaleX, scaleY));
     add(parallax);
     world = CardBattleMultiplayer(scaleX, redirectToHomePage);

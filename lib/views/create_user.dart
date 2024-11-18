@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/services/local_session.dart';
+import 'package:net_monstrum_card_game/state/coin_state.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
 import 'package:provider/provider.dart';
 
@@ -60,10 +61,10 @@ class CreateUserWidget extends StatefulWidget {
 }
 
 class _CreateUserWidgetState extends State<CreateUserWidget> {
-  String _avatarUrlSelected = "assets/images/avatars/hikari.png";
+  String _avatarUrlSelected = "hikari.png";
   final TextEditingController _usernameController = TextEditingController();
 
-  void _createUser(AppState appState) async {
+  void _createUser(AppState appState, CoinState coinState) async {
     UsersService usersService = UsersService();
 
     final String username = _usernameController.text.trim();
@@ -109,6 +110,9 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
                 JwtDecoder.getExpirationDate(accessTokenFromApi);
 
             await saveUserSession(accessTokenFromApi, expirationDate);
+
+            //Hacer consulta sobre cuantas monedas tiene el usuario y setear state
+            coinState.setWithoutListener(decodedToken["coins"]);
             appState.setUserInformation(decodedToken, accessTokenFromApi);
             Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => Scaffold(
@@ -143,7 +147,8 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
+    final coinState = Provider.of<CoinState>(context, listen: false);
 
     return Scaffold(
         appBar: AppBar(
@@ -167,7 +172,7 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
                 const SizedBox(height: 16),
                 StyledButton(
                   text: "Crear usuario",
-                  onPressed: () => _createUser(appState),
+                  onPressed: () => _createUser(appState, coinState),
                 ),
               ],
             ),

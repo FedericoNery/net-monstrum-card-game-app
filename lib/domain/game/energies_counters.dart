@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:net_monstrum_card_game/domain/card/color.dart';
 
 class EnergiesCounters {
@@ -7,6 +8,9 @@ class EnergiesCounters {
   int white;
   int green;
   int black;
+  final enableSummonDigimonWithOneEnergy =
+      dotenv.env['ENABLE_SUMMON_DIGIMON_WITH_ONE_ENERGY']?.toLowerCase() ==
+          'true';
 
   EnergiesCounters(
       this.red, this.blue, this.brown, this.black, this.green, this.white);
@@ -56,22 +60,22 @@ class EnergiesCounters {
 
   bool canBeDiscountedByColorAndQuantity(String color, int quantity) {
     if (CardColor.RED == color) {
-      return red - quantity >= 0;
+      return red - (enableSummonDigimonWithOneEnergy ? 1 : quantity) >= 0;
     }
     if (CardColor.GREEN == color) {
-      return green - quantity >= 0;
+      return green - (enableSummonDigimonWithOneEnergy ? 1 : quantity) >= 0;
     }
     if (CardColor.BROWN == color) {
-      return brown - quantity >= 0;
+      return brown - (enableSummonDigimonWithOneEnergy ? 1 : quantity) >= 0;
     }
     if (CardColor.BLACK == color) {
-      return black - quantity >= 0;
+      return black - (enableSummonDigimonWithOneEnergy ? 1 : quantity) >= 0;
     }
     if (CardColor.BLUE == color) {
-      return blue - quantity >= 0;
+      return blue - (enableSummonDigimonWithOneEnergy ? 1 : quantity) >= 0;
     }
     if (CardColor.WHITE == color) {
-      return white - quantity >= 0;
+      return white - (enableSummonDigimonWithOneEnergy ? 1 : quantity) >= 0;
     }
 
     return false;
@@ -95,6 +99,27 @@ class EnergiesCounters {
     }
     if (CardColor.WHITE == color) {
       white -= 1;
+    }
+  }
+
+  void discountByColorAndQuantity(String color, int quantity) {
+    if (CardColor.RED == color) {
+      red -= enableSummonDigimonWithOneEnergy ? 1 : quantity;
+    }
+    if (CardColor.GREEN == color) {
+      green -= enableSummonDigimonWithOneEnergy ? 1 : quantity;
+    }
+    if (CardColor.BROWN == color) {
+      brown -= enableSummonDigimonWithOneEnergy ? 1 : quantity;
+    }
+    if (CardColor.BLACK == color) {
+      black -= enableSummonDigimonWithOneEnergy ? 1 : quantity;
+    }
+    if (CardColor.BLUE == color) {
+      blue -= enableSummonDigimonWithOneEnergy ? 1 : quantity;
+    }
+    if (CardColor.WHITE == color) {
+      white -= enableSummonDigimonWithOneEnergy ? 1 : quantity;
     }
   }
 

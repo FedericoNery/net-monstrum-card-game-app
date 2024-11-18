@@ -15,7 +15,7 @@ import 'views/single_player_game_view.dart';
 // ...
 
 void main() async {
-  await dotenv.load(fileName: "../dotenv.txt"); // Carga el archivo .env
+  await dotenv.load(fileName: "../dotenv.txt");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -41,32 +41,31 @@ void main() async {
   /* SocketView socketView = SocketView();
   runApp(socketView); */
 
-  bool redirectToMultiplayer =
-      dotenv.env['REDIRECT_TO_MULTIPLAYER']?.toLowerCase() == 'true';
-  bool redirectToSinglePlayer =
-      dotenv.env['REDIRECT_TO_SINGLE_PLAYER']?.toLowerCase() == 'true';
-
-  bool redirectToComponentsViewer =
-      dotenv.env['REDIRECT_TO_COMPONENTS_VIEWER']?.toLowerCase() == 'true';
-
-  //final _mainNavigatorKey = GlobalKey<NavigatorState>();
-
   FlutterNativeSplash.remove();
 
-  runApp(MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AppState()),
-        ChangeNotifierProvider(create: (_) => CoinState())
-      ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.deepPurple,
-          fontFamily: 'PixelDigivolve',
-        ),
-        //navigatorKey: _mainNavigatorKey,
-        home: LoginScreen(),
-      )));
+  final HttpLink httpLink = HttpLink(dotenv.env['API_URL'] ?? '');
+
+  final GraphQLClient client = GraphQLClient(
+    link: httpLink,
+    cache: GraphQLCache(store: HiveStore()),
+  );
+
+  runApp(GraphQLProvider(
+      client: ValueNotifier(client),
+      child: MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => AppState()),
+            ChangeNotifierProvider(create: (_) => CoinState())
+          ],
+          child: MaterialApp(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primarySwatch: Colors.deepPurple,
+              fontFamily: 'PixelDigivolve',
+            ),
+            //navigatorKey: _mainNavigatorKey,
+            home: LoginScreen(),
+          ))));
 
 /*   MultiplayerGameView multiplayerGameView = MultiplayerGameView();
   runApp(multiplayerGameView); */

@@ -72,7 +72,8 @@ class Tamer {
     EnergiesCounters energiesCountersCopy = energiesCounters.getCopy();
     if (digimonsToSummon.isNotEmpty) {
       for (CardDigimon card in digimonsToSummon) {
-        energiesCountersCopy.discountByColor(card.color);
+        energiesCountersCopy.discountByColorAndQuantity(
+            card.color, card.energyCount);
       }
     }
     return energiesCountersCopy.allEnergiesAreZeroOrMore();

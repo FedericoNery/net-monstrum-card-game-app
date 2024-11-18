@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('Error checking login status'));
+          return Center(child: Text('Error al revisar estado de sesión'));
         } else if (!(snapshot.data!.isTokenExpiredOrNotExists) &&
             snapshot.data!.user != null &&
             snapshot.data!.token != "") {

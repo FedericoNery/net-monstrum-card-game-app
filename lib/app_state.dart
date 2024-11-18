@@ -6,6 +6,9 @@ class AppState extends ChangeNotifier {
   String _message = "Hola Mundo";
   String get message => _message;
 
+  bool _deckUpdated = false;
+  bool get deckUpdated => _deckUpdated;
+
   List<Map<String, dynamic>>? _selectedDeckToMultiplayer;
   List<Map<String, dynamic>>? get selectedDeckToMultiplayer =>
       _selectedDeckToMultiplayer;
@@ -22,6 +25,15 @@ class AppState extends ChangeNotifier {
     castedDeckToMultiplayer = player.decksAggregations[0].cards;
     userId = player.user.id;
     username = player.user.username;
+  }
+
+  void notifyDeckUpdated() {
+    _deckUpdated = true;
+    notifyListeners();
+  }
+
+  void resetDeckUpdated() {
+    _deckUpdated = false;
   }
 
   void updateMessage(String newMessage) {

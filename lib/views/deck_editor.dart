@@ -120,6 +120,10 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                         const SnackBar(
                             content: Text('La edición del mazo fué exitosa')),
                       );
+                      final appState =
+                          Provider.of<AppState>(context, listen: false);
+                      appState.notifyDeckUpdated();
+
                       widget.refetchPreviewDecks?.call();
                     }
                   },

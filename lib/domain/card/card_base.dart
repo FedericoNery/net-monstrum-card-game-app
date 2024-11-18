@@ -26,6 +26,11 @@ class Card implements ICard {
   }
 
   @override
+  bool isEnergyCardOrEquipmentCard() {
+    return this is CardEnergy || this is CardEquipment;
+  }
+
+  @override
   bool isDigimonCard() {
     return this is CardDigimon;
   }

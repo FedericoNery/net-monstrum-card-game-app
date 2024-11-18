@@ -124,6 +124,17 @@ class CardBattleMultiplayer extends World
 
   CardBattleMultiplayer(this.screenSizeWidth, this.redirectToHomePage) {
     socket.on("UPDATE GAME DATA", (data) {
+      try {
+        var jsonMap = json.decode(data);
+        print("UPDATE GAME DATA");
+        print(jsonMap["gameData"]["game"]["estadoDeLaRonda"]);
+        if (jsonMap["gameData"]["game"]["estadoDeLaRonda"] == 'SUMMON_PHASE' &&
+            !jsonMap["gameData"]["game"]["player1SummonCards"] &&
+            !jsonMap["gameData"]["game"]["player2SummonCards"]) {
+          fadingText.addText("Fase de invocación");
+        }
+      } catch (error) {}
+
       updateBattleCardGameBloc(data);
     });
 
@@ -150,6 +161,9 @@ class CardBattleMultiplayer extends World
     });
 
     socket.on('finish battle phase', (data) {
+      /* var jsonMap = json.decode(data);
+      print(jsonMap["gameData"]["game"]["roundsPlayer1"]);
+      print(jsonMap["gameData"]["game"]["roundsPlayer2"]); */
       //AGREGAR CARTEL O ALGO QUE INDIQUE GANADOR DE LA RONDA
       updateBattleCardGameBloc(data);
     });
@@ -324,7 +338,7 @@ class CardBattleMultiplayer extends World
         !addedCardsToUi) {
       playerCards = CardWidgetFactory(state.battleCardGame.player, false);
       rivalCards = CardWidgetFactory(state.battleCardGame.rival, true);
-      fadingTextQueueComponent.addText("Reparto");
+      fadingText.addText("Fase de reparto de cartas");
       addCards();
       addedCardsToUi = true;
     }
@@ -371,7 +385,6 @@ class CardBattleMultiplayer extends World
       //remove(activateEquipmentButton);
       await Future.delayed(const Duration(seconds: 3));
 
-      socket.disconnect(); // VER SI SIRVE ESTO
       redirectToHomePage();
     }
 
@@ -445,7 +458,7 @@ class CardBattleMultiplayer extends World
         bloc.state.battleCardGame.decksShuffled &&
         !bloc.state.battleCardGame.drawedCards) {
       bloc.add(const DrawCards());
-      fadingText.addText("Fase de reparto");
+      //fadingText.addText("Fase de reparto");
     }
 
 /*     if (bloc.state.battleCardGame.isDrawPhase() &&
@@ -510,6 +523,48 @@ class CardBattleMultiplayer extends World
         bloc.state.battleCardGame.rival.hand.cards.length;
 
     removeEnergyCardIfWasActivated();
+    removeUsedCardsByRival();
+  }
+
+  void removeUsedCardsByRival() {
+    if (addedCardsToUi) {
+      if (rivalCards.card1.isMounted &&
+          bloc.state.battleCardGame.rival.trash
+              .isCardInTrash(rivalCards.card1.getUniqueCardId()) &&
+          rivalCards.card1.card!.isEnergyCardOrEquipmentCard()) {
+        remove(rivalCards.card1);
+      }
+      if (rivalCards.card2.isMounted &&
+          bloc.state.battleCardGame.rival.trash
+              .isCardInTrash(rivalCards.card2.getUniqueCardId()) &&
+          rivalCards.card2.card!.isEnergyCardOrEquipmentCard()) {
+        remove(rivalCards.card2);
+      }
+      if (rivalCards.card3.isMounted &&
+          bloc.state.battleCardGame.rival.trash
+              .isCardInTrash(rivalCards.card3.getUniqueCardId()) &&
+          rivalCards.card3.card!.isEnergyCardOrEquipmentCard()) {
+        remove(rivalCards.card3);
+      }
+      if (rivalCards.card4.isMounted &&
+          bloc.state.battleCardGame.rival.trash
+              .isCardInTrash(rivalCards.card4.getUniqueCardId()) &&
+          rivalCards.card4.card!.isEnergyCardOrEquipmentCard()) {
+        remove(rivalCards.card4);
+      }
+      if (rivalCards.card5.isMounted &&
+          bloc.state.battleCardGame.rival.trash
+              .isCardInTrash(rivalCards.card5.getUniqueCardId()) &&
+          rivalCards.card5.card!.isEnergyCardOrEquipmentCard()) {
+        remove(rivalCards.card5);
+      }
+      if (rivalCards.card6.isMounted &&
+          bloc.state.battleCardGame.rival.trash
+              .isCardInTrash(rivalCards.card6.getUniqueCardId()) &&
+          rivalCards.card6.card!.isEnergyCardOrEquipmentCard()) {
+        remove(rivalCards.card6);
+      }
+    }
   }
 
   void removeEnergyCardIfWasActivated() {
@@ -568,12 +623,20 @@ class CardBattleMultiplayer extends World
   }
 
   void summonToDigimonZone() {
-    socket.emit(PlayerActions.SUMMON_DIGIMONS, {
-      "socketId": socket.id,
-      "usuarioId": bloc.state.battleCardGame.player.username,
-      "cardDigimonsToSummonIds":
-          bloc.state.battleCardGame.player.hand.selectedCardsInternalIds,
-    });
+    //VALIDAR ACÁ
+    if (bloc.state.battleCardGame.player.canSummonAllDigimonSelected()) {
+      print("INVOCA");
+      print(bloc.state.battleCardGame.player.hand.selectedCardsInternalIds);
+      socket.emit(PlayerActions.SUMMON_DIGIMONS, {
+        "socketId": socket.id,
+        "usuarioId": bloc.state.battleCardGame.player.username,
+        "cardDigimonsToSummonIds":
+            bloc.state.battleCardGame.player.hand.selectedCardsInternalIds,
+      });
+    } else {
+      fadingTextQueueComponent.addText("Energías insuficientes para invocar");
+    }
+
     //AGREGAR BOTON CUANDO FINALIZA LA SUMMON PHASE
     //add(confirmUpgradePhaseButton);
   }

@@ -12,9 +12,13 @@ class Trash {
   }
 
   void addAll(List<Card> cards) {
-    for (Card card in cards){
+    for (Card card in cards) {
       this.cards.add(card);
     }
+  }
+
+  bool isCardInTrash(int uniqueCardId) {
+    return cards.any((element) => element.uniqueIdInGame! == uniqueCardId);
   }
 
   Card removeCardAt(int index) {

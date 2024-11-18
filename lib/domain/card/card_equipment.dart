@@ -80,8 +80,12 @@ class CardEquipment extends Card {
     CardEquipment cardEquipment = CardEquipment(
         card["id"],
         card["name"],
-        card["attackPoints"],
-        card["healthPoints"],
+        card.containsKey("attackPoints")
+            ? card["attackPoints"]
+            : card["attackPointsCardEquipment"],
+        card.containsKey("healthPoints")
+            ? card["healthPoints"]
+            : card["healthPointsCardEquipment"],
         card["targetScope"],
         card["quantityOfTargets"]);
     cardEquipment.uniqueIdInGame = card["uniqueIdInGame"];

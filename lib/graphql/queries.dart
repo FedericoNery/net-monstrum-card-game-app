@@ -40,9 +40,6 @@ String getUserByIdQuery = """
             healthPointsCardSummonDigimon: healthPoints
             energyCount
             level
-            evolution {
-              name
-            }
           }
         }
         ... on CardEquipment {

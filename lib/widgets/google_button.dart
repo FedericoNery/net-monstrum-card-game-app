@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
+import 'package:net_monstrum_card_game/infrastructure/env_service.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
 import 'package:net_monstrum_card_game/services/local_session.dart';
 import 'package:net_monstrum_card_game/services/user_service.dart';
@@ -23,6 +24,20 @@ class GoogleSignInButtonState extends StatefulWidget {
 }
 
 class _GoogleSignInButton extends State<GoogleSignInButtonState> {
+  bool isValidEmail(String email) {
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9.a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return email.isNotEmpty && emailRegex.hasMatch(email);
+  }
+
+  void showError(BuildContext context, String? message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red.shade600,
+        content: Text(
+          message ?? "Ocurrió un error",
+        )));
+  }
+
   @override
   Widget build(BuildContext context) {
     GraphQlClientManager graphQlClientManager = GraphQlClientManager();
@@ -51,61 +66,51 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
             ),
             onPressed: () async {
               try {
-                bool loginWithoutGoogle =
-                    dotenv.env['LOGIN_WITHOUT_GOOGLE']?.toLowerCase() == 'true';
-                final user = loginWithoutGoogle
-                    ? {"email": widget.usernameController.text}
-                        as Map<String, String>
-                    : await UserController.loginWithGoogle() as User?;
+                final usernameText = widget.usernameController.text.trim();
+                if (!isValidEmail(usernameText)) {
+                  showError(context, "El email es inválido");
+                  return;
+                }
+
+                final user = EnvService.loginWithoutGoogle
+                    ? {"email": widget.usernameController.text.trim()}
+                    : await UserController.loginWithGoogle();
 
                 if (user != null && mounted) {
-                  final accessTokenFromApi =
-                      await usersService.fetchUserWithEmail(loginWithoutGoogle
+                  final accessTokenFromApi = await usersService
+                      .fetchUserWithEmail(EnvService.loginWithoutGoogle
                           ? (user as Map<String, String>)["email"]!
                           : (user as User?)!.email!);
 
-                  bool isExpired = JwtDecoder.isExpired(accessTokenFromApi!);
-
-                  if (isExpired) {
-                    throw Exception("Expired session");
-                  }
-
                   if (accessTokenFromApi == null) {
-                    throw Exception("User not found in app");
-                  } else {
-                    Map<String, dynamic> decodedToken =
-                        JwtDecoder.decode(accessTokenFromApi);
-
-                    DateTime expirationDate =
-                        JwtDecoder.getExpirationDate(accessTokenFromApi);
-
-                    await saveUserSession(accessTokenFromApi, expirationDate);
-                    appState.setUserInformation(
-                        decodedToken, accessTokenFromApi);
-
-                    coinState.setCoins(decodedToken["coins"]);
-
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => Scaffold(
-                              backgroundColor: Colors.white,
-                              body: Center(
-                                child: MenuPage(),
-                              ),
-                            )));
+                    showError(context, "Usuario no encontrado");
+                    return;
                   }
+
+                  Map<String, dynamic> decodedToken =
+                      JwtDecoder.decode(accessTokenFromApi);
+
+                  DateTime expirationDate =
+                      JwtDecoder.getExpirationDate(accessTokenFromApi);
+
+                  await saveUserSession(accessTokenFromApi, expirationDate);
+                  appState.setUserInformation(decodedToken, accessTokenFromApi);
+
+                  coinState.setCoins(decodedToken["coins"]);
+
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => Scaffold(
+                            backgroundColor: Colors.white,
+                            body: Center(
+                              child: MenuPage(),
+                            ),
+                          )));
                 }
               } on FirebaseAuthException catch (error) {
-                print(error.message);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                  error.message ?? "Something went wrong",
-                )));
+                showError(context, error.message);
               } catch (error) {
                 print(error);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                  error.toString(),
-                )));
+                showError(context, error.toString());
               }
             }));
   }

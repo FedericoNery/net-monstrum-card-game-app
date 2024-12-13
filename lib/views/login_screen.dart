@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
+import 'package:net_monstrum_card_game/infrastructure/env_service.dart';
 import 'package:net_monstrum_card_game/services/local_session.dart';
 import 'package:net_monstrum_card_game/services/user_service.dart';
 import 'package:net_monstrum_card_game/state/coin_state.dart';
@@ -35,19 +36,19 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final TextEditingController usernameController = TextEditingController();
-    bool loginWithoutGoogle =
-        dotenv.env['LOGIN_WITHOUT_GOOGLE']?.toLowerCase() == 'true';
 
     return FutureBuilder<UserFromLocalSession>(
       future: getUserFromLocalSession(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error al revisar estado de sesión'));
-        } else if (!(snapshot.data!.isTokenExpiredOrNotExists) &&
-            snapshot.data!.user != null &&
-            snapshot.data!.token != "") {
+        }
+
+        if (snapshot.hasError) {
+          return const Center(child: Text('Error al revisar estado de sesión'));
+        }
+
+        if (snapshot.data!.hasInformationInLocalStorage()) {
           // Token is valid, navigate to home screen
           final appState = Provider.of<AppState>(context, listen: false);
           final coinState = Provider.of<CoinState>(context, listen: false);
@@ -58,7 +59,9 @@ class _LoginScreenState extends State<LoginScreen> {
               snapshot.data!.user!, snapshot.data!.token);
           print("ENTRó");
           return MenuPage();
-        } else if (snapshot.data!.isTokenExpiredOrNotExists) {
+        }
+
+        if (snapshot.data!.isTokenExpiredOrNotExists) {
           // Token is expired, navigate to login screen
           return Scaffold(
               appBar: AppBar(
@@ -69,13 +72,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                     GoogleSignInButtonState(usernameController),
-                    if (loginWithoutGoogle)
+                    if (EnvService.loginWithoutGoogle)
                       Padding(
                           padding: const EdgeInsets.fromLTRB(48, 20, 48, 40),
                           child: TextField(
                             controller: usernameController,
                             decoration: const InputDecoration(
-                              labelText: 'Ingrese email registrado',
+                              labelText: 'Ingrese el email registrado',
                               border: OutlineInputBorder(),
                             ),
                           )),
@@ -87,9 +90,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () => _toCreateUserPage(context),
                     ),
                   ])));
-        } else {
-          return Container();
         }
+
+        return Container();
       },
     );
   }

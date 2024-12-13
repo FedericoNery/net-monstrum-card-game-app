@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
+import 'package:net_monstrum_card_game/infrastructure/env_service.dart';
 import 'package:net_monstrum_card_game/services/local_session.dart';
 import 'package:net_monstrum_card_game/state/coin_state.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
@@ -74,68 +75,64 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor ingresa un nombre de usuario')),
       );
-    } else {
-      try {
-        bool registerWithoutGoogle =
-            dotenv.env['REGISTER_WITHOUT_GOOGLE']?.toLowerCase() == 'true';
 
-        final user = registerWithoutGoogle
-            ? {"email": "$username@email.com"}
-            : await UserController.loginWithGoogle();
+      return;
+    }
 
-        final resultMutation = await usersService.createUserWithEmail(
-            registerWithoutGoogle
+    try {
+      final user = EnvService.registerWithoutGoogle
+          ? {"email": "$username@email.com"}
+          : await UserController.loginWithGoogle();
+
+      final resultMutation = await usersService.createUserWithEmail(
+          EnvService.registerWithoutGoogle
+              ? (user as Map<String, String>)["email"]!
+              : (user as User?)!.email!,
+          username,
+          _avatarUrlSelected);
+
+      if (resultMutation != null && user != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Usuario creado exitosamente'),
+            backgroundColor: Colors.green.shade900,
+          ),
+        );
+
+        final accessTokenFromApi = await usersService.fetchUserWithEmail(
+            EnvService.registerWithoutGoogle
                 ? (user as Map<String, String>)["email"]!
-                : (user as User?)!.email!,
-            username,
-            _avatarUrlSelected);
+                : (user as User?)!.email!);
 
-        if (resultMutation != null && user != null && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Usuario creado exitosamente')),
-          );
-
-          final accessTokenFromApi = await usersService.fetchUserWithEmail(
-              registerWithoutGoogle
-                  ? (user as Map<String, String>)["email"]!
-                  : (user as User?)!.email!);
-
-          if (accessTokenFromApi == null) {
-            throw Exception("User not found in app");
-          } else {
-            Map<String, dynamic> decodedToken =
-                JwtDecoder.decode(accessTokenFromApi);
-
-            DateTime expirationDate =
-                JwtDecoder.getExpirationDate(accessTokenFromApi);
-
-            await saveUserSession(accessTokenFromApi, expirationDate);
-
-            //Hacer consulta sobre cuantas monedas tiene el usuario y setear state
-            coinState.setWithoutListener(decodedToken["coins"]);
-            appState.setUserInformation(decodedToken, accessTokenFromApi);
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => Scaffold(
-                      backgroundColor: Colors.white,
-                      body: Center(
-                        child: MenuPage(),
-                      ),
-                    )));
-          }
+        if (accessTokenFromApi == null) {
+          showError(context, "Usuario no encontrado");
+          return;
         }
-      } on FirebaseAuthException catch (error) {
-        print(error.message);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-          error.message ?? "Something went wrong",
-        )));
-      } catch (error) {
-        print(error);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-          error.toString(),
-        )));
+        Map<String, dynamic> decodedToken =
+            JwtDecoder.decode(accessTokenFromApi);
+
+        DateTime expirationDate =
+            JwtDecoder.getExpirationDate(accessTokenFromApi);
+
+        await saveUserSession(accessTokenFromApi, expirationDate);
+
+        //Hacer consulta sobre cuantas monedas tiene el usuario y setear state
+        coinState.setWithoutListener(decodedToken["coins"]);
+        appState.setUserInformation(decodedToken, accessTokenFromApi);
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => Scaffold(
+                  backgroundColor: Colors.white,
+                  body: Center(
+                    child: MenuPage(),
+                  ),
+                )));
       }
+    } on FirebaseAuthException catch (error) {
+      print(error.message);
+      showError(context, error.message);
+    } catch (error) {
+      print(error);
+      showError(context, error.toString());
     }
   }
 
@@ -143,6 +140,14 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
     setState(() {
       _avatarUrlSelected = avatarUrl;
     });
+  }
+
+  void showError(BuildContext context, String? message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red.shade600,
+        content: Text(
+          message ?? "Ocurrió un error",
+        )));
   }
 
   @override

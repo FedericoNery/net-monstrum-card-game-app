@@ -642,10 +642,12 @@ class CardBattle extends World
     await Future.delayed(Duration(seconds: 3));
 
     bloc.add(BattlePhasePlayerAttacksRival());
-    await Future.delayed(Duration(seconds: 3));
+    await playerCards.attackAnimation();
+    await Future.delayed(Duration(seconds: 5));
 
     bloc.add(BattlePhaseRivalAttacksPlayer());
-    await Future.delayed(Duration(seconds: 3));
+    await rivalCards.attackAnimation();
+    await Future.delayed(Duration(seconds: 5));
 
     bloc.add(BattlePhaseFinishRound());
     fadingTextQueueComponent.addText("Batalla finalizada...");

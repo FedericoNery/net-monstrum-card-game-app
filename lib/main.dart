@@ -35,15 +35,15 @@ void main() async {
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
 
-/*   SinglePlayerGameView singlePlayerGameView = SinglePlayerGameView();
-  runApp(singlePlayerGameView);
- */
   /* SocketView socketView = SocketView();
   runApp(socketView); */
 
   FlutterNativeSplash.remove();
 
-  final HttpLink httpLink = HttpLink(dotenv.env['API_URL'] ?? '');
+  SinglePlayerGameView singlePlayerGameView = SinglePlayerGameView();
+  runApp(singlePlayerGameView);
+
+  /*  final HttpLink httpLink = HttpLink(dotenv.env['API_URL'] ?? '');
 
   final GraphQLClient client = GraphQLClient(
     link: httpLink,
@@ -63,10 +63,6 @@ void main() async {
               primarySwatch: Colors.deepPurple,
               fontFamily: 'PixelDigivolve',
             ),
-            //navigatorKey: _mainNavigatorKey,
             home: LoginScreen(),
-          ))));
-
-/*   MultiplayerGameView multiplayerGameView = MultiplayerGameView();
-  runApp(multiplayerGameView); */
+          )))); */
 }

@@ -8,6 +8,7 @@ import 'package:net_monstrum_card_game/graphql/queries.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
 import 'package:net_monstrum_card_game/state/coin_state.dart';
 import 'package:net_monstrum_card_game/widgets/deck_editor/card_color.dart';
+import 'package:net_monstrum_card_game/widgets/shared/snackbar.dart';
 import 'package:provider/provider.dart';
 
 class CardShop extends StatefulWidget {
@@ -24,22 +25,12 @@ class _CardShopState extends State<CardShop> {
 
   void buyCard(RunMutation runMutation, CardItem card) {
     if (coins < card.price) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('No posee suficientes monedas'),
-          backgroundColor: Colors.amber.shade600,
-        ),
-      );
+      showWarning(context, 'No posee suficientes monedas');
       return;
     }
 
     if (card.ownedCount >= card.maxCopies) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Alcanzó la máxima cantidad de copias de la carta'),
-          backgroundColor: Colors.amber.shade600,
-        ),
-      );
+      showWarning(context, 'Alcanzó la máxima cantidad de copias de la carta');
       return;
     }
 
@@ -99,27 +90,18 @@ class _CardShopState extends State<CardShop> {
                             ['reachedMaxCopiesOfCard'];
 
                         if (cardNotFound) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Carta no encontrada')),
-                          );
+                          showError(context, 'Alguna carta no fué encontrada');
                           return;
                         }
 
                         if (insuficientCoins) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('No posee suficientes monedas')),
-                          );
+                          showError(context, 'No posee suficientes monedas');
                           return;
                         }
 
                         if (reachedMaxCopiesOfCard) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'Alcanzó la cantidad máxima de cartas')),
-                          );
+                          showError(
+                              context, 'Alcanzó la cantidad máxima de cartas');
                           return;
                         }
 
@@ -142,12 +124,7 @@ class _CardShopState extends State<CardShop> {
                             }
                           }
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('La compra fué exitosa'),
-                              backgroundColor: Colors.green.shade900,
-                            ),
-                          );
+                          showSuccess(context, 'La compra fué exitosa');
                           refetch?.call();
                           Navigator.of(context).pop();
                         }

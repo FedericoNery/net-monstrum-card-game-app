@@ -21,7 +21,7 @@ class CardBattleComponent extends FlameGame {
   @override
   Future<void> onLoad() async {
     final backgroundImage = await images.load("backgrounds/fondo5.jpeg");
-    final _imagesNames = [ParallaxImageData("backgrounds/fondo5-min.jpeg")];
+    final _imagesNames = [ParallaxImageData("backgrounds/fondo5.jpeg")];
 
     final screenSize = WidgetsBinding.instance!.window.physicalSize;
 

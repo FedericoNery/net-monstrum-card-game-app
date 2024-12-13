@@ -164,6 +164,33 @@ class CardWidgetFactory {
     card6.update(1);
   }
 
+  Future attackAnimation() async {
+    if (card1.isMounted && card1 is DigimonCardComponent) {
+      (card1 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+    if (card2.isMounted && card2 is DigimonCardComponent) {
+      (card2 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+    if (card3.isMounted && card3 is DigimonCardComponent) {
+      (card3 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+    if (card4.isMounted && card4 is DigimonCardComponent) {
+      (card4 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+    if (card5.isMounted && card5 is DigimonCardComponent) {
+      (card5 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+    if (card6.isMounted && card6 is DigimonCardComponent) {
+      (card6 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+  }
+
   void applyDrawEffect() {
     MoveEffect moveEffect = getDrawMoveEffect(
         card1.x, card1.y, CardsMeasures.card1x, CardsMeasures.card1y);

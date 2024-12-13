@@ -70,6 +70,78 @@ class DigimonCardComponent extends BaseCardComponent
     };
   }
 
+  /*  void attackAnimation() async {
+    final scaleEffectUp = ScaleEffect.to(
+      Vector2.all(1.5),
+      EffectController(duration: 0.15),
+    );
+
+    final attackPathEffect = MoveAlongPathEffect(
+      Path()
+        ..moveTo(0, 0)
+        ..quadraticBezierTo(30, isRival ? 100 : -80, 0, isRival ? 200 : -180),
+      EffectController(duration: 0.3),
+    );
+
+    final returnPathEffect = MoveAlongPathEffect(
+      Path()
+        ..moveTo(0, 0)
+        ..quadraticBezierTo(30, isRival ? -100 : 80, 0, isRival ? -200 : 180),
+      EffectController(duration: 0.3),
+    );
+
+    final scaleEffectDown = ScaleEffect.to(
+      Vector2.all(1.0),
+      EffectController(duration: 0.15),
+    );
+
+    add(scaleEffectUp);
+    scaleEffectUp.onComplete = () {
+      add(attackPathEffect);
+    };
+
+    attackPathEffect.onComplete = () {
+      add(returnPathEffect);
+    };
+
+    returnPathEffect.onComplete = () {
+      add(scaleEffectDown);
+    };
+  } */
+  void attackAnimation() async {
+    final scaleEffectUp = ScaleEffect.to(
+      Vector2.all(1.5),
+      EffectController(duration: 0.15, startDelay: 0.05),
+    );
+
+    final attackPathEffect = MoveAlongPathEffect(
+      Path()
+        ..moveTo(0, 0)
+        ..quadraticBezierTo(30, isRival ? 100 : -80, 0, isRival ? 200 : -180),
+      EffectController(duration: 0.3),
+    );
+
+    final returnPathEffect = MoveAlongPathEffect(
+      Path()
+        ..moveTo(0, 0)
+        ..quadraticBezierTo(30, isRival ? -100 : 80, 0, isRival ? -200 : 180),
+      EffectController(duration: 0.3),
+    );
+
+    final scaleEffectDown = ScaleEffect.to(
+      Vector2.all(1.0),
+      EffectController(duration: 0.15, startDelay: 0.05),
+    );
+
+    add(attackPathEffect);
+    add(scaleEffectUp);
+
+    attackPathEffect.onComplete = () {
+      add(scaleEffectDown);
+      add(returnPathEffect);
+    };
+  }
+
   bool isEnabledToEquip() {
     return bloc.state.battleCardGame.isUpgradePhase();
   }

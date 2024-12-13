@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
@@ -16,7 +17,10 @@ import '../../../domain/card/card_digimon.dart';
 import '../effects/effects.dart';
 
 class DigimonCardComponent extends BaseCardComponent
-    with TapCallbacks, FlameBlocListenable<CardBattleBloc, CardBattleState> {
+    with
+        TapCallbacks,
+        CollisionCallbacks,
+        FlameBlocListenable<CardBattleBloc, CardBattleState> {
   final CardDigimon card;
   DigimonCardComponent(
       this.card, double x, double y, bool isHidden, bool isRival)
@@ -36,6 +40,8 @@ class DigimonCardComponent extends BaseCardComponent
         ? 'cards/card_back4.webp'
         : 'digimon/${card.digimonName.replaceAll(" ", "-")}.jpg';
     sprite = await Sprite.load(uri);
+    add(RectangleHitbox(
+        position: Vector2(x, y), size: Vector2(400, 80), isSolid: true));
   }
 
   @override
@@ -52,6 +58,48 @@ class DigimonCardComponent extends BaseCardComponent
   @override
   void update(double dt) {
     // Implementa la lógica de actualización si es necesario
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+
+    // Comprobar si colisiona con otra carta
+    print("ENTRO");
+    if (other is DigimonCardComponent) {
+      handleCollision();
+    }
+  }
+
+  void handleCollision() {
+    // Lógica cuando colisiona con otra carta
+    rotateAndApplyLightning();
+  }
+
+  void rotateAndApplyLightning() {
+    final rotateEffect = RotateEffect.by(
+      0.1, // Ángulo en radianes (positivo o negativo)
+      EffectController(duration: 0.2, reverseDuration: 0.2), // Rotar y volver
+    );
+
+    add(rotateEffect);
+    applyLightningEffect();
+  }
+
+  void applyLightningEffect() async {
+    final lightningSprite = SpriteComponent()
+      ..sprite =
+          await Sprite.load('effects/lightning-2.png') // Tu imagen de rayos
+      ..size = size // Ajustar al tamaño de la carta
+      ..position = Vector2.zero() // Coincidir con la posición de la carta
+      ..anchor = Anchor.center;
+
+    add(lightningSprite);
+
+    // Remover el efecto después de un tiempo
+    Future.delayed(Duration(milliseconds: 300), () {
+      lightningSprite.removeFromParent();
+    });
   }
 
   void reveal() async {
@@ -166,10 +214,10 @@ class DigimonCardComponent extends BaseCardComponent
       add(moveEffect);
 
       if (isSelected) {
-        final shapeComponent = getFlickeringCardBorder();
-        add(shapeComponent);
+        add(super.shapeComponent);
       } else {
-        children.first.add(RemoveEffect(delay: 0.1));
+        remove(super.shapeComponent);
+        //children.first.add(RemoveEffect(delay: 0.1));
       }
 
       if (bloc.state.battleCardGame.player
@@ -187,7 +235,14 @@ class DigimonCardComponent extends BaseCardComponent
   }
 
   @override
-  void onNewState(CardBattleState state) {}
+  void onNewState(CardBattleState state) {
+    /* print(state.battleCardGame.isUpgradePhase());
+    print(children.first.isMounted); */
+
+    /* if (state.battleCardGame.isUpgradePhase() && shapeComponent.isMounted) {
+      children.first.add(RemoveEffect(delay: 0.1));
+    } */
+  }
 
   @override
   int getUniqueCardId() {

@@ -2,6 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/widgets/card_battle/effects/effects.dart';
+import 'package:net_monstrum_card_game/widgets/card_battle/styles/flickering_card_border.dart';
 
 abstract class BaseCardComponent extends SpriteComponent {
   bool isHidden = false;
@@ -10,6 +11,7 @@ abstract class BaseCardComponent extends SpriteComponent {
   bool isSelected = false;
   bool isRival = false;
   Card? card;
+  final shapeComponent = getFlickeringCardBorder();
 
   BaseCardComponent({required Vector2 size, required Vector2 position})
       : super(size: size, position: position);
@@ -17,17 +19,18 @@ abstract class BaseCardComponent extends SpriteComponent {
   void reveal();
   int getUniqueCardId();
 
-  void deselectCardEffect(){
-    if(isSelected){
+  void deselectCardEffect() {
+    if (isSelected) {
+      print("LLEGO A QUIOTAR");
       isSelected = false;
-      children.first.add(RemoveEffect(delay: 0.1));
+      remove(shapeComponent);
+      //children.first.add(RemoveEffect(delay: 0.1));
       update(1);
     }
   }
 
-  void setPosition(double x, double y){
+  void setPosition(double x, double y) {
     this.x = x;
     this.y = y;
   }
-
 }

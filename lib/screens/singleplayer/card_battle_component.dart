@@ -10,7 +10,7 @@ import 'package:net_monstrum_card_game/screens/singleplayer/card_battle.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_state.dart';
 
-class CardBattleComponent extends FlameGame {
+class CardBattleComponent extends FlameGame with HasCollisionDetection {
   final BattleCardGame battleCardGame;
 
   CardBattleComponent(this.battleCardGame)

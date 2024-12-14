@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
+import 'package:net_monstrum_card_game/infrastructure/env_service.dart';
 import 'package:net_monstrum_card_game/state/coin_state.dart';
 import 'package:net_monstrum_card_game/views/login_screen.dart';
 import 'package:provider/provider.dart';
@@ -16,21 +17,15 @@ import 'views/single_player_game_view.dart';
 
 void main() async {
   await dotenv.load(fileName: "../dotenv.txt");
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  if (!EnvService.skipGoogleSession) {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+  }
   await initHiveForFlutter();
 
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
-  bool skipGoogleSession =
-      dotenv.env['SKIP_GOOGLE_SESSION']?.toLowerCase() == 'true';
-  if (!skipGoogleSession) {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-  }
 
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();

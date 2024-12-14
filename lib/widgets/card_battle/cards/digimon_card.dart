@@ -5,6 +5,7 @@ import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/card_battle.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_event.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_state.dart';
@@ -20,18 +21,25 @@ class DigimonCardComponent extends BaseCardComponent
     with
         TapCallbacks,
         CollisionCallbacks,
+        HasWorldReference<CardBattle>,
         FlameBlocListenable<CardBattleBloc, CardBattleState> {
   final CardDigimon card;
+  late int rowId;
+  late bool isAttacking;
+
   DigimonCardComponent(
       this.card, double x, double y, bool isHidden, bool isRival)
       : super(
           size: isHidden ? Vector2(64, 85) : Vector2.all(64),
           position: Vector2(x, y),
         ) {
+    debugMode = true;
     this.isHidden = isHidden;
     this.isRival = isRival;
     this.x = x;
     this.y = y;
+    this.rowId = isRival ? 1 : 2;
+    this.isAttacking = false;
   }
 
   @override
@@ -40,8 +48,15 @@ class DigimonCardComponent extends BaseCardComponent
         ? 'cards/card_back4.webp'
         : 'digimon/${card.digimonName.replaceAll(" ", "-")}.jpg';
     sprite = await Sprite.load(uri);
-    add(RectangleHitbox(
-        position: Vector2(x, y), size: Vector2(400, 80), isSolid: true));
+
+    if (isRival) {
+      final xHitboxOrigin = 100.0 - x;
+      final yHitboxOrigin = 35.0 - y;
+      add(RectangleHitbox(
+          position: Vector2(xHitboxOrigin, yHitboxOrigin),
+          size: Vector2(520, 85),
+          isSolid: true));
+    }
   }
 
   @override
@@ -65,9 +80,12 @@ class DigimonCardComponent extends BaseCardComponent
     super.onCollision(intersectionPoints, other);
 
     // Comprobar si colisiona con otra carta
-    print("ENTRO");
-    if (other is DigimonCardComponent) {
-      handleCollision();
+    if (other is DigimonCardComponent &&
+        bloc.state.battleCardGame.isBattlePhase()) {
+      // Usar gameRef para encontrar todas las cartas de la fila
+      if (other.isAttacking && !isAttacking && other.rowId != this.rowId) {
+        handleCollision();
+      }
     }
   }
 
@@ -81,7 +99,8 @@ class DigimonCardComponent extends BaseCardComponent
       0.1, // Ángulo en radianes (positivo o negativo)
       EffectController(duration: 0.2, reverseDuration: 0.2), // Rotar y volver
     );
-
+    position = Vector2(x + 32, y + 32);
+    anchor = Anchor.center;
     add(rotateEffect);
     applyLightningEffect();
   }
@@ -91,7 +110,7 @@ class DigimonCardComponent extends BaseCardComponent
       ..sprite =
           await Sprite.load('effects/lightning-2.png') // Tu imagen de rayos
       ..size = size // Ajustar al tamaño de la carta
-      ..position = Vector2.zero() // Coincidir con la posición de la carta
+      ..position = Vector2(32, 30) // Coincidir con la posición de la carta
       ..anchor = Anchor.center;
 
     add(lightningSprite);
@@ -115,6 +134,15 @@ class DigimonCardComponent extends BaseCardComponent
       final uri = 'digimon/${card.digimonName.replaceAll(" ", "-")}.jpg';
       sprite = await Sprite.load(uri);
       update(1);
+
+      if (!isRival) {
+        final xHitboxOrigin = 100.0 - x;
+        final yHitboxOrigin = 278.5 - y;
+        add(RectangleHitbox(
+            position: Vector2(xHitboxOrigin, yHitboxOrigin),
+            size: Vector2(520, 85),
+            isSolid: true));
+      }
     };
   }
 
@@ -157,6 +185,7 @@ class DigimonCardComponent extends BaseCardComponent
     };
   } */
   void attackAnimation() async {
+    isAttacking = true;
     final scaleEffectUp = ScaleEffect.to(
       Vector2.all(1.5),
       EffectController(duration: 0.15, startDelay: 0.05),
@@ -187,6 +216,10 @@ class DigimonCardComponent extends BaseCardComponent
     attackPathEffect.onComplete = () {
       add(scaleEffectDown);
       add(returnPathEffect);
+    };
+
+    returnPathEffect.onComplete = () {
+      isAttacking = false;
     };
   }
 

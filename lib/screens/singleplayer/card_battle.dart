@@ -8,6 +8,7 @@ import 'package:net_monstrum_card_game/domain/card/card_base.dart' as cardBase;
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/card_battle_component.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/rounded_rectangle_component.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_event.dart';
@@ -27,7 +28,7 @@ import '../../widgets/shared/icon_with_counter.dart';
 import 'dart:ui' as ui;
 
 class CardBattle extends World
-    with HasGameRef, FlameBlocListenable<CardBattleBloc, CardBattleState> {
+    with HasGameRef<CardBattleComponent>, FlameBlocListenable<CardBattleBloc, CardBattleState> {
   late ParallaxComponent backgroundParallax;
 
   final enabledMusic = false;
@@ -109,9 +110,9 @@ class CardBattle extends World
       minPlayers: 2,
       maxPlayers: 2,
     );
-    if (enabledMusic) {
+    /* if (enabledMusic) {
       startBgmMusic();
-    }
+    } */
 
     fadingText = FadingTextComponent(
         screenWidth: screenSizeWidth / 850,
@@ -164,11 +165,11 @@ class CardBattle extends World
       scale: Vector2.all(0.8),
     ); */
 
-    summonDigimonButton.position = Vector2(650, 50);
+    summonDigimonButton.position = Vector2(650, 175);
     summonDigimonButton.size = Vector2(100, 50);
     summonDigimonButton.tapUpCallback = nextPhase;
 
-    activateEquipmentButton.position = Vector2(650, 50);
+    activateEquipmentButton.position = Vector2(650, 175);
     activateEquipmentButton.size = Vector2(100, 50);
     activateEquipmentButton.tapUpCallback = nextToBattlePhase;
 

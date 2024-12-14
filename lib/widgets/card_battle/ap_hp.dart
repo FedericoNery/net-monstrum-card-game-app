@@ -5,9 +5,14 @@ import 'package:net_monstrum_card_game/domain/game.dart';
 class ApHpText extends PositionComponent {
   String text;
   int cantidad;
+  int _currentCantidad;
+  int _targetCantidad;
   final double x;
   final double y;
   final Color backgroundColor;
+  double _animationProgress = 0.0;
+  double _animationDuration = 5.0; // Duración de la animación en segundos.
+  double _elapsedTime = 0.0;
 
   ApHpText({
     required this.text,
@@ -15,7 +20,34 @@ class ApHpText extends PositionComponent {
     required this.x,
     required this.y,
     this.backgroundColor = const Color(0xFF333333),
-  });
+  })  : _currentCantidad = cantidad,
+        _targetCantidad = cantidad;
+
+  void updateCantidad(int nuevaCantidad) {
+    if (nuevaCantidad != _targetCantidad) {
+      _animationProgress = 0.0;
+      _animationDuration =
+          nuevaCantidad.abs() - _targetCantidad.abs() > 50 ? 5.0 : 2.5;
+      _elapsedTime = 0.0;
+      _targetCantidad = nuevaCantidad;
+    }
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    if (_animationProgress < 1.0) {
+      // Incrementa el tiempo transcurrido y calcula el progreso de la animación.
+      _elapsedTime += dt;
+      _animationProgress = (_elapsedTime / _animationDuration).clamp(0.0, 5.0);
+
+      // Interpola entre el valor actual y el objetivo.
+      _currentCantidad = (_currentCantidad +
+              (_targetCantidad - _currentCantidad) * _animationProgress)
+          .round();
+    }
+  }
 
   @override
   void render(Canvas canvas) {
@@ -43,7 +75,7 @@ class ApHpText extends PositionComponent {
         fontSize: 12,
       ),
     );
-    textPaint.render(canvas, '$text $cantidad', Vector2(30, 4));
+    textPaint.render(canvas, '$text $_currentCantidad', Vector2(30, 4));
   }
 }
 

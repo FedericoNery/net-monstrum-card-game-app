@@ -28,7 +28,9 @@ import '../../widgets/shared/icon_with_counter.dart';
 import 'dart:ui' as ui;
 
 class CardBattle extends World
-    with HasGameRef<CardBattleComponent>, FlameBlocListenable<CardBattleBloc, CardBattleState> {
+    with
+        HasGameRef<CardBattleComponent>,
+        FlameBlocListenable<CardBattleBloc, CardBattleState> {
   late ParallaxComponent backgroundParallax;
 
   final enabledMusic = false;
@@ -551,10 +553,16 @@ class CardBattle extends World
     colorCounterInstances.whiteCounterRival.cantidad =
         bloc.state.battleCardGame.rival.energiesCounters.white;
 
-    apRival.cantidad = bloc.state.battleCardGame.rival.attackPoints;
+    /*  apRival.cantidad = bloc.state.battleCardGame.rival.attackPoints;
     hpRival.cantidad = bloc.state.battleCardGame.rival.healthPoints;
     apPlayer.cantidad = bloc.state.battleCardGame.player.attackPoints;
-    hpPlayer.cantidad = bloc.state.battleCardGame.player.healthPoints;
+    hpPlayer.cantidad = bloc.state.battleCardGame.player.healthPoints; */
+
+    apRival.updateCantidad(bloc.state.battleCardGame.rival.attackPoints);
+    hpRival.updateCantidad(bloc.state.battleCardGame.rival.healthPoints);
+
+    apPlayer.updateCantidad(bloc.state.battleCardGame.player.attackPoints);
+    hpPlayer.updateCantidad(bloc.state.battleCardGame.player.healthPoints);
 
     roundsWinPlayer.text = 'W:${bloc.state.battleCardGame.player.roundsWon}';
     roundsWinRival.text = 'W:${bloc.state.battleCardGame.rival.roundsWon}';
@@ -639,6 +647,7 @@ class CardBattle extends World
   }
 
   void battlePhase() async {
+    removeCardsBeforeBattlePhaseStart();
     bloc.add(BattlePhaseInit());
     await Future.delayed(Duration(seconds: 3));
 
@@ -652,6 +661,52 @@ class CardBattle extends World
 
     bloc.add(BattlePhaseFinishRound());
     fadingTextQueueComponent.addText("Batalla finalizada...");
+  }
+
+  void removeCardsBeforeBattlePhaseStart() {
+    if (playerCards.card1.isMounted &&
+        !playerCards.card1.card!.isDigimonCard()) {
+      remove(playerCards.card1);
+    }
+    if (playerCards.card2.isMounted &&
+        !playerCards.card2.card!.isDigimonCard()) {
+      remove(playerCards.card2);
+    }
+    if (playerCards.card3.isMounted &&
+        !playerCards.card3.card!.isDigimonCard()) {
+      remove(playerCards.card3);
+    }
+    if (playerCards.card4.isMounted &&
+        !playerCards.card4.card!.isDigimonCard()) {
+      remove(playerCards.card4);
+    }
+    if (playerCards.card5.isMounted &&
+        !playerCards.card5.card!.isDigimonCard()) {
+      remove(playerCards.card5);
+    }
+    if (playerCards.card6.isMounted &&
+        !playerCards.card6.card!.isDigimonCard()) {
+      remove(playerCards.card6);
+    }
+
+    if (rivalCards.card1.isMounted && !rivalCards.card1.card!.isDigimonCard()) {
+      remove(rivalCards.card1);
+    }
+    if (rivalCards.card2.isMounted && !rivalCards.card2.card!.isDigimonCard()) {
+      remove(rivalCards.card2);
+    }
+    if (rivalCards.card3.isMounted && !rivalCards.card3.card!.isDigimonCard()) {
+      remove(rivalCards.card3);
+    }
+    if (rivalCards.card4.isMounted && !rivalCards.card4.card!.isDigimonCard()) {
+      remove(rivalCards.card4);
+    }
+    if (rivalCards.card5.isMounted && !rivalCards.card5.card!.isDigimonCard()) {
+      remove(rivalCards.card5);
+    }
+    if (rivalCards.card6.isMounted && !rivalCards.card6.card!.isDigimonCard()) {
+      remove(rivalCards.card6);
+    }
   }
 
   void removeAllCards() {

@@ -40,7 +40,8 @@ class ApHpText extends PositionComponent {
     if (_animationProgress < 1.0) {
       // Incrementa el tiempo transcurrido y calcula el progreso de la animación.
       _elapsedTime += dt;
-      _animationProgress = (_elapsedTime / _animationDuration).clamp(0.0, 5.0);
+      _animationProgress =
+          (_elapsedTime / _animationDuration).clamp(0.0, _animationDuration);
 
       // Interpola entre el valor actual y el objetivo.
       _currentCantidad = (_currentCantidad +

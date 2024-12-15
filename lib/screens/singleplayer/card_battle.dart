@@ -527,31 +527,31 @@ class CardBattle extends World
     int? activatedEnergyCardId =
         bloc.state.battleCardGame.activatedEnergyCardId;
 
-    colorCounterInstances.blackCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.black;
-    colorCounterInstances.blueCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.blue;
-    colorCounterInstances.brownCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.brown;
-    colorCounterInstances.greenCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.green;
-    colorCounterInstances.redCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.red;
-    colorCounterInstances.whiteCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.white;
+    colorCounterInstances.blackCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.black);
+    colorCounterInstances.blueCounter
+        .updateCantidad(bloc.state.battleCardGame.player.energiesCounters.blue);
+    colorCounterInstances.brownCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.brown);
+    colorCounterInstances.greenCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.green);
+    colorCounterInstances.redCounter
+        .updateCantidad(bloc.state.battleCardGame.player.energiesCounters.red);
+    colorCounterInstances.whiteCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.white);
 
-    colorCounterInstances.blackCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.black;
-    colorCounterInstances.blueCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.blue;
-    colorCounterInstances.brownCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.brown;
-    colorCounterInstances.greenCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.green;
-    colorCounterInstances.redCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.red;
-    colorCounterInstances.whiteCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.white;
+    colorCounterInstances.blackCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.black);
+    colorCounterInstances.blueCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.blue);
+    colorCounterInstances.brownCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.brown);
+    colorCounterInstances.greenCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.green);
+    colorCounterInstances.redCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.red);
+    colorCounterInstances.whiteCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.white);
 
     /*  apRival.cantidad = bloc.state.battleCardGame.rival.attackPoints;
     hpRival.cantidad = bloc.state.battleCardGame.rival.healthPoints;

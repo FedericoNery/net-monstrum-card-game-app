@@ -19,7 +19,9 @@ abstract class BaseCardComponent<T extends Card> extends SpriteComponent {
   int getUniqueCardId();
 
   void deselectCardEffect() {
-    if (isSelected) {
+    print("UNIQUEID");
+    print(this.card.uniqueIdInGame!);
+    if (isSelected && shapeComponent.isMounted) {
       isSelected = false;
       remove(shapeComponent);
 //      children.first.add(RemoveEffect(delay: 0.1));

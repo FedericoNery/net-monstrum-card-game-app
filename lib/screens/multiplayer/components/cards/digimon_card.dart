@@ -79,7 +79,6 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    print(bloc.state.battleCardGame.phaseGame);
     if (other is DigimonCardComponent &&
         bloc.state.battleCardGame.isBattlePhase()) {
       if (other.isAttacking && !isAttacking && other.rowId != this.rowId) {

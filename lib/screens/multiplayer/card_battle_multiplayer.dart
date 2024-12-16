@@ -127,8 +127,6 @@ class CardBattleMultiplayer extends World
     socket.on("UPDATE GAME DATA", (data) {
       try {
         var jsonMap = json.decode(data);
-        print("UPDATE GAME DATA");
-        print(jsonMap["gameData"]["game"]["estadoDeLaRonda"]);
         if (jsonMap["gameData"]["game"]["estadoDeLaRonda"] == 'SUMMON_PHASE' &&
             !jsonMap["gameData"]["game"]["player1SummonCards"] &&
             !jsonMap["gameData"]["game"]["player2SummonCards"]) {
@@ -699,8 +697,6 @@ class CardBattleMultiplayer extends World
   void summonToDigimonZone() {
     //VALIDAR ACÁ
     if (bloc.state.battleCardGame.player.canSummonAllDigimonSelected()) {
-      print("INVOCA");
-      print(bloc.state.battleCardGame.player.hand.selectedCardsInternalIds);
       socket.emit(PlayerActions.SUMMON_DIGIMONS, {
         "socketId": socket.id,
         "usuarioId": bloc.state.battleCardGame.player.username,

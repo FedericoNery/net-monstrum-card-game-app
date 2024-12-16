@@ -21,7 +21,6 @@ abstract class BaseCardComponent extends SpriteComponent {
 
   void deselectCardEffect() {
     if (isSelected) {
-      print("LLEGO A QUIOTAR");
       isSelected = false;
       remove(shapeComponent);
       //children.first.add(RemoveEffect(delay: 0.1));

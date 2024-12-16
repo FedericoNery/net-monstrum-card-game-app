@@ -57,7 +57,6 @@ class _LoginScreenState extends State<LoginScreen> {
           coinState.setWithoutListener(snapshot.data!.user!["coins"]);
           appState.setUserInformation(
               snapshot.data!.user!, snapshot.data!.token);
-          print("ENTRó");
           return MenuPage();
         }
 

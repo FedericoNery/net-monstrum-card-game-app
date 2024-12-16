@@ -44,8 +44,7 @@ class NewColorCounter extends PositionComponent {
 
     if (_animationProgress < 1.0) {
       _elapsedTime += dt;
-      _animationProgress =
-          (_elapsedTime / _animationDuration).clamp(0.0, _animationDuration);
+      _animationProgress = (_elapsedTime / _animationDuration).clamp(0.0, 1.0);
 
       _currentCantidad = (_currentCantidad +
               (_targetCantidad - _currentCantidad) * _animationProgress)

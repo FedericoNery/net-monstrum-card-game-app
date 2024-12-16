@@ -114,8 +114,6 @@ class _CardShopState extends State<CardShop> {
                             cards[index] = cards[index]
                                 .copyWith(ownedCount: ownedCountCalculated);
                             coins = coins - cards[index].price;
-                            print("COINS");
-                            print(coins);
                             coinState.setCoins(coins);
                             //appState.setCoins(coins);
 

@@ -41,7 +41,6 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
     this.card = cardDigimon;
     this.rowId = isRival ? 1 : 2;
     this.isAttacking = false;
-    debugMode = true;
   }
 
   @override

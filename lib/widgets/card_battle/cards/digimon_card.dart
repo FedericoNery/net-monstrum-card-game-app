@@ -33,7 +33,6 @@ class DigimonCardComponent extends BaseCardComponent
           size: isHidden ? Vector2(64, 85) : Vector2.all(64),
           position: Vector2(x, y),
         ) {
-    debugMode = true;
     this.isHidden = isHidden;
     this.isRival = isRival;
     this.x = x;

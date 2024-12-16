@@ -11,7 +11,7 @@ class NewColorCounter extends PositionComponent {
   int _currentCantidad;
   int _targetCantidad;
   double _animationProgress = 0.0;
-  double _animationDuration = 5.0; // Duración de la animación en segundos.
+  double _animationDuration = 5.0;
   double _elapsedTime = 0.0;
   TextPaint textPaint = TextPaint(
     style: TextStyle(
@@ -32,7 +32,7 @@ class NewColorCounter extends PositionComponent {
   void updateCantidad(int nuevaCantidad) {
     if (nuevaCantidad != _targetCantidad) {
       _animationProgress = 0.0;
-      _animationDuration = nuevaCantidad * 1.0;
+      _animationDuration = nuevaCantidad * 0.3;
       _elapsedTime = 0.0;
       _targetCantidad = nuevaCantidad;
     }
@@ -43,12 +43,10 @@ class NewColorCounter extends PositionComponent {
     super.update(dt);
 
     if (_animationProgress < 1.0) {
-      // Incrementa el tiempo transcurrido y calcula el progreso de la animación.
       _elapsedTime += dt;
       _animationProgress =
           (_elapsedTime / _animationDuration).clamp(0.0, _animationDuration);
 
-      // Interpola entre el valor actual y el objetivo.
       _currentCantidad = (_currentCantidad +
               (_targetCantidad - _currentCantidad) * _animationProgress)
           .round();
@@ -79,19 +77,6 @@ class NewColorCounter extends PositionComponent {
     canvas.drawRRect(textBackgroundRect, textBackgroundPaint);
 
     textPaint.render(canvas, '$_currentCantidad', Vector2(30, 4));
-  }
-}
-
-class ColorCounter extends PositionComponent {
-  final Color color;
-
-  ColorCounter(this.color);
-
-  @override
-  void render(Canvas canvas) {
-    final Paint paint = Paint();
-    paint.color = color;
-    canvas.drawRect(Rect.fromLTWH(0, 0, 20.0, 20.0), paint);
   }
 }
 

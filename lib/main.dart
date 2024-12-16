@@ -35,10 +35,10 @@ void main() async {
 
   FlutterNativeSplash.remove();
 
-  SinglePlayerGameView singlePlayerGameView = SinglePlayerGameView();
-  runApp(singlePlayerGameView);
+  /* SinglePlayerGameView singlePlayerGameView = SinglePlayerGameView();
+  runApp(singlePlayerGameView); */
 
-  /*  final HttpLink httpLink = HttpLink(dotenv.env['API_URL'] ?? '');
+  final HttpLink httpLink = HttpLink(dotenv.env['API_URL'] ?? '');
 
   final GraphQLClient client = GraphQLClient(
     link: httpLink,
@@ -59,5 +59,5 @@ void main() async {
               fontFamily: 'PixelDigivolve',
             ),
             home: LoginScreen(),
-          )))); */
+          ))));
 }

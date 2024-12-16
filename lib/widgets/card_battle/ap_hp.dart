@@ -38,12 +38,10 @@ class ApHpText extends PositionComponent {
     super.update(dt);
 
     if (_animationProgress < 1.0) {
-      // Incrementa el tiempo transcurrido y calcula el progreso de la animación.
       _elapsedTime += dt;
       _animationProgress =
           (_elapsedTime / _animationDuration).clamp(0.0, _animationDuration);
 
-      // Interpola entre el valor actual y el objetivo.
       _currentCantidad = (_currentCantidad +
               (_targetCantidad - _currentCantidad) * _animationProgress)
           .round();
@@ -56,16 +54,9 @@ class ApHpText extends PositionComponent {
 
     this.position = Vector2(x, y);
 
-    /* final Paint colorBackgroundPaint = Paint()..color = backgroundColor;
-    final RRect colorBackgroundRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(0, 0, 22.0, 22.0),
-      Radius.circular(5.0),
-    );
-    canvas.drawRRect(colorBackgroundRect, colorBackgroundPaint); */
-
     final Paint textBackgroundPaint = Paint()..color = backgroundColor;
     final RRect textBackgroundRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(26.0, 0, 36.0, 22.0),
+      Rect.fromLTWH(26.0, 0, 46.0, 22.0),
       Radius.circular(5.0),
     );
     canvas.drawRRect(textBackgroundRect, textBackgroundPaint);
@@ -117,9 +108,9 @@ class ApHPInstances {
   }
 
   updateValues(BattleCardGame battleCardGame) {
-    apRival.cantidad = battleCardGame.rival.attackPoints;
-    hpRival.cantidad = battleCardGame.rival.healthPoints;
-    apPlayer.cantidad = battleCardGame.player.attackPoints;
-    hpPlayer.cantidad = battleCardGame.player.healthPoints;
+    apRival.updateCantidad(battleCardGame.rival.attackPoints);
+    hpRival.updateCantidad(battleCardGame.rival.healthPoints);
+    apPlayer.updateCantidad(battleCardGame.player.attackPoints);
+    hpPlayer.updateCantidad(battleCardGame.player.healthPoints);
   }
 }

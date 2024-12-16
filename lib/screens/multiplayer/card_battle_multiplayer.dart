@@ -11,6 +11,7 @@ import 'package:net_monstrum_card_game/communication/socket_events_names.dart';
 import 'package:net_monstrum_card_game/domain/card/card_base.dart';
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/card_battle_component_multiplayer.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/digimon_card.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/factories/card_widget_factory.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
@@ -33,7 +34,7 @@ import '../singleplayer/rounded_rectangle_component.dart';
 
 class CardBattleMultiplayer extends World
     with
-        HasGameRef,
+        HasGameRef<CardBattleComponentMultiplayer>,
         FlameBlocListenable<CardBattleMultiplayerBloc,
             CardBattleMultiplayerState> {
   IO.Socket socket = SocketManager().socket!;
@@ -147,16 +148,19 @@ class CardBattleMultiplayer extends World
 
     socket.on("START_BATTLE", (data) {
       fadingText.addText("Fase de batalla");
+      //VER SI FUNCIONA
+      removeCardsBeforeBattlePhaseStart();
+
       updateBattleCardGameBloc(data);
     });
 
-    socket.on("PLAYER 1 ATTACKS", (data) {
-      //TODO ANIMACION ATAQUE
+    socket.on("PLAYER 1 ATTACKS", (data) async {
+      await playerCards.attackAnimation();
       updateBattleCardGameBloc(data);
     });
 
-    socket.on("PLAYER 2 ATTACKS", (data) {
-      //TODO ANIMACION ATAQUE
+    socket.on("PLAYER 2 ATTACKS", (data) async {
+      await rivalCards.attackAnimation();
       updateBattleCardGameBloc(data);
     });
 
@@ -482,31 +486,31 @@ class CardBattleMultiplayer extends World
     roundsWinPlayer.text = 'W:${bloc.state.battleCardGame.player.roundsWon}';
     roundsWinRival.text = 'W:${bloc.state.battleCardGame.rival.roundsWon}';
 
-    colorCounterInstances.blackCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.black;
-    colorCounterInstances.blueCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.blue;
-    colorCounterInstances.brownCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.brown;
-    colorCounterInstances.greenCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.green;
-    colorCounterInstances.redCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.red;
-    colorCounterInstances.whiteCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.white;
+    colorCounterInstances.blackCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.black);
+    colorCounterInstances.blueCounter
+        .updateCantidad(bloc.state.battleCardGame.player.energiesCounters.blue);
+    colorCounterInstances.brownCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.brown);
+    colorCounterInstances.greenCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.green);
+    colorCounterInstances.redCounter
+        .updateCantidad(bloc.state.battleCardGame.player.energiesCounters.red);
+    colorCounterInstances.whiteCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.white);
 
-    colorCounterInstances.blackCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.black;
-    colorCounterInstances.blueCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.blue;
-    colorCounterInstances.brownCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.brown;
-    colorCounterInstances.greenCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.green;
-    colorCounterInstances.redCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.red;
-    colorCounterInstances.whiteCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.white;
+    colorCounterInstances.blackCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.black);
+    colorCounterInstances.blueCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.blue);
+    colorCounterInstances.brownCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.brown);
+    colorCounterInstances.greenCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.green);
+    colorCounterInstances.redCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.red);
+    colorCounterInstances.whiteCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.white);
 
     countersCardsSectionPlayer.deckPlayer.cantidad =
         bloc.state.battleCardGame.player.deck.cards.length;
@@ -596,6 +600,76 @@ class CardBattleMultiplayer extends World
           playerCards.card6.card!.isDigimonOrEnergyCard()) {
         remove(playerCards.card6);
       }
+    }
+  }
+
+  void removeCardsBeforeBattlePhaseStart() {
+    if (playerCards.card1.isMounted &&
+        !playerCards.card1.card!.isDigimonCard()) {
+      remove(playerCards.card1);
+    }
+    if (playerCards.card2.isMounted &&
+        !playerCards.card2.card!.isDigimonCard()) {
+      remove(playerCards.card2);
+    }
+    if (playerCards.card3.isMounted &&
+        !playerCards.card3.card!.isDigimonCard()) {
+      remove(playerCards.card3);
+    }
+    if (playerCards.card4.isMounted &&
+        !playerCards.card4.card!.isDigimonCard()) {
+      remove(playerCards.card4);
+    }
+    if (playerCards.card5.isMounted &&
+        !playerCards.card5.card!.isDigimonCard()) {
+      remove(playerCards.card5);
+    }
+    if (playerCards.card6.isMounted &&
+        !playerCards.card6.card!.isDigimonCard()) {
+      remove(playerCards.card6);
+    }
+
+    if (rivalCards.card1.isMounted && !rivalCards.card1.card!.isDigimonCard() ||
+        rivalCards.card1.isMounted &&
+            rivalCards.card1.card!.isDigimonCard() &&
+            !bloc.state.battleCardGame.rival.digimonZone
+                .hasCardById(rivalCards.card1.card.uniqueIdInGame!)) {
+      remove(rivalCards.card1);
+    }
+    if (rivalCards.card2.isMounted && !rivalCards.card2.card!.isDigimonCard() ||
+        rivalCards.card2.isMounted &&
+            rivalCards.card2.card!.isDigimonCard() &&
+            !bloc.state.battleCardGame.rival.digimonZone
+                .hasCardById(rivalCards.card2.card.uniqueIdInGame!)) {
+      remove(rivalCards.card2);
+    }
+    if (rivalCards.card3.isMounted && !rivalCards.card3.card!.isDigimonCard() ||
+        rivalCards.card3.isMounted &&
+            rivalCards.card3.card!.isDigimonCard() &&
+            !bloc.state.battleCardGame.rival.digimonZone
+                .hasCardById(rivalCards.card3.card.uniqueIdInGame!)) {
+      remove(rivalCards.card3);
+    }
+    if (rivalCards.card4.isMounted && !rivalCards.card4.card!.isDigimonCard() ||
+        rivalCards.card4.isMounted &&
+            rivalCards.card4.card!.isDigimonCard() &&
+            !bloc.state.battleCardGame.rival.digimonZone
+                .hasCardById(rivalCards.card4.card.uniqueIdInGame!)) {
+      remove(rivalCards.card4);
+    }
+    if (rivalCards.card5.isMounted && !rivalCards.card5.card!.isDigimonCard() ||
+        rivalCards.card5.isMounted &&
+            rivalCards.card5.card!.isDigimonCard() &&
+            !bloc.state.battleCardGame.rival.digimonZone
+                .hasCardById(rivalCards.card5.card.uniqueIdInGame!)) {
+      remove(rivalCards.card5);
+    }
+    if (rivalCards.card6.isMounted && !rivalCards.card6.card!.isDigimonCard() ||
+        rivalCards.card6.isMounted &&
+            rivalCards.card6.card!.isDigimonCard() &&
+            !bloc.state.battleCardGame.rival.digimonZone
+                .hasCardById(rivalCards.card6.card.uniqueIdInGame!)) {
+      remove(rivalCards.card6);
     }
   }
 

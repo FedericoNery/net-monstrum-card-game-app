@@ -1,8 +1,10 @@
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:net_monstrum_card_game/screens/multiplayer/card_battle_multiplayer.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/components/cards/base_card.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_event.dart';
@@ -19,8 +21,13 @@ import '../../../../domain/card/card_digimon.dart';
 class DigimonCardComponent extends BaseCardComponent<CardDigimon>
     with
         TapCallbacks,
+        CollisionCallbacks,
+        HasWorldReference<CardBattleMultiplayer>,
         FlameBlocListenable<CardBattleMultiplayerBloc,
             CardBattleMultiplayerState> {
+  late int rowId;
+  late bool isAttacking;
+
   DigimonCardComponent(
       CardDigimon cardDigimon, double x, double y, bool isHidden, bool isRival)
       : super(
@@ -32,6 +39,9 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
     this.x = x;
     this.y = y;
     this.card = cardDigimon;
+    this.rowId = isRival ? 1 : 2;
+    this.isAttacking = false;
+    debugMode = true;
   }
 
   @override
@@ -40,6 +50,15 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
         ? 'cards/card_back4.webp'
         : 'digimon/${card.digimonName.replaceAll(' ', '-')}.jpg';
     sprite = await Sprite.load(uri);
+
+    if (isRival) {
+      final xHitboxOrigin = 100.0 - x;
+      final yHitboxOrigin = 35.0 - y;
+      add(RectangleHitbox(
+          position: Vector2(xHitboxOrigin, yHitboxOrigin),
+          size: Vector2(520, 85),
+          isSolid: true));
+    }
   }
 
   @override
@@ -58,6 +77,49 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
     // Implementa la lógica de actualización si es necesario
   }
 
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    print(bloc.state.battleCardGame.phaseGame);
+    if (other is DigimonCardComponent &&
+        bloc.state.battleCardGame.isBattlePhase()) {
+      if (other.isAttacking && !isAttacking && other.rowId != this.rowId) {
+        handleCollision();
+      }
+    }
+  }
+
+  void handleCollision() {
+    rotateAndApplyLightning();
+  }
+
+  void rotateAndApplyLightning() {
+    final rotateEffect = RotateEffect.by(
+      0.1, // Ángulo en radianes (positivo o negativo)
+      EffectController(duration: 0.2, reverseDuration: 0.2), // Rotar y volver
+    );
+    position = Vector2(x + 32, y + 32);
+    anchor = Anchor.center;
+    add(rotateEffect);
+    applyLightningEffect();
+  }
+
+  void applyLightningEffect() async {
+    final lightningSprite = SpriteComponent()
+      ..sprite =
+          await Sprite.load('effects/lightning-2.png') // Tu imagen de rayos
+      ..size = size // Ajustar al tamaño de la carta
+      ..position = Vector2(32, 30) // Coincidir con la posición de la carta
+      ..anchor = Anchor.center;
+
+    add(lightningSprite);
+
+    // Remover el efecto después de un tiempo
+    Future.delayed(Duration(milliseconds: 300), () {
+      lightningSprite.removeFromParent();
+    });
+  }
+
   void reveal() async {
     final sizeEffect = SizeEffect.to(
       Vector2(1, 85),
@@ -72,6 +134,15 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
       sprite = await Sprite.load(uri);
       update(1);
     };
+
+    if (!isRival) {
+      final xHitboxOrigin = 100.0 - x;
+      final yHitboxOrigin = 278.5 - y;
+      add(RectangleHitbox(
+          position: Vector2(xHitboxOrigin, yHitboxOrigin),
+          size: Vector2(520, 85),
+          isSolid: true));
+    }
   }
 
   bool isEnabledToEquip(int internalCardId) {
@@ -84,6 +155,45 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
     return bloc.state.battleCardGame.isSummonPhase() &&
         bloc.state.battleCardGame.player.hand
             .isDigimonCardByInternalId(internalCardId);
+  }
+
+  void attackAnimation() async {
+    isAttacking = true;
+    final scaleEffectUp = ScaleEffect.to(
+      Vector2.all(1.5),
+      EffectController(duration: 0.15, startDelay: 0.05),
+    );
+
+    final attackPathEffect = MoveAlongPathEffect(
+      Path()
+        ..moveTo(0, 0)
+        ..quadraticBezierTo(30, isRival ? 100 : -80, 0, isRival ? 200 : -180),
+      EffectController(duration: 0.3),
+    );
+
+    final returnPathEffect = MoveAlongPathEffect(
+      Path()
+        ..moveTo(0, 0)
+        ..quadraticBezierTo(30, isRival ? -100 : 80, 0, isRival ? -200 : 180),
+      EffectController(duration: 0.3),
+    );
+
+    final scaleEffectDown = ScaleEffect.to(
+      Vector2.all(1.0),
+      EffectController(duration: 0.15, startDelay: 0.05),
+    );
+
+    add(attackPathEffect);
+    add(scaleEffectUp);
+
+    attackPathEffect.onComplete = () {
+      add(scaleEffectDown);
+      add(returnPathEffect);
+    };
+
+    returnPathEffect.onComplete = () {
+      isAttacking = false;
+    };
   }
 
   @override
@@ -102,10 +212,10 @@ class DigimonCardComponent extends BaseCardComponent<CardDigimon>
       add(moveEffect);
 
       if (isSelected) {
-        final shapeComponent = getFlickeringCardBorder();
-        add(shapeComponent);
+        add(super.shapeComponent);
       } else {
-        children.first.add(RemoveEffect(delay: 0.1));
+        remove(super.shapeComponent);
+        //children.first.add(RemoveEffect(delay: 0.1));
       }
 
       if (bloc.state.battleCardGame.player

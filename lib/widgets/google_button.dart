@@ -67,13 +67,13 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
             onPressed: () async {
               try {
                 final usernameText = widget.usernameController.text.trim();
-                if (!isValidEmail(usernameText)) {
+                if (EnvService.loginWithoutGoogle && !isValidEmail(usernameText)) {
                   showError(context, "El email es inválido");
                   return;
                 }
 
                 final user = EnvService.loginWithoutGoogle
-                    ? {"email": widget.usernameController.text.trim()}
+                    ? {"email": usernameText}
                     : await UserController.loginWithGoogle();
 
                 if (user != null && mounted) {

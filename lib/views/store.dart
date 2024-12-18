@@ -23,13 +23,15 @@ class _CardShopState extends State<CardShop> {
   String lastCardIdPurchased = "";
   String userIdLocal = "";
 
-  void buyCard(RunMutation runMutation, CardItem card) {
+  void buyCard(BuildContext context, RunMutation runMutation, CardItem card) {
     if (coins < card.price) {
+      Navigator.of(context).pop();
       showWarning(context, 'No posee suficientes monedas');
       return;
     }
 
     if (card.ownedCount >= card.maxCopies) {
+      Navigator.of(context).pop();
       showWarning(context, 'Alcanzó la máxima cantidad de copias de la carta');
       return;
     }
@@ -142,7 +144,7 @@ class _CardShopState extends State<CardShop> {
                           ),
                         )),
                         onPressed: () {
-                          buyCard(runMutation, card);
+                          buyCard(context, runMutation, card);
                         },
                         child: Text('Comprar'),
                       );
@@ -217,7 +219,7 @@ class _CardShopState extends State<CardShop> {
               return Scaffold(
                 appBar: AppBar(title: Text('Comprar Cartas'), actions: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.fromLTRB(8.0,8.0,32.0,8.0),
                     child: Center(child: Text('Monedas: $coins')),
                   )
                 ]),
@@ -231,7 +233,7 @@ class _CardShopState extends State<CardShop> {
                     if (card.isMaxOwned)
                       return Container(); // No mostrar si ya tiene 4
 
-                    return GestureDetector(
+                    return InkWell(
                       onTap: () =>
                           showCardModal(card, refetch, appState, coinState),
                       child: Center(

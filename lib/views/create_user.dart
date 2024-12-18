@@ -7,6 +7,7 @@ import 'package:net_monstrum_card_game/infrastructure/env_service.dart';
 import 'package:net_monstrum_card_game/services/local_session.dart';
 import 'package:net_monstrum_card_game/state/coin_state.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
+import 'package:net_monstrum_card_game/widgets/shared/snackbar.dart';
 import 'package:provider/provider.dart';
 
 import '../services/firebase_auth_service.dart';
@@ -65,17 +66,13 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
   String _avatarUrlSelected = "hikari.png";
   final TextEditingController _usernameController = TextEditingController();
 
-  void _createUser(AppState appState, CoinState coinState) async {
+  void _createUser(BuildContext context, AppState appState, CoinState coinState) async {
     UsersService usersService = UsersService();
 
     final String username = _usernameController.text.trim();
 
     if (username.isEmpty) {
-      // Mostrar un mensaje de error si el campo está vacío
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor ingresa un nombre de usuario')),
-      );
-
+      showError(context, 'Por favor ingresa un nombre de usuario');
       return;
     }
 
@@ -92,12 +89,7 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
           _avatarUrlSelected);
 
       if (resultMutation != null && user != null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Usuario creado exitosamente'),
-            backgroundColor: Colors.green.shade900,
-          ),
-        );
+        showSuccess(context, 'Usuario creado exitosamente');
 
         final accessTokenFromApi = await usersService.fetchUserWithEmail(
             EnvService.registerWithoutGoogle
@@ -177,7 +169,7 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
                 const SizedBox(height: 16),
                 StyledButton(
                   text: "Crear usuario",
-                  onPressed: () => _createUser(appState, coinState),
+                  onPressed: () => _createUser(context, appState, coinState),
                 ),
               ],
             ),

@@ -124,12 +124,14 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                   ),
                 ),
                 builder: (RunMutation runMutation, QueryResult? result) {
-                  return IconButton(
+                  return Padding(
+                    padding: EdgeInsets.fromLTRB(8.0, 8.0, 32.0, 8.0),
+                    child: IconButton(
                     icon: Icon(Icons.save),
                     onPressed: () => _onSaveDeck(
                         runMutation, // "6670647552c07bc9e106083d"
                         widget.folderId),
-                  );
+                  ));
                 },
               )),
         ],

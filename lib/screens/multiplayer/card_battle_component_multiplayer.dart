@@ -10,7 +10,8 @@ import 'package:net_monstrum_card_game/screens/multiplayer/card_battle_multiplay
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/multiplayer/state/card_battle_state.dart';
 
-class CardBattleComponentMultiplayer extends FlameGame {
+class CardBattleComponentMultiplayer extends FlameGame
+    with HasCollisionDetection {
   final BattleCardGame battleCardGame;
   Function redirectToHomePage;
 

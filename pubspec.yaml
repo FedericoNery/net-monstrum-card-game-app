@@ -80,6 +80,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/digimon/
+    - assets/images/effects/
     - assets/images/playmat/
     - assets/images/cards/
     - assets/images/equipments/

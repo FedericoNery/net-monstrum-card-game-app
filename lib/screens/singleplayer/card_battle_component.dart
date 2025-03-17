@@ -10,7 +10,7 @@ import 'package:net_monstrum_card_game/screens/singleplayer/card_battle.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_state.dart';
 
-class CardBattleComponent extends FlameGame {
+class CardBattleComponent extends FlameGame with HasCollisionDetection {
   final BattleCardGame battleCardGame;
 
   CardBattleComponent(this.battleCardGame)
@@ -21,7 +21,7 @@ class CardBattleComponent extends FlameGame {
   @override
   Future<void> onLoad() async {
     final backgroundImage = await images.load("backgrounds/fondo5.jpeg");
-    final _imagesNames = [ParallaxImageData("backgrounds/fondo5-min.jpeg")];
+    final _imagesNames = [ParallaxImageData("backgrounds/fondo5.jpeg")];
 
     final screenSize = WidgetsBinding.instance!.window.physicalSize;
 

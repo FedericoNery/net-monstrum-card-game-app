@@ -8,6 +8,7 @@ import 'package:net_monstrum_card_game/graphql/queries.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
 import 'package:net_monstrum_card_game/state/coin_state.dart';
 import 'package:net_monstrum_card_game/widgets/deck_editor/card_color.dart';
+import 'package:net_monstrum_card_game/widgets/shared/snackbar.dart';
 import 'package:provider/provider.dart';
 
 class CardShop extends StatefulWidget {
@@ -22,24 +23,16 @@ class _CardShopState extends State<CardShop> {
   String lastCardIdPurchased = "";
   String userIdLocal = "";
 
-  void buyCard(RunMutation runMutation, CardItem card) {
+  void buyCard(BuildContext context, RunMutation runMutation, CardItem card) {
     if (coins < card.price) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('No posee suficientes monedas'),
-          backgroundColor: Colors.amber.shade600,
-        ),
-      );
+      Navigator.of(context).pop();
+      showWarning(context, 'No posee suficientes monedas');
       return;
     }
 
     if (card.ownedCount >= card.maxCopies) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Alcanzó la máxima cantidad de copias de la carta'),
-          backgroundColor: Colors.amber.shade600,
-        ),
-      );
+      Navigator.of(context).pop();
+      showWarning(context, 'Alcanzó la máxima cantidad de copias de la carta');
       return;
     }
 
@@ -99,27 +92,18 @@ class _CardShopState extends State<CardShop> {
                             ['reachedMaxCopiesOfCard'];
 
                         if (cardNotFound) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Carta no encontrada')),
-                          );
+                          showError(context, 'Alguna carta no fué encontrada');
                           return;
                         }
 
                         if (insuficientCoins) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('No posee suficientes monedas')),
-                          );
+                          showError(context, 'No posee suficientes monedas');
                           return;
                         }
 
                         if (reachedMaxCopiesOfCard) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'Alcanzó la cantidad máxima de cartas')),
-                          );
+                          showError(
+                              context, 'Alcanzó la cantidad máxima de cartas');
                           return;
                         }
 
@@ -132,8 +116,6 @@ class _CardShopState extends State<CardShop> {
                             cards[index] = cards[index]
                                 .copyWith(ownedCount: ownedCountCalculated);
                             coins = coins - cards[index].price;
-                            print("COINS");
-                            print(coins);
                             coinState.setCoins(coins);
                             //appState.setCoins(coins);
 
@@ -142,12 +124,7 @@ class _CardShopState extends State<CardShop> {
                             }
                           }
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('La compra fué exitosa'),
-                              backgroundColor: Colors.green.shade900,
-                            ),
-                          );
+                          showSuccess(context, 'La compra fué exitosa');
                           refetch?.call();
                           Navigator.of(context).pop();
                         }
@@ -167,7 +144,7 @@ class _CardShopState extends State<CardShop> {
                           ),
                         )),
                         onPressed: () {
-                          buyCard(runMutation, card);
+                          buyCard(context, runMutation, card);
                         },
                         child: Text('Comprar'),
                       );
@@ -242,7 +219,7 @@ class _CardShopState extends State<CardShop> {
               return Scaffold(
                 appBar: AppBar(title: Text('Comprar Cartas'), actions: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.fromLTRB(8.0,8.0,32.0,8.0),
                     child: Center(child: Text('Monedas: $coins')),
                   )
                 ]),
@@ -256,7 +233,7 @@ class _CardShopState extends State<CardShop> {
                     if (card.isMaxOwned)
                       return Container(); // No mostrar si ya tiene 4
 
-                    return GestureDetector(
+                    return InkWell(
                       onTap: () =>
                           showCardModal(card, refetch, appState, coinState),
                       child: Center(

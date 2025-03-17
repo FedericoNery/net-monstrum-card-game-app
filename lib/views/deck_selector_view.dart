@@ -31,8 +31,6 @@ class _DeckSelectionScreenState extends State<DeckSelectionScreen> {
     final appState = Provider.of<AppState>(context, listen: false);
     final client = GraphQLProvider.of(context).value;
 
-    print("INFO");
-    print(appState.userInformation?["id"]);
     final QueryResult result = await client.query(
       QueryOptions(
         document: gql(getUserByIdQuery),

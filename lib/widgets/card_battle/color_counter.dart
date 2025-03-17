@@ -8,6 +8,17 @@ class NewColorCounter extends PositionComponent {
   final double y;
   int cantidad;
   final Color backgroundColor;
+  int _currentCantidad;
+  int _targetCantidad;
+  double _animationProgress = 0.0;
+  double _animationDuration = 5.0;
+  double _elapsedTime = 0.0;
+  TextPaint textPaint = TextPaint(
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: 12,
+    ),
+  );
 
   NewColorCounter({
     required this.color,
@@ -15,7 +26,31 @@ class NewColorCounter extends PositionComponent {
     required this.y,
     required this.cantidad,
     this.backgroundColor = const Color(0xFF333333),
-  });
+  })  : _currentCantidad = cantidad,
+        _targetCantidad = cantidad;
+
+  void updateCantidad(int nuevaCantidad) {
+    if (nuevaCantidad != _targetCantidad) {
+      _animationProgress = 0.0;
+      _animationDuration = nuevaCantidad * 0.3;
+      _elapsedTime = 0.0;
+      _targetCantidad = nuevaCantidad;
+    }
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    if (_animationProgress < 1.0) {
+      _elapsedTime += dt;
+      _animationProgress = (_elapsedTime / _animationDuration).clamp(0.0, 1.0);
+
+      _currentCantidad = (_currentCantidad +
+              (_targetCantidad - _currentCantidad) * _animationProgress)
+          .round();
+    }
+  }
 
   @override
   void render(Canvas canvas) {
@@ -40,26 +75,7 @@ class NewColorCounter extends PositionComponent {
     );
     canvas.drawRRect(textBackgroundRect, textBackgroundPaint);
 
-    final TextPaint textPaint = TextPaint(
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 12,
-      ),
-    );
-    textPaint.render(canvas, '$cantidad', Vector2(30, 4));
-  }
-}
-
-class ColorCounter extends PositionComponent {
-  final Color color;
-
-  ColorCounter(this.color);
-
-  @override
-  void render(Canvas canvas) {
-    final Paint paint = Paint();
-    paint.color = color;
-    canvas.drawRect(Rect.fromLTWH(0, 0, 20.0, 20.0), paint);
+    textPaint.render(canvas, '$_currentCantidad', Vector2(30, 4));
   }
 }
 

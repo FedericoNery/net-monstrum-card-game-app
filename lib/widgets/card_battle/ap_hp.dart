@@ -5,9 +5,14 @@ import 'package:net_monstrum_card_game/domain/game.dart';
 class ApHpText extends PositionComponent {
   String text;
   int cantidad;
+  int cantidadActual;
+  int cantidadObjetivo;
   final double x;
   final double y;
   final Color backgroundColor;
+  double progresoAnimacion = 0.0; // 1.0 sería el "100%" de la animación "completada"
+  double duracionAnimacion = 5.0; 
+  double tiempoEnCurso = 0.0;
 
   ApHpText({
     required this.text,
@@ -15,7 +20,33 @@ class ApHpText extends PositionComponent {
     required this.x,
     required this.y,
     this.backgroundColor = const Color(0xFF333333),
-  });
+  })  : cantidadActual = cantidad,
+        cantidadObjetivo = cantidad;
+
+  void updateCantidad(int nuevaCantidad) {
+    if (nuevaCantidad != cantidadObjetivo) {
+      progresoAnimacion = 0.0;
+      duracionAnimacion =
+          nuevaCantidad.abs() - cantidadObjetivo.abs() > 50 ? 5.0 : 2.5;
+      tiempoEnCurso = 0.0;
+      cantidadObjetivo = nuevaCantidad;
+    }
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    if (progresoAnimacion < 1.0) {
+      tiempoEnCurso += dt;
+      progresoAnimacion =
+          (tiempoEnCurso / duracionAnimacion).clamp(0.0, duracionAnimacion);
+
+      cantidadActual = (cantidadActual +
+              (cantidadObjetivo - cantidadActual) * progresoAnimacion)
+          .round();
+    }
+  }
 
   @override
   void render(Canvas canvas) {
@@ -23,16 +54,9 @@ class ApHpText extends PositionComponent {
 
     this.position = Vector2(x, y);
 
-    /* final Paint colorBackgroundPaint = Paint()..color = backgroundColor;
-    final RRect colorBackgroundRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(0, 0, 22.0, 22.0),
-      Radius.circular(5.0),
-    );
-    canvas.drawRRect(colorBackgroundRect, colorBackgroundPaint); */
-
     final Paint textBackgroundPaint = Paint()..color = backgroundColor;
     final RRect textBackgroundRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(26.0, 0, 36.0, 22.0),
+      Rect.fromLTWH(26.0, 0, 46.0, 22.0),
       Radius.circular(5.0),
     );
     canvas.drawRRect(textBackgroundRect, textBackgroundPaint);
@@ -43,7 +67,7 @@ class ApHpText extends PositionComponent {
         fontSize: 12,
       ),
     );
-    textPaint.render(canvas, '$text $cantidad', Vector2(30, 4));
+    textPaint.render(canvas, '$text $cantidadActual', Vector2(30, 4));
   }
 }
 
@@ -84,9 +108,9 @@ class ApHPInstances {
   }
 
   updateValues(BattleCardGame battleCardGame) {
-    apRival.cantidad = battleCardGame.rival.attackPoints;
-    hpRival.cantidad = battleCardGame.rival.healthPoints;
-    apPlayer.cantidad = battleCardGame.player.attackPoints;
-    hpPlayer.cantidad = battleCardGame.player.healthPoints;
+    apRival.updateCantidad(battleCardGame.rival.attackPoints);
+    hpRival.updateCantidad(battleCardGame.rival.healthPoints);
+    apPlayer.updateCantidad(battleCardGame.player.attackPoints);
+    hpPlayer.updateCantidad(battleCardGame.player.healthPoints);
   }
 }

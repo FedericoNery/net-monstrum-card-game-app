@@ -31,6 +31,10 @@ class UserFromLocalSession {
   bool isTokenExpiredOrNotExists = true;
 
   UserFromLocalSession(this.token, this.user, this.isTokenExpiredOrNotExists);
+
+  bool hasInformationInLocalStorage() {
+    return !isTokenExpiredOrNotExists && user != null && token.isNotEmpty;
+  }
 }
 
 Future<UserFromLocalSession> getUserFromLocalSession() async {

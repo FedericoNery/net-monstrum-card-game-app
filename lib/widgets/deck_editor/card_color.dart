@@ -17,7 +17,6 @@ class CardColor {
       CardColor.WHITE: Colors.white,
       CardColor.GREEN: Colors.green,
     };
-    //print(color);
     return color == null ? Colors.grey : colorStringToColorsFlutterMap[color]!;
   }
 }

@@ -8,6 +8,7 @@ import 'package:net_monstrum_card_game/domain/card/card_base.dart' as cardBase;
 import 'package:net_monstrum_card_game/domain/card/card_digimon.dart';
 import 'package:net_monstrum_card_game/domain/game.dart';
 import 'package:net_monstrum_card_game/domain/game/digimon_zone.dart';
+import 'package:net_monstrum_card_game/screens/singleplayer/card_battle_component.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/rounded_rectangle_component.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_bloc.dart';
 import 'package:net_monstrum_card_game/screens/singleplayer/state/card_battle_event.dart';
@@ -27,7 +28,9 @@ import '../../widgets/shared/icon_with_counter.dart';
 import 'dart:ui' as ui;
 
 class CardBattle extends World
-    with HasGameRef, FlameBlocListenable<CardBattleBloc, CardBattleState> {
+    with
+        HasGameRef<CardBattleComponent>,
+        FlameBlocListenable<CardBattleBloc, CardBattleState> {
   late ParallaxComponent backgroundParallax;
 
   final enabledMusic = false;
@@ -109,9 +112,9 @@ class CardBattle extends World
       minPlayers: 2,
       maxPlayers: 2,
     );
-    if (enabledMusic) {
+    /* if (enabledMusic) {
       startBgmMusic();
-    }
+    } */
 
     fadingText = FadingTextComponent(
         screenWidth: screenSizeWidth / 850,
@@ -164,11 +167,11 @@ class CardBattle extends World
       scale: Vector2.all(0.8),
     ); */
 
-    summonDigimonButton.position = Vector2(650, 50);
+    summonDigimonButton.position = Vector2(650, 175);
     summonDigimonButton.size = Vector2(100, 50);
     summonDigimonButton.tapUpCallback = nextPhase;
 
-    activateEquipmentButton.position = Vector2(650, 50);
+    activateEquipmentButton.position = Vector2(650, 175);
     activateEquipmentButton.size = Vector2(100, 50);
     activateEquipmentButton.tapUpCallback = nextToBattlePhase;
 
@@ -524,36 +527,42 @@ class CardBattle extends World
     int? activatedEnergyCardId =
         bloc.state.battleCardGame.activatedEnergyCardId;
 
-    colorCounterInstances.blackCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.black;
-    colorCounterInstances.blueCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.blue;
-    colorCounterInstances.brownCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.brown;
-    colorCounterInstances.greenCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.green;
-    colorCounterInstances.redCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.red;
-    colorCounterInstances.whiteCounter.cantidad =
-        bloc.state.battleCardGame.player.energiesCounters.white;
+    colorCounterInstances.blackCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.black);
+    colorCounterInstances.blueCounter
+        .updateCantidad(bloc.state.battleCardGame.player.energiesCounters.blue);
+    colorCounterInstances.brownCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.brown);
+    colorCounterInstances.greenCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.green);
+    colorCounterInstances.redCounter
+        .updateCantidad(bloc.state.battleCardGame.player.energiesCounters.red);
+    colorCounterInstances.whiteCounter.updateCantidad(
+        bloc.state.battleCardGame.player.energiesCounters.white);
 
-    colorCounterInstances.blackCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.black;
-    colorCounterInstances.blueCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.blue;
-    colorCounterInstances.brownCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.brown;
-    colorCounterInstances.greenCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.green;
-    colorCounterInstances.redCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.red;
-    colorCounterInstances.whiteCounterRival.cantidad =
-        bloc.state.battleCardGame.rival.energiesCounters.white;
+    colorCounterInstances.blackCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.black);
+    colorCounterInstances.blueCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.blue);
+    colorCounterInstances.brownCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.brown);
+    colorCounterInstances.greenCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.green);
+    colorCounterInstances.redCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.red);
+    colorCounterInstances.whiteCounterRival
+        .updateCantidad(bloc.state.battleCardGame.rival.energiesCounters.white);
 
-    apRival.cantidad = bloc.state.battleCardGame.rival.attackPoints;
+    /*  apRival.cantidad = bloc.state.battleCardGame.rival.attackPoints;
     hpRival.cantidad = bloc.state.battleCardGame.rival.healthPoints;
     apPlayer.cantidad = bloc.state.battleCardGame.player.attackPoints;
-    hpPlayer.cantidad = bloc.state.battleCardGame.player.healthPoints;
+    hpPlayer.cantidad = bloc.state.battleCardGame.player.healthPoints; */
+
+    apRival.updateCantidad(bloc.state.battleCardGame.rival.attackPoints);
+    hpRival.updateCantidad(bloc.state.battleCardGame.rival.healthPoints);
+
+    apPlayer.updateCantidad(bloc.state.battleCardGame.player.attackPoints);
+    hpPlayer.updateCantidad(bloc.state.battleCardGame.player.healthPoints);
 
     roundsWinPlayer.text = 'W:${bloc.state.battleCardGame.player.roundsWon}';
     roundsWinRival.text = 'W:${bloc.state.battleCardGame.rival.roundsWon}';
@@ -638,17 +647,66 @@ class CardBattle extends World
   }
 
   void battlePhase() async {
+    removeCardsBeforeBattlePhaseStart();
     bloc.add(BattlePhaseInit());
     await Future.delayed(Duration(seconds: 3));
 
     bloc.add(BattlePhasePlayerAttacksRival());
-    await Future.delayed(Duration(seconds: 3));
+    await playerCards.attackAnimation();
+    await Future.delayed(Duration(seconds: 5));
 
     bloc.add(BattlePhaseRivalAttacksPlayer());
-    await Future.delayed(Duration(seconds: 3));
+    await rivalCards.attackAnimation();
+    await Future.delayed(Duration(seconds: 5));
 
     bloc.add(BattlePhaseFinishRound());
     fadingTextQueueComponent.addText("Batalla finalizada...");
+  }
+
+  void removeCardsBeforeBattlePhaseStart() {
+    if (playerCards.card1.isMounted &&
+        !playerCards.card1.card!.isDigimonCard()) {
+      remove(playerCards.card1);
+    }
+    if (playerCards.card2.isMounted &&
+        !playerCards.card2.card!.isDigimonCard()) {
+      remove(playerCards.card2);
+    }
+    if (playerCards.card3.isMounted &&
+        !playerCards.card3.card!.isDigimonCard()) {
+      remove(playerCards.card3);
+    }
+    if (playerCards.card4.isMounted &&
+        !playerCards.card4.card!.isDigimonCard()) {
+      remove(playerCards.card4);
+    }
+    if (playerCards.card5.isMounted &&
+        !playerCards.card5.card!.isDigimonCard()) {
+      remove(playerCards.card5);
+    }
+    if (playerCards.card6.isMounted &&
+        !playerCards.card6.card!.isDigimonCard()) {
+      remove(playerCards.card6);
+    }
+
+    if (rivalCards.card1.isMounted && !rivalCards.card1.card!.isDigimonCard()) {
+      remove(rivalCards.card1);
+    }
+    if (rivalCards.card2.isMounted && !rivalCards.card2.card!.isDigimonCard()) {
+      remove(rivalCards.card2);
+    }
+    if (rivalCards.card3.isMounted && !rivalCards.card3.card!.isDigimonCard()) {
+      remove(rivalCards.card3);
+    }
+    if (rivalCards.card4.isMounted && !rivalCards.card4.card!.isDigimonCard()) {
+      remove(rivalCards.card4);
+    }
+    if (rivalCards.card5.isMounted && !rivalCards.card5.card!.isDigimonCard()) {
+      remove(rivalCards.card5);
+    }
+    if (rivalCards.card6.isMounted && !rivalCards.card6.card!.isDigimonCard()) {
+      remove(rivalCards.card6);
+    }
   }
 
   void removeAllCards() {

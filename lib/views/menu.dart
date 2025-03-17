@@ -85,7 +85,7 @@ class _MenuPageState extends State<MenuPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
-            label: 'Multiplayer',
+            label: 'Jugar en línea',
           ),
         ],
         currentIndex: _selectedIndex,

@@ -4,6 +4,7 @@ import 'package:net_monstrum_card_game/app_state.dart';
 import 'package:net_monstrum_card_game/graphql/mutations.dart';
 import 'package:net_monstrum_card_game/graphql/queries.dart';
 import 'package:net_monstrum_card_game/infrastructure/graphql_client.dart';
+import 'package:net_monstrum_card_game/widgets/shared/snackbar.dart';
 import 'package:provider/provider.dart';
 
 import '../domain/editor_deck/card_deck_editor.dart';
@@ -50,9 +51,7 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
 
   void _onSaveDeck(RunMutation runMutation, String folderId) {
     List<String> cardsInput = deck.map((card) => card.id).toList();
-    print(cardsInput);
-    print(localUserId);
-    print(folderId);
+
     runMutation({
       'userId': localUserId, //"670f2cd4798b3b58a3eb08e3", //
       'folderId': folderId,
@@ -65,10 +64,6 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
     GraphQlClientManager graphQlClientManager = GraphQlClientManager();
     final appState = Provider.of<AppState>(context);
     String userId = appState.userInformation?["id"] ?? "";
-/*     print("localUserId");
-    print(localUserId);
-    print("widget.folderId");
-    print(widget.folderId); */
 
     return Scaffold(
       appBar: AppBar(
@@ -114,12 +109,8 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                       );
                       return;
                     }
-
                     if (successful) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('La edición del mazo fué exitosa')),
-                      );
+                      showSuccess(context, 'La edición del mazo fué exitosa');
                       final appState =
                           Provider.of<AppState>(context, listen: false);
                       appState.notifyDeckUpdated();
@@ -133,12 +124,14 @@ class _DeckEditorScreenState extends State<DeckEditorScreen> {
                   ),
                 ),
                 builder: (RunMutation runMutation, QueryResult? result) {
-                  return IconButton(
+                  return Padding(
+                    padding: EdgeInsets.fromLTRB(8.0, 8.0, 32.0, 8.0),
+                    child: IconButton(
                     icon: Icon(Icons.save),
                     onPressed: () => _onSaveDeck(
                         runMutation, // "6670647552c07bc9e106083d"
                         widget.folderId),
-                  );
+                  ));
                 },
               )),
         ],

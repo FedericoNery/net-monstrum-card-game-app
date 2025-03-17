@@ -117,6 +117,33 @@ class CardWidgetFactory {
     return EnergyCardComponent(card as CardEnergy, x, y, isHidden, isRival);
   }
 
+  Future attackAnimation() async {
+    if (card1.isMounted && card1 is DigimonCardComponent) {
+      (card1 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+    if (card2.isMounted && card2 is DigimonCardComponent) {
+      (card2 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+    if (card3.isMounted && card3 is DigimonCardComponent) {
+      (card3 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+    if (card4.isMounted && card4 is DigimonCardComponent) {
+      (card4 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+    if (card5.isMounted && card5 is DigimonCardComponent) {
+      (card5 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+    if (card6.isMounted && card6 is DigimonCardComponent) {
+      (card6 as DigimonCardComponent).attackAnimation();
+      await Future.delayed(Duration(seconds: 1));
+    }
+  }
+
   void revealSelectedCards() {
     if (!card1.isRemoved && tamer.wasSummonedCard(card1.getUniqueCardId())) {
       card1.reveal();
@@ -250,6 +277,13 @@ class CardWidgetFactory {
     };
 
     moveEffect6.onComplete = () {
+      card1.setPosition(CardsMeasures.card1x, CardsMeasures.card1y);
+      card2.setPosition(CardsMeasures.card2x, CardsMeasures.card2y);
+      card3.setPosition(CardsMeasures.card3x, CardsMeasures.card3y);
+      card4.setPosition(CardsMeasures.card4x, CardsMeasures.card4y);
+      card5.setPosition(CardsMeasures.card5x, CardsMeasures.card5y);
+      card6.setPosition(CardsMeasures.card6x, CardsMeasures.card6y);
+
       card1.reveal();
       card2.reveal();
       card3.reveal();

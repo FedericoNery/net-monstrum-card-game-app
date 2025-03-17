@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:net_monstrum_card_game/app_state.dart';
+import 'package:net_monstrum_card_game/infrastructure/env_service.dart';
 import 'package:net_monstrum_card_game/services/local_session.dart';
 import 'package:net_monstrum_card_game/state/coin_state.dart';
 import 'package:net_monstrum_card_game/views/menu.dart';
+import 'package:net_monstrum_card_game/widgets/shared/snackbar.dart';
 import 'package:provider/provider.dart';
 
 import '../services/firebase_auth_service.dart';
@@ -64,78 +66,65 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
   String _avatarUrlSelected = "hikari.png";
   final TextEditingController _usernameController = TextEditingController();
 
-  void _createUser(AppState appState, CoinState coinState) async {
+  void _createUser(BuildContext context, AppState appState, CoinState coinState) async {
     UsersService usersService = UsersService();
 
     final String username = _usernameController.text.trim();
 
     if (username.isEmpty) {
-      // Mostrar un mensaje de error si el campo está vacío
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor ingresa un nombre de usuario')),
-      );
-    } else {
-      try {
-        bool registerWithoutGoogle =
-            dotenv.env['REGISTER_WITHOUT_GOOGLE']?.toLowerCase() == 'true';
+      showError(context, 'Por favor ingresa un nombre de usuario');
+      return;
+    }
 
-        final user = registerWithoutGoogle
-            ? {"email": "$username@email.com"}
-            : await UserController.loginWithGoogle();
+    try {
+      final user = EnvService.registerWithoutGoogle
+          ? {"email": "$username@email.com"}
+          : await UserController.loginWithGoogle();
 
-        final resultMutation = await usersService.createUserWithEmail(
-            registerWithoutGoogle
+      final resultMutation = await usersService.createUserWithEmail(
+          EnvService.registerWithoutGoogle
+              ? (user as Map<String, String>)["email"]!
+              : (user as User?)!.email!,
+          username,
+          _avatarUrlSelected);
+
+      if (resultMutation != null && user != null && mounted) {
+        showSuccess(context, 'Usuario creado exitosamente');
+
+        final accessTokenFromApi = await usersService.fetchUserWithEmail(
+            EnvService.registerWithoutGoogle
                 ? (user as Map<String, String>)["email"]!
-                : (user as User?)!.email!,
-            username,
-            _avatarUrlSelected);
+                : (user as User?)!.email!);
 
-        if (resultMutation != null && user != null && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Usuario creado exitosamente')),
-          );
-
-          final accessTokenFromApi = await usersService.fetchUserWithEmail(
-              registerWithoutGoogle
-                  ? (user as Map<String, String>)["email"]!
-                  : (user as User?)!.email!);
-
-          if (accessTokenFromApi == null) {
-            throw Exception("User not found in app");
-          } else {
-            Map<String, dynamic> decodedToken =
-                JwtDecoder.decode(accessTokenFromApi);
-
-            DateTime expirationDate =
-                JwtDecoder.getExpirationDate(accessTokenFromApi);
-
-            await saveUserSession(accessTokenFromApi, expirationDate);
-
-            //Hacer consulta sobre cuantas monedas tiene el usuario y setear state
-            coinState.setWithoutListener(decodedToken["coins"]);
-            appState.setUserInformation(decodedToken, accessTokenFromApi);
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => Scaffold(
-                      backgroundColor: Colors.white,
-                      body: Center(
-                        child: MenuPage(),
-                      ),
-                    )));
-          }
+        if (accessTokenFromApi == null) {
+          showError(context, "Usuario no encontrado");
+          return;
         }
-      } on FirebaseAuthException catch (error) {
-        print(error.message);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-          error.message ?? "Something went wrong",
-        )));
-      } catch (error) {
-        print(error);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-          error.toString(),
-        )));
+        Map<String, dynamic> decodedToken =
+            JwtDecoder.decode(accessTokenFromApi);
+
+        DateTime expirationDate =
+            JwtDecoder.getExpirationDate(accessTokenFromApi);
+
+        await saveUserSession(accessTokenFromApi, expirationDate);
+
+        //Hacer consulta sobre cuantas monedas tiene el usuario y setear state
+        coinState.setWithoutListener(decodedToken["coins"]);
+        appState.setUserInformation(decodedToken, accessTokenFromApi);
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => Scaffold(
+                  backgroundColor: Colors.white,
+                  body: Center(
+                    child: MenuPage(),
+                  ),
+                )));
       }
+    } on FirebaseAuthException catch (error) {
+      print(error.message);
+      showError(context, error.message);
+    } catch (error) {
+      print(error);
+      showError(context, error.toString());
     }
   }
 
@@ -143,6 +132,14 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
     setState(() {
       _avatarUrlSelected = avatarUrl;
     });
+  }
+
+  void showError(BuildContext context, String? message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red.shade600,
+        content: Text(
+          message ?? "Ocurrió un error",
+        )));
   }
 
   @override
@@ -172,7 +169,7 @@ class _CreateUserWidgetState extends State<CreateUserWidget> {
                 const SizedBox(height: 16),
                 StyledButton(
                   text: "Crear usuario",
-                  onPressed: () => _createUser(appState, coinState),
+                  onPressed: () => _createUser(context, appState, coinState),
                 ),
               ],
             ),

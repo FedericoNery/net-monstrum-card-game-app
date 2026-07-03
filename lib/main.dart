@@ -16,7 +16,7 @@ import 'views/single_player_game_view.dart';
 // ...
 
 void main() async {
-  await dotenv.load(fileName: "../dotenv.txt");
+  await dotenv.load();
   if (!EnvService.skipGoogleSession) {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);

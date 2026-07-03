@@ -16,7 +16,7 @@ class UsersService {
     _usersList.add(User(3, 'Usuario3', 'Apellido3', 'user3',
         'usuario3@email.com', 300, 'password3', [1, 2]));
 
-    final HttpLink httpLink = HttpLink('http://localhost:5000/graphql');
+    final HttpLink httpLink = HttpLink('http://10.0.2.2:5000/graphql');
     client = GraphQLClient(cache: GraphQLCache(), link: httpLink);
   }
 

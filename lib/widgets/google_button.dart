@@ -56,7 +56,7 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
               side: BorderSide(color: Colors.grey),
             ),
             icon: Image.asset(
-              'images/google-logo.png',
+              'assets/images/google-logo.png',
               height: 24,
               width: 24,
             ),
@@ -67,7 +67,8 @@ class _GoogleSignInButton extends State<GoogleSignInButtonState> {
             onPressed: () async {
               try {
                 final usernameText = widget.usernameController.text.trim();
-                if (EnvService.loginWithoutGoogle && !isValidEmail(usernameText)) {
+                if (EnvService.loginWithoutGoogle &&
+                    !isValidEmail(usernameText)) {
                   showError(context, "El email es inválido");
                   return;
                 }
